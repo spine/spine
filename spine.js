@@ -400,6 +400,10 @@
     toJSON: function(){
       return(this.attributes());
     },
+    
+    exists: function(){
+      return(this.id && this.id in this.parent.records);
+    },
 
     // Private
 
