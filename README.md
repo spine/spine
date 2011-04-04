@@ -1,6 +1,6 @@
-# Spine.js
+# Spine
 
-Spine.js is a lightweight library for building JavaScript applications. Some parts, like its controllers, are largely based on on [Backbone](http://documentcloud.github.com/backbone), others are based on some of the ideas behind [Super.js](http://github.com/maccman/super.js).
+Spine is a lightweight library for building JavaScript applications. Some parts, like its controllers, are largely based on on [Backbone](http://documentcloud.github.com/backbone), others are based on some of the ideas behind [Super.js](http://github.com/maccman/super.js).
 
 More documentation is coming soon, but for now checkout the example code in the [Todos](https://github.com/maccman/spine.todos) and [Holla](http://github.com/maccman/holla) applications. 
 

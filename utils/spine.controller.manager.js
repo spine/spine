@@ -1,4 +1,4 @@
-(function(){
+(function(Spine, $){
 
 var Manager = Spine.Controller.Manager = Spine.Klass.create();
 Manager.include(Spine.Events);
@@ -27,7 +27,7 @@ Manager.include({
 
 Spine.Controller.include({
   active: function(callback){
-    callback ? this.bind("active", callback) : this.trigger("active");
+    $.isFunction(callback) ? this.bind("active", callback) : this.trigger("active");
     return this;
   },
   
@@ -46,4 +46,4 @@ Spine.Controller.include({
   }
 });
 
-})();
+})(Spine, jQuery);

@@ -24,6 +24,8 @@ var ajaxSync = function(e, method, record){
     dataType:     "json",
     processData:  false
   };
+        
+  if (Spine.Model._noSync) return;
     
   params.url = getUrl(record);
   if (!params.url) throw("Invalid URL");
@@ -43,7 +45,6 @@ var ajaxSync = function(e, method, record){
   $.ajax(params);
 };
 
-
 Spine.Model.Ajax = {
   extended: function(){    
     this.sync(ajaxSync);
@@ -56,7 +57,13 @@ Spine.Model.Ajax = {
 Spine.Model.extend({
   url: function() {
     return "/" + this.name.toLowerCase() + "s"
-  }  
+  },
+  
+  noSync: function(callback){
+    Spine.Model._noSync = true;
+    callback.apply(callback, arguments);
+    Spine.Model._noSync = false;
+  }
 });
 
 Spine.Model.include({

@@ -5,7 +5,7 @@ Spine.Model.Local = {
   },
     
   saveLocal: function(){
-    var result = JSON.stringify(this.recordsValues());
+    var result = JSON.stringify(this);
     localStorage[this.name] = result;
   },
 
