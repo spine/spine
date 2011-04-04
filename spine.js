@@ -7,7 +7,7 @@
     Spine = this.Spine = {};
   }
   
-  Spine.version = "0.0.1";
+  Spine.version = "0.0.2";
   
   var $ = this.jQuery || this.Zepto;
   
@@ -36,7 +36,6 @@
     trigger: function() {
       var args = makeArray(arguments);
       var ev   = args.shift();
-      args.splice(0, 0, {type: ev, target: this});
             
       var list, calls, i, l;
       if (!(calls = this._callbacks)) return this;
@@ -190,9 +189,15 @@
      this.records = {};
      this.attributes = [];
      
-     this.bind("create update destroy", function(e, record){
-       this.trigger("change", e.type, record);
-     });
+     this.bind("create",  this.proxy(function(record){ 
+       this.trigger("change", "create", record);
+     }));
+     this.bind("update",  this.proxy(function(record){ 
+       this.trigger("change", "update", record);
+     }));
+     this.bind("destroy", this.proxy(function(record){ 
+       this.trigger("change", "destroy", record);
+     }));
    },
 
    find: function(id){
@@ -313,13 +318,15 @@
    },
 
    dupArray: function(array){
-     return array.map(function(item){
-       return item.dup();
-     });
+     var result = [];
+     for (var i=0; i < array.length; i++)
+      result.push(array[i].dup());
+     return result;
    }
   });
 
   Model.include({
+    model: true,
     newRecord: true,
 
     init: function(atts){
@@ -411,7 +418,7 @@
     },
     
     bind: function(events, callback){
-      this.parent.bind(events, this.proxy(function(e, record){
+      this.parent.bind(events, this.proxy(function(record){
         if ( record && this.eql(record) )
           callback.apply(this, arguments);
       }));

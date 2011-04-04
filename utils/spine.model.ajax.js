@@ -16,7 +16,7 @@ var urlError = function() {
   throw new Error("A 'url' property or function must be specified");
 };
 
-var ajaxSync = function(e, method, record){  
+var ajaxSync = function(method, record){  
   
   var params = {
     type:          methodMap[method],
@@ -48,8 +48,8 @@ var ajaxSync = function(e, method, record){
 Spine.Model.Ajax = {
   extended: function(){    
     this.sync(ajaxSync);
-    this.fetch(this.proxy(function(e){
-      ajaxSync(e, "read", this);
+    this.fetch(this.proxy(function(){
+      ajaxSync("read", this);
     }));
   }
 };

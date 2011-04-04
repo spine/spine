@@ -12,14 +12,14 @@ Manager.include({
   add: function(controller){
     if ( !controller ) throw("Controller required");
     
-    this.bind("change", function(e, current){
+    this.bind("change", function(current){
       if (controller == current)
         controller.activate();
       else
         controller.deactivate();
     });
     
-    controller.active(this.proxy(function(e){
+    controller.active(this.proxy(function(){
       this.trigger("change", controller);
     }));
   }  
