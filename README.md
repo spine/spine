@@ -8,12 +8,16 @@ More documentation is coming soon, but for now checkout the example code in the 
 
 > Here are some example applications built with Spine.js:
 
-Todos is [available on Github](http://github.com/maccman/spine.todos).
+Todos is [available on GitHub](http://github.com/maccman/spine.todos).
 
 ![Spine Todos](https://lh4.googleusercontent.com/_IH1OempnqUc/TZF16JZSTlI/AAAAAAAABKM/ojAu7OBqXp8/s800/Screen%20shot%202011-03-29%20at%2019.01.44.png)
 
 ![Dreamail](https://lh3.googleusercontent.com/_IH1OempnqUc/TZF1hU28fnI/AAAAAAAABKI/UwPGtksBTSM/s800/Screen%20shot%202011-03-29%20at%2018.58.27.png)
 
-Holla is [available on Github](http://github.com/maccman/holla).
+Holla is [available on GitHub](http://github.com/maccman/holla).
 
 ![Holla](https://lh4.googleusercontent.com/_IH1OempnqUc/TZF1gMnidmI/AAAAAAAABKE/b9rp9RdtA3o/s800/Screen%20shot%202011-03-29%20at%2018.58.12.png)
+
+Spine contacts is [available on GitHub](http://github.com/maccman/spine.contacts).
+
+![Spine Contacts](https://lh5.googleusercontent.com/_IH1OempnqUc/TZpgYfnlUBI/AAAAAAAABKg/UYLhdmoc15o/s800/contacts.png)
