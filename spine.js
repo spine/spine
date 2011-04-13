@@ -94,7 +94,7 @@
       
   var moduleKeywords = ["included", "extended", "setup"];
 
-  var Klass = Spine.Klass = {
+  var Class = Spine.Class = {
     initializer: function(){},
     init: function(){},
 
@@ -159,8 +159,8 @@
     }
   };
   
-  Klass.prototype.proxy    = Klass.proxy;
-  Klass.prototype.proxyAll = Klass.proxyAll;
+  Class.prototype.proxy    = Class.proxy;
+  Class.prototype.proxyAll = Class.proxyAll;
 
   // Models
   
@@ -171,7 +171,7 @@
     }).toUpperCase();      
   };
 
-  var Model = Spine.Model = Klass.create();
+  var Model = Spine.Model = Class.create();
   
   Model.extend(Events);
 
@@ -437,7 +437,7 @@
   
   // Controllers
   
-  var Controller = Spine.Controller = Klass.create({
+  var Controller = Spine.Controller = Class.create({
     tag: "div",
     
     initializer: function(options){
@@ -454,7 +454,7 @@
       
       if (this.events) this.delegateEvents();
       if (this.elements) this.refreshElements();
-      if (this.scoped) this.proxyAll.apply(this, this.scoped);
+      if (this.proxied) this.proxyAll.apply(this, this.proxied);
     },
     
     render: function(){},

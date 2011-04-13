@@ -27,7 +27,7 @@ c) There's a much more elegant alternative: `Object.create()`
 
 It's not possible to inherit class properties when using constructor functions, without a lot of copying. 
 
-Spine has an approach to inheritance that uses JavaScript's native prototypal inheritance. The one caveat to this is that you can use the `new` keyword, as object aren't constructor functions. See `Klass`
+Spine has an approach to inheritance that uses JavaScript's native prototypal inheritance. The one caveat to this is that you can use the `new` keyword, as object aren't constructor functions. See `Class`
 
 #Collections
 
@@ -60,9 +60,9 @@ including/extending
 
 Creating a new class.
 
-    Spine.Klass.create([instanceProperties, classProperties]);
+    Spine.Class.create([instanceProperties, classProperties]);
 
-    var User = Spine.Klass.create({
+    var User = Spine.Class.create({
       name: "Caroline"
     });
 
@@ -76,7 +76,7 @@ Instantiating a class.
     
 Initializer function.
     
-    var User = Spine.Klass.create({
+    var User = Spine.Class.create({
       init: function(name){
         this.name = name;
       }
@@ -102,7 +102,7 @@ Adding instance and class properties.
 
 Context changes with callback, so this won't work:
 
-    var Controller = Spine.Klass.create({
+    var Controller = Spine.Class.create({
       init: function(){
         $("#destroy").click(this.destroy);
       }
@@ -110,7 +110,7 @@ Context changes with callback, so this won't work:
     
 Use `proxy()` to keep local context.
     
-    var Controller = Spine.Klass.create({
+    var Controller = Spine.Class.create({
       init: function(){
         $("#destroy").click(this.proxy(this.destroy));
       }
@@ -118,7 +118,7 @@ Use `proxy()` to keep local context.
     
 Or use `proxyAll()` to force a function's execution context.
     
-    var Controller = Spine.Klass.create({
+    var Controller = Spine.Class.create({
       init: function(){
         this.proxyAll("destroy")
         $("#destroy").click(this.destroy);
@@ -129,7 +129,7 @@ Or use `proxyAll()` to force a function's execution context.
 
 Adding events to a class.
 
-    var Controller = Spine.Klass.create();
+    var Controller = Spine.Class.create();
     Controller.include(Spine.Events);
     
     var users = Controller.inst();
@@ -265,7 +265,7 @@ The `validate()` function is called on save. If it returns anything, the validat
     
     // Equivalent to using proxyAll
     var Tasks = Spine.Controller.create({
-      scoped: ["render", "addAll"]
+      proxied: ["render", "addAll"]
     });
     
     // The `input` instance variable
@@ -284,7 +284,7 @@ The `validate()` function is called on save. If it returns anything, the validat
     });
     
     var Tasks = Spine.Controller.create({
-      scoped: ["change"],
+      proxied: ["change"],
       
       init: function(){
         this.App.bind("change", this.change);
@@ -328,7 +328,7 @@ The `validate()` function is called on save. If it returns anything, the validat
     window.Tasks = Spine.Controller.create({
       tag: "li",
 
-      scoped: ["render", "remove"],
+      proxied: ["render", "remove"],
 
       events: {
         "change   input[type=checkbox]": "toggle",
@@ -404,7 +404,7 @@ The `validate()` function is called on save. If it returns anything, the validat
     window.TaskApp = Spine.Controller.create({
       el: $("#tasks"),
 
-      scoped: ["addOne", "addAll"],
+      proxied: ["addOne", "addAll"],
 
       events: {
         "submit form": "create",
