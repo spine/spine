@@ -31,7 +31,6 @@ task :build do
   require "yui/compressor"
   require "fileutils"
   
-  tempfile   = Tempfile.new("yui")
   compressor = YUI::JavaScriptCompressor.new(:munge => true)
   File.open("spine.production.js", "w+") do |output|
     File.open("spine.js", "r") do |input|
