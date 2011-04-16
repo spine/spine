@@ -107,7 +107,7 @@ Context changes with callback, so this won't work:
         $("#destroy").click(this.destroy);
       }
     });
-    
+        
 Use `proxy()` to keep local context.
     
     var Controller = Spine.Class.create({

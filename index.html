@@ -1,0 +1,434 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Spine</title>
+  <link rel="stylesheet" href="site/site.css" type="text/css" charset="utf-8">
+  <link rel="stylesheet" href="site/highlight.css" type="text/css" charset="utf-8">
+  <script src="site/jquery.js" type="text/javascript" charset="utf-8"></script>      
+  <script src="spine.js" type="text/javascript" charset="utf-8"></script>      
+  <script src="site/highlight.js" type="text/javascript" charset="utf-8"></script>
+  <script type="text/javascript" charset="utf-8">
+    hljs.initHighlightingOnLoad();
+  </script>
+</head>
+<body>
+<div id="container"><h1>Spine</h1>
+
+<p><strong>Spine is a lightwork framework for building JavaScript web applications.</strong> Spine gives your apps a MVC structure, and gets out of your way, allowing you to concentrate on the fun stuff, building awesome web applications.</p>
+
+<p><strong>Latest version:</strong> <a href="TODO">0.0.2</a></p>
+
+<h1>Overview</h1>
+
+<p>Hello there</p>
+
+<p>MVC</p>
+
+<ul>
+<li>Proper class library</li>
+<li>Full ORM</li>
+</ul>
+
+
+<p>Backbone mention</p>
+
+<h1>Setup</h1>
+
+<p>Using Spine is very straightforward, simply include the library in the page.</p>
+
+<pre><code>&lt;script src="spine.js" type="text/javascript" charset="utf-8"&gt;&lt;/script&gt;
+</code></pre>
+
+<p>Spine has no prerequisites, but is optimized to work with <a href="http://jquery.com">jQuery</a> or <a href="http://zeptojs.com">Zepto</a>.
+Certain extensions to Spine, such as the Ajax and Local Storage model persistence, require additional files located inside the <a href="TODO">lib</a> folder.</p>
+
+<h1>Classes</h1>
+
+<p>Spine's class implementation is one of its features that makes it stand out from the crowd. Rather than copying properties to emulate inheritance, as most libraries, Spine uses JavaScript's native prototypal inheritance. This is how inheritance should be done, and means its dynamic, properties are resolved at runtime.</p>
+
+<p>Classes are created like so:</p>
+
+<pre><code>var Task = Spine.Class.create();
+</code></pre>
+
+<p><code>create()</code> takes optional arguments of instance properties, and class properties.</p>
+
+<pre><code>Spine.Class.create([instanceProperties, classProperties]);
+
+var User = Spine.Class.create({
+  name: "Carolin"
+});
+</code></pre>
+
+<p>Alternative you can add instance properties using <code>include()</code>, and class properties with <code>extend()</code>.</p>
+
+<pre><code>var User = Spine.Class.create();
+
+User.extend({
+  find: function(){ /* ... */ }
+});
+
+User.include({
+  name: "Tonje"
+});
+</code></pre>
+
+<p>Since Spine doesn't use constructor functions, due to limitations with prototypal inheritance, classes are instantiated with <code>inst()</code>.</p>
+
+<pre><code>var User = Spine.Class.create({
+  name: "Tonje"
+});
+
+var user = User.inst();
+
+assertEqual( user.name, "Tonje" );
+user.name = "Trish";
+assertEqual( user.name, "Trish" );
+</code></pre>
+
+<p>Any arguments passed to <code>inst()</code> will be forwarded to <code>init()</code>, the classes' instantiation callback.</p>
+
+<pre><code>var User = Spine.Class.create({
+  init: function(name){
+    this.name = name;
+  }
+});
+
+User.inst("Martina");
+assertEqual( user.name, "Martina" );
+</code></pre>
+
+<p>Sub-classes are created the same way base classes are, with <code>create()</code>.</p>
+
+<pre><code>var Friend = User.create();
+</code></pre>
+
+<p>All of the subclass's parent properties are inherited.</p>
+
+<pre><code>var friend = Friend.inst("Tim");
+
+assertEqual( friend.name, "Tim" );
+</code></pre>
+
+<p>Because we're using real prototypal inheritance, properties are resolved dynamically at runtime. This means that you can change the properties of a parent class, and all its sub-classes with reflect those changes immediately.</p>
+
+<pre><code>var User   = Super.Class.create();
+var Friend = User.create();
+
+User.include({defaultName: "(empty)"});
+
+assertEqual( Friend.inst().defaultName, "(empty)" );
+</code></pre>
+
+<h2>Context</h2>
+
+<p>Context changes constantly in JavaScript, and it's very important your code is executing in the correct one. The most common cause of this is with event listeners, where callbacks will be invoked in the context of <code>window</code> or the element, rather than than their original context. To resolve this, Spine's classes provides a few helper functions for maintaing context.</p>
+
+<p>You can pass a function to <code>proxy()</code> to guarantee that it will be invoked in the current context.</p>
+
+<pre><code>var Tasks = Spine.Class.create({
+  init: function(){
+    $("#destroy").click(this.proxy(this.destroy));
+  },
+
+  destroy: function(){ /* ... */ }
+});
+</code></pre>
+
+<p>Or pass multiple function names to <code>proxyAll()</code> in order to re-write them permanently, so they're always called with the classes' local content.</p>
+
+<pre><code>var Tasks = Spine.Class.create({
+  init: function(){
+    this.proxyAll("destroy")
+    $("#destroy").click(this.destroy);
+  },
+
+  destroy: function(){ /* ... */ }
+});
+</code></pre>
+
+<h1>Events</h1>
+
+<p><code>Spine.Events</code> is the module Spine uses for adding event support to classes. To use it, just include/extend a class with the module.</p>
+
+<pre><code>var Tasks = Spine.Class.create();
+Tasks.extend(Spine.Events);
+</code></pre>
+
+<p><code>Spine.Events</code> gives you three functions, <code>bind()</code>, <code>trigger()</code>, and <code>unbind()</code>. All three have a very similar API to jQuery's event handling one, if you're familiar with that. <code>bind(name, callback)</code> takes a event name and callback. <code>trigger(name, [*data])</code> takes an event name and optional data to be passed to handlers. <code>unbind(name, [callback])</code> takes a event name and optional callback.</p>
+
+<pre><code>Tasks.bind("create", function(){ /* ... */ });
+Tasks.trigger("create", ["some", "data"]);
+</code></pre>
+
+<p>You can bind to multiple events by separating them with spaces. Callbacks are invoked in the context the event is associated with.</p>
+
+<pre><code>Tasks.bind("create update destroy", function(){ this.trigger("change") });
+</code></pre>
+
+<p>You can pass optional data arguments to <code>trigger()</code> that will be passed onto event callbacks. Unlike jQuery, an event object will not be passed to callbacks.</p>
+
+<pre><code>Tasks.bind("create", function(name){
+  alert(name);
+});
+
+Tasks.trigger("create", "Take out the rubbish");
+</code></pre>
+
+<p>Although you may never use <code>Spine.Events</code> in your own classes, you will use it with Spine's models and controllers. We're going to cover those next.</p>
+
+<h1>Models</h1>
+
+<p>Models are the core to Spine, and absolutely critical to your applications. Models are where your application's data is stored, and where any logic associated with that data is kept. Models should be de-coupled from the rest of your application, and completely independent. The data associated with models is stored in memory under <code>Model.records</code>.</p>
+
+<p>Creating models is slightly different from creating classes, since the <code>create()</code> function is already reserved by models. Models are created with the <code>setup()</code> function, passing in the model name and an array of attributes.</p>
+
+<pre><code>var Contact = Spine.Model.setup("Contact", ["first_name", "last_name"]);
+</code></pre>
+
+<p>Models are Spine classes, so you can treat them as such, extending and including properties.</p>
+
+<pre><code>Contact.include({
+  fullName: function(){
+    return(this.first_name + " " + this.last_name);
+  }
+});
+</code></pre>
+
+<p>Model instances are created with <code>inst()</code>, passing in an optional set of attributes.</p>
+
+<pre><code>var contact = Contact.inst({first_name: "Alex", last_name: "MacCaw"});
+assertEqual( contact.fullName(), "Alex MacCaw" );
+</code></pre>
+
+<h2>Saving/Retrieving Records</h2>
+
+<p>Once an instance is created it can be saved in memory by calling <code>save()</code>.</p>
+
+<pre><code>var Contact = Spine.Model.setup("Contact", ["first_name", "last_name"]);
+
+var contact = Contact.inst({first_name: "Joe"});
+contact.save();
+</code></pre>
+
+<p>When a record is saved, Spine automatically creates an ID if it doesn't already exist.</p>
+
+<pre><code>assertEqual( contact.id, "AD9408B3-1229-4150-A6CC-B507DFDF8E90" );
+</code></pre>
+
+<p>You can use this ID to retrieve the saved record using <code>find()</code>.</p>
+
+<pre><code>var identicalContact = Contact.find( contact.id );
+assert( contact.eql( identicalContact ) );
+</code></pre>
+
+<p>If <code>find()</code> fails to retrieve a record, an exception will be thrown. You can check for the existence of records without fear of an exception by calling <code>exists()</code>.</p>
+
+<pre><code>assert( Contact.exists( contact.id ) );
+</code></pre>
+
+<p>Once you've changed any of a record's attributes, you can update it in-memory by re-calling <code>save()</code>.</p>
+
+<pre><code>var contact = Contact.create({first_name: "Polo"});
+contact.save();
+contact.first_name = "Marko";
+contact.save();
+</code></pre>
+
+<p>You can also use <code>first()</code>, <code>last()</code> on the model to retrieve the first and last records.</p>
+
+<pre><code>var firstContact = Contact.first();
+</code></pre>
+
+<p>To retrieve every contact, use <code>all()</code>.</p>
+
+<pre><code>var contacts = Contact.all();
+for (var i=0; i &lt; contacts.length; i++) {
+  console.log( contact.first_name );
+</code></pre>
+
+<p>You can pass a function that'll be called with every record with <code>each()</code>.</p>
+
+<pre><code>Contact.each(function(con){
+  console.log( con.first_name );
+});
+</code></pre>
+
+<p>Or select a subset of records with <code>select()</code>.</p>
+
+<pre><code>Contact.select(function(con){
+  if (con.first_name) return true;
+});
+</code></pre>
+
+<h2>Validation</h2>
+
+<p>Validating models is dirt simple, simply override the <code>validate()</code> function with your own custom one.</p>
+
+<pre><code>Contact.extend({
+  validate: function(){
+    if (!this.first_name)
+      return "First name is required";
+  }
+});
+</code></pre>
+
+<p>If <code>validate()</code> returns anything, the validation will fail and an <em>error</em> event will be fired on the model.</p>
+
+<pre><code>Contact.bind("error", function(rec, msg){
+  alert("Contact failed to save - " + msg);
+});
+</code></pre>
+
+<h2>Serialization</h2>
+
+<p>Spine's models include special support for JSON serialization. To serialize a record, call <code>JSON.stringify()</code> passing the record, or to serialize every record, pass the model.</p>
+
+<pre><code>JSON.stringify(Contact);
+JSON.stringify(Contact.first());
+</code></pre>
+
+<p>Alternative, you can retrieve a instances attributes and implement your own serialization by calling <code>attributes()</code>.</p>
+
+<pre><code>var contact = Contact.inst({first_name: "Leo"});
+assertEqual( contact.attributes(), {first_name: "Leo"} );
+
+Contact.include({
+  toXML: function(){
+    return serializeToXML(this.attributes());
+  }
+});
+</code></pre>
+
+<h2>Persistence</h2>
+
+<p>While storing records in memory is useful for quick retrieval, persisting them in one sort of another is often required. Spine includes a number of pre-existing storage modules, such as Ajax and HTML5 Local Storage, which you can use for persistence. Alternatively you can roll your own custom one, take a look at <code>spine.model.ajax.js</code> for inspiration.</p>
+
+<p>To persist a model using HTML5 Local Storage, simply extend it with <code>Spine.Model.Local</code>.</p>
+
+<pre><code>Contact.extend(Spine.Model.Local);
+</code></pre>
+
+<p>When a record is changed, the Local Storage database will be updated to reflect that. In order to fetch the records from Local Storage in the first place, you need to use <code>fetch()</code>.</p>
+
+<pre><code>Contact.fetch();
+</code></pre>
+
+<p>Typically this is called once, when your application is first initialized.</p>
+
+<h3>Local</h3>
+
+<pre><code>Contact.extend(Spine.Model.Local)
+</code></pre>
+
+<h3>Ajax</h3>
+
+<pre><code>Contact.extend(Spine.Model.Ajax);
+
+Spine.Model.ajaxPrefix = true;
+</code></pre>
+
+<h2>Events</h2>
+
+<ul>
+<li><em>save</em> - record was saved (either created/updated)</li>
+<li><em>update</em> - record was updated</li>
+<li><em>create</em> - record was created</li>
+<li><em>destroy</em> - record was destroyed</li>
+<li><em>change</em> - any of the above, record was created/updated/destroyed</li>
+<li><em>refresh</em> - all records invalidated and replaced</li>
+<li><em>error</em> - validation failed</li>
+</ul>
+
+
+<h1>Controllers</h1>
+
+<pre><code>var Tasks = Spine.Controller.create({
+  init: function(){
+
+  }
+});
+</code></pre>
+
+<h2>Proxying</h2>
+
+<pre><code>var Tasks = Spine.Controller.create({
+  proxied: ["render"],
+
+  init: function(){
+    Task.change(this.render);
+  }
+});
+</code></pre>
+
+<h2>Elements</h2>
+
+<pre><code>var Tasks = Spine.Controller.create({
+  elements: {".items": "items"},
+
+  init: function(){
+
+  }
+});
+</code></pre>
+
+<h2>Events</h2>
+
+<pre><code>var Tasks = Spine.Controller.create({
+  events: {"click .item", "click"},
+
+  init: function(){
+
+  }
+});
+</code></pre>
+
+<p>Custom events.</p>
+
+<pre><code>var ToggleView = Spine.Controller.create({
+  proxied: ["toggle"],
+
+  init: function(){
+    this.el.click(this.toggle);
+  },
+
+  toggle: function(){
+    this.trigger("toggle");
+  }
+});
+</code></pre>
+
+<p>Global events.</p>
+
+<pre><code>var ToggleView = Spine.Controller.create({
+  proxied: ["toggle"],
+
+  init: function(){
+    this.el.click(this.toggle);
+  },
+
+  toggle: function(){
+    this.App.trigger("toggle");
+  }
+});
+</code></pre>
+
+<h1>Render Pattern</h1>
+
+<h1>The Element Pattern</h1>
+
+<h1>Examples</h1>
+
+<h1>Resources</h1>
+
+<h1>Change Log</h1>
+
+<script type="text/javascript" charset="utf-8">
+  $("code").addClass("javascript");
+</script>
+
+</div>
+</body>
+</html>
+    

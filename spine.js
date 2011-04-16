@@ -15,13 +15,6 @@
     return Array.prototype.slice.call(args, 0);
   };
   
-  var dupHash = function(hash){
-    var result = {};
-    for(var name in hash)
-      result[name] = hash[name];
-    return result;
-  };
-  
   var Events = Spine.Events = {
     bind: function(ev, callback) {
       var evs   = ev.split(" ");
@@ -495,10 +488,10 @@
   Controller.include(Events);
   Controller.include(Log);
   
-  Spine.App = Spine.Controller.create({
+  Spine.App = Controller.create({
     create: function(properties){
       this.parent.include(properties);
     }
   }).inst();
-  Spine.Controller.fn.App = Spine.App;
+  Controller.fn.App = Spine.App;
 })();
