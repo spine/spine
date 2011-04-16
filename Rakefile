@@ -27,8 +27,21 @@ task :generate do
   end
 end
 
-task :compile do
-  # TODO - yui-compressor
+task :build do
+  require "yui/compressor"
+  require "fileutils"
+  
+  tempfile   = Tempfile.new("yui")
+  compressor = YUI::JavaScriptCompressor.new(:munge => true)
+  File.open("spine.production.js", "w+") do |output|
+    File.open("spine.js", "r") do |input|
+      compressor.compress(input) do |compressed|
+        while buffer = compressed.read(4096)
+          output.write(buffer)
+        end
+      end
+    end
+  end
 end
 
 task :default => :generate

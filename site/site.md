@@ -14,10 +14,11 @@ Or check out the [source code](http://github.com/maccman/spine).
 So, what's so special about Spine? How does it stand out from the crowd?
 
 * Class library with __real__ prototypal inheritance
-* Lightweight controller implementation, based on Backbone's API
-* Full model layer and ORM
-* Asynchronous communication with servers
+* Lightweight __controller__ implementation, based on Backbone's API
+* Full __model__ layer and ORM
 * Ajax and Local Storage adapters baked in
+* Asynchronous server communication
+* Simple and lightweight
 
 But don't take my word for it. Take a look at the source of the example applications below, and decide for yourself. 
 
