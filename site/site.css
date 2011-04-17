@@ -24,12 +24,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h2 {
-  margin-top: 30px;
+  padding-top: 10px;
+  margin-top: 20px;
 }
 
 h1 {
-  padding: 0 0 8px 0;
-  margin-top: 40px;
+  padding: 10px 0 8px 0;
+  margin-top: 30px;
   border-bottom: 1px solid #e5e5ee;
 }
 
@@ -55,4 +56,42 @@ ul {
 
 #container {
   width: 625px;
+  margin: 40px 0 50px 260px;
+}
+
+#sidebar {
+  background: ghostWhite;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 200px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 15px 0 30px 30px;
+  border-right: 1px solid #DDD;
+}
+
+#sidebar a {
+  text-decoration: none;
+  display: block;
+  color: black;
+  font-weight: bold;
+  margin-top: 15px;
+}
+
+#sidebar ul {
+  margin: 5px 0 0 0;
+  list-style: none;
+}
+
+#sidebar li a {
+  margin: 0;
+  font-weight: normal;
+  font-size: 13px;
+}
+
+#sidebar li a:before {
+  padding: 0 3px;
+  content: "– ";
 }

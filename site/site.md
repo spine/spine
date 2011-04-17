@@ -625,3 +625,56 @@ All resources are located in the *lib* folder in Spine's repository.
 #Change Log
 
 __0.0.2:__ 17/04/2011 - first public release
+
+<script type="text/javascript" charset="utf-8">
+  jQuery(function($){
+    function underscore(str) {
+      return str.replace(/::/g, '/')
+                .replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
+                .replace(/([a-z\d])([A-Z])/g, '$1_$2')
+                .replace(/-/g, '_')
+                .toLowerCase();
+    }
+
+    function dasherize(str) {
+      return underscore(str).replace(/_/g, '-');
+    }
+    
+    $("h1").each(function(){
+      var name = $(this).text();
+      $(this).attr("id", "h-" + dasherize(name));
+    });
+    
+    $("h2").each(function(){
+      var name = $(this).text(); 
+      $(this).attr("id", "s-" + dasherize(name));
+    });
+  });
+  
+  jQuery(function(){
+    var div = $("<div />").attr("id", "sidebar");
+    
+    $("h1").each(function(){
+      var link = $("<a />");
+      link.attr("href", "#" + $(this).attr("id"));
+      link.text($(this).text());
+      div.append(link);
+      
+      var subs = $(this).nextUntil("h1").filter("h2");
+            
+      if (subs[0]) {
+        var list = $("<ul />");
+        subs.each(function(){
+          var link = $("<a />");
+          link.text($(this).text())
+          link.attr("href", "#" + $(this).attr("id"));
+          list.append($("<li />").append(link));
+        });
+        
+        div.append(list);
+      }
+    });
+    
+    $("body").prepend(div);
+  });
+</script>
