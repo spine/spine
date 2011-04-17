@@ -29,16 +29,15 @@ Spine includes some great example applications to show you what's possible with 
 Todos is a very simple to-do application. Users can CRUD tasks, and mark them as complete.
 The source is [available on GitHub](http://github.com/maccman/spine.todos).
 
-![Spine Todos](https://lh4.googleusercontent.com/_IH1OempnqUc/TZF16JZSTlI/AAAAAAAABKM/ojAu7OBqXp8/s800/Screen%20shot%202011-03-29%20at%2019.01.44.png)
+![Spine Todos](https://lh4.googleusercontent.com/_IH1OempnqUc/TZF16JZSTlI/AAAAAAAABKM/ojAu7OBqXp8/s500/Screen%20shot%202011-03-29%20at%2019.01.44.png)
 
 Spine contacts is a simple address book, allowing users to CRUD contacts. The full source is [available on GitHub](http://github.com/maccman/spine.contacts). *WebKit only*.
 
-![Spine Contacts](https://lh5.googleusercontent.com/_IH1OempnqUc/TZpgYfnlUBI/AAAAAAAABKg/UYLhdmoc15o/s800/contacts.png)
-
+![Spine Contacts](https://lh5.googleusercontent.com/_IH1OempnqUc/TZpgYfnlUBI/AAAAAAAABKg/UYLhdmoc15o/s500/contacts.png)
 
 Holla is the most advanced example, and [can be found on GitHub](http://github.com/maccman/holla). Holla is a group chat application, and uses a combination of [Rails](http://rubyonrails.org), [Juggernaut](http://github.com/maccman/juggernaut) and Spine to let users chat in realtime. *WebKit only*.
 
-![Holla](https://lh4.googleusercontent.com/_IH1OempnqUc/TZF1gMnidmI/AAAAAAAABKE/b9rp9RdtA3o/s800/Screen%20shot%202011-03-29%20at%2018.58.12.png)
+![Holla](https://lh4.googleusercontent.com/_IH1OempnqUc/TZF1gMnidmI/AAAAAAAABKE/b9rp9RdtA3o/s500/Screen%20shot%202011-03-29%20at%2018.58.12.png)
  
 #Setup
 
