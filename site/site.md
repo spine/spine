@@ -46,7 +46,7 @@ Using Spine is very straightforward, simply include the library in the page.
     <script src="spine.js" type="text/javascript" charset="utf-8"></script>
     
 Spine has no prerequisites, but is optimized to work with [jQuery](http://jquery.com) or [Zepto](http://zeptojs.com).
-Certain extensions to Spine, such as the Ajax and Local Storage model persistence, require additional files located inside the [lib](TODO) folder.
+Certain extensions to Spine, such as the Ajax and Local Storage model persistence, require additional files located inside the [lib](https://github.com/maccman/spine/tree/master/lib) folder.
     
 #Classes
 
