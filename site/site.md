@@ -6,17 +6,17 @@ Spine is opinionated and, although at first glance it might look similar to othe
 
 Spine is tiny, the library comes in at around 500 lines of JavaScript, that's about 2K minified & compressed. However, it's not about size, it's how you use it, and Spine certainly packs a punch! 
 
-__Latest version:__ [0.0.2](TODO)  
+__Latest version:__ [0.0.2](http://github.com/maccman/spine/master/tarball)  
 Or check out the [source code](http://github.com/maccman/spine).
 
 #Overview
 
-So, what's so special about Spine? How does it stand out from the crowd?
+So, what's so special about Spine, how does it stand out from the crowd?
 
 * Class library with __real__ prototypal inheritance
 * Lightweight __controller__ implementation, based on Backbone's API
 * Full __model__ layer and ORM
-* Ajax and Local Storage adapters baked in
+* Ajax and HTML5 Local Storage adapters baked in
 * Asynchronous server communication
 * Simple and lightweight
 
@@ -24,7 +24,7 @@ But don't take my word for it. Take a look at the source of the example applicat
 
 #Examples
 
-Spine includes some great example applications to show you what's possible with the framework, and give you a practical understanding of the library. Although Spine is cross browser, it's worth noting that some of the examples are for WebKit based browsers only (Chrome/Safari), due to browser specific CSS (i.e. they'll just look really ugly in other browser). 
+Spine includes some great example applications to show you what's possible with the framework, and give you a practical understanding of the library. Although Spine is cross browser, it's worth noting that some of the examples are for WebKit based browsers only (Chrome/Safari), due to browser specific CSS (i.e. they'll just look really ugly in other browsers). 
 
 Todos is a very simple to-do application. Users can CRUD tasks, and mark them as complete.
 The source is [available on GitHub](http://github.com/maccman/spine.todos).
@@ -36,7 +36,7 @@ Spine contacts is a simple address book, allowing users to CRUD contacts. The fu
 ![Spine Contacts](https://lh5.googleusercontent.com/_IH1OempnqUc/TZpgYfnlUBI/AAAAAAAABKg/UYLhdmoc15o/s800/contacts.png)
 
 
-Holla is the most advanced, and [available here on GitHub](http://github.com/maccman/holla). Holla is a group chat application, and uses a combination of Rails, [Juggernaut](http://github.com/maccman/juggernaut) and Spine to let users chat in realtime. *WebKit only*.
+Holla is the most advanced example, and [can be found on GitHub](http://github.com/maccman/holla). Holla is a group chat application, and uses a combination of [Rails](http://rubyonrails.org), [Juggernaut](http://github.com/maccman/juggernaut) and Spine to let users chat in realtime. *WebKit only*.
 
 ![Holla](https://lh4.googleusercontent.com/_IH1OempnqUc/TZF1gMnidmI/AAAAAAAABKE/b9rp9RdtA3o/s800/Screen%20shot%202011-03-29%20at%2018.58.12.png)
  
@@ -514,17 +514,17 @@ So, we've covered all the main options available in controllers, so let's have a
 
 The render pattern is a really useful way of binding models and views together. When the controller is instantiated, it adds an event listener to the relevant model, invoking a callback when the model is refreshed or changed. The callback will update `el`, usually by replacing its contents with a rendered template. 
 
-    var Tasks = Spine.Controller.create({
+    var Contacts = Spine.Controller.create({
       init: function(){
-        Task.bind("refresh change", this.proxy(this.render));
+        Contact.bind("refresh change", this.proxy(this.render));
       },
 
       template: function(items){ 
-        return($("#tasksTemplate").tmpl(items));
+        return($("#contactsTemplate").tmpl(items));
       },
 
       render: function(){
-        this.el.html(this.template(Task.all()));
+        this.el.html(this.template(Contact.all()));
       }
     });
     
@@ -534,7 +534,7 @@ This is a simple but blunt method for data binding, updating every element whene
 
 The element pattern essentially gives you the same functionality as the render pattern, but a lot more control. It consists of two controllers, one that controls a collection of items, and the other deals with each individual item. Let's dive right into the code to give you a good indication of how it works.
 
-    var TasksItem = Spine.Controller.create({
+    var ContactItem = Spine.Controller.create({
       // Delegate the click event to a local handler
       events: {
         "click": "click"
@@ -559,7 +559,7 @@ The element pattern essentially gives you the same functionality as the render p
 
       // Use a template, in this case via jQuery.tmpl.js
       template: function(items){ 
-        return($("#tasksTemplate").tmpl(items));
+        return($("#contactsTemplate").tmpl(items));
       },
 
       // Called after an element is destroyed
@@ -572,25 +572,25 @@ The element pattern essentially gives you the same functionality as the render p
       click: function(){ /* ... */ }
     });
 
-    var Tasks = Spine.Controller.create({
+    var Contacts = Spine.Controller.create({
       proxied: ["addAll", "addOne"],
 
       init: function(){
-        Task.bind("refresh", this.addAll);
-        Task.bind("create",  this.addOne);
+        Contact.bind("refresh", this.addAll);
+        Contact.bind("create",  this.addOne);
       },
 
       addOne: function(item){
-        var task = TasksItem.inst({item: item});
-        this.el.append(task.render().el);
+        var contact = ContactItem.inst({item: item});
+        this.el.append(contact.render().el);
       },
 
       addAll: function(){
-        Task.each(this.addOne);
+        Contact.each(this.addOne);
       }
     });
     
-In the example above, `Tasks` has responsibility for adding records when they're initially created, and `TasksItem` responsibility for the record's update and destroy events, re-rendering the record when necessary. Albeit more complicated, this gives us some advantages over the previous render pattern. 
+In the example above, `Contacts` has responsibility for adding records when they're initially created, and `ContactItem` responsibility for the record's update and destroy events, re-rendering the record when necessary. Albeit more complicated, this gives us some advantages over the previous render pattern. 
 
 For one thing, it's more performant; the list doesn't need to be re-drawn whenever a single element changes. Furthermore, we now have a lot more control over individual items. We can place event handlers, as demonstrated with the `click` callback, and manage rendering on an item by item basis.
     
@@ -610,14 +610,14 @@ All resources are located in the *lib* folder in Spine's repository.
   
 * *What's so good about prototypal inheritance?*
   Let me give you a visual example of what I mean. Take a Spine class instance, you can follow its `__proto__` property through its parents, all the way up to `Object`.
-  <img src="site/images/inheritance.png" height="500" />  
+  ![Inheritance](site/images/inheritance.png)  
   Classical class libraries just copy properties to achieve inheritance, resulting in overhead when your class is first loaded, and doesn't allow for dynamically resolving properties. 
   
 * *Doesn't the fact that servers are de-coupled, and clients never wait for a response, cause issues like conflicts?*
   Nope, certainly not in my experience. Ajax requests to the server are sent serially, requests have to finish before the next one is fired, even if the client UI has already updated. For example, if a contact is created and then immediately destroyed, the create POST will complete before the DELETE request is sent. Certainly, there may be scenarios where you need to disable a UI element while waiting for a server response, but this isn't usually required, and so isn't the default inside Spine. 
   
 * *I still don't get the advantages of server de-coupling.*
-  Well, it's all about perceived speed - which makes a huge difference to the user experience. Perceived speed is just as important as actual speed since, at the end of the day, this is what users are going to notice. If we take [Holla](http://github.com/maccman/holla) as an example, when a user sends a new message, we could wait until the message takes the roundtrip through the server and clients before appending it to the chat log. However, that would introduce a couple of seconds latency between the time a user submitted a new message, and it appearing in their chat log. The application would seem slow, and it would definitely hurt the user experience. 
+  Well, it's all about perceived speed - which makes a huge difference to the user experience. Perceived speed is just as important as actual speed since, at the end of the day, this is what users are going to notice. If we take [Holla](http://github.com/maccman/holla) as an example, when a user sends a new chat message, we could wait until the message takes the roundtrip through the server and clients before appending it to the chat log. However, that would introduce a couple of seconds latency between the time a user submitted a new message, and it appearing in their chat log. The application would seem slow, and it would definitely hurt the user experience. 
 
   Instead, why not create the new message locally, thereby immediately adding it to the chat log. From a user's perspective, it seems like the message has been sent instantly. User's won't know (or care), that the message hasn't yet been delivered to other clients in the chat room. They'll just be happy with a fast and snappy user experience.
   
@@ -626,7 +626,3 @@ All resources are located in the *lib* folder in Spine's repository.
 #Change Log
 
 __0.0.2:__ 17/04/2011 - first public release
-
-<script type="text/javascript" charset="utf-8">
-  $("code").addClass("javascript");
-</script>

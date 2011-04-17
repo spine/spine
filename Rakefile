@@ -32,7 +32,7 @@ task :build do
   require "fileutils"
   
   compressor = YUI::JavaScriptCompressor.new(:munge => true)
-  File.open("spine.production.js", "w+") do |output|
+  File.open("spine.min.js", "w+") do |output|
     File.open("spine.js", "r") do |input|
       compressor.compress(input) do |compressed|
         while buffer = compressed.read(4096)
