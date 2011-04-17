@@ -6,7 +6,7 @@ Spine is opinionated and, although at first glance it might look similar to othe
 
 Spine is tiny, the library comes in at around 500 lines of JavaScript, that's about 2K minified & compressed. However, it's not about size, it's how you use it, and Spine certainly packs a punch! 
 
-__Latest version:__ [0.0.2](https://github.com/maccman/spine/tarball/master)  
+__Latest version:__ [0.0.2](https://github.com/maccman/spine/raw/master/spine.js)  
 Or check out the [source code](http://github.com/maccman/spine).
 
 #Overview
