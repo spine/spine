@@ -734,7 +734,7 @@ Well, it's all about perceived speed - which makes a huge difference to the user
   });
   
   jQuery(function(){
-    var div = $("<div id='sidebar' />");
+    var div = $("<div />").attr("id", "sidebar");
     
     $("h1").each(function(){
       var link = $("<a />");
@@ -743,9 +743,7 @@ Well, it's all about perceived speed - which makes a huge difference to the user
       div.append(link);
       
       var subs = $(this).nextUntil("h1").filter("h2");
-      
-      console.log(subs)
-      
+            
       if (subs[0]) {
         var list = $("<ul />");
         subs.each(function(){
