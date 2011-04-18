@@ -1,6 +1,6 @@
 #Spine
 
-__Spine is a lightwork framework for building JavaScript web applications.__ Spine gives you a MVC structure and then gets out of your way,  allowing you to concentrate on the fun stuff, building awesome web applications. 
+__Spine is a lightweight framework for building JavaScript web applications.__ Spine gives you a MVC structure and then gets out of your way,  allowing you to concentrate on the fun stuff, building awesome web applications. 
 
 Spine is opinionated and, although at first glance it might look similar to other frameworks like Backbone, it actually has quite a different take on things. 
 
