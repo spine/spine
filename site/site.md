@@ -304,10 +304,11 @@ By convention, this uses a basic pluralization mechanism to generate an endpoint
     
 Spine will use this endpoint URL as a basis for all of its Ajax requests. Once a model has been persisted with Ajax, whenever its records are changed, Spine will send an Ajax request notifying the server. Spine encodes all of its request's parameters with JSON, and expects JSON encoded responses. Spine uses REST to determine the method and endpoint of HTTP requests, and will work seamlessly with REST friendly frameworks like Rails.
 
-    read    → GET    /collection
-    create  → POST   /collection
-    update  → PUT    /collection/id
-    destroy → DELETE /collection/id
+<pre><code>read    &rarr; GET    /collection
+create  &rarr; POST   /collection
+update  &rarr; PUT    /collection/id
+destroy &rarr; DELETE /collection/id
+</code></pre>
 
 For example, after a record has been created client side Spine will send off a HTTP POST to your server, including a JSON representation of the record. Let's say we created a `Contact` with a name of `"Lars"`, this is the request that would be send to the server:
 
