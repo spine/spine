@@ -64,7 +64,7 @@ Classes are created like so:
       name: "Carolin"
     });
     
-Alternative you can add instance properties using `include()`, and class properties with `extend()`.
+Alternatively you can add instance properties using `include()`, and class properties with `extend()`.
 
     var User = Spine.Class.create();
     
@@ -265,7 +265,7 @@ Spine's models include special support for JSON serialization. To serialize a re
     JSON.stringify(Contact);
     JSON.stringify(Contact.first());
     
-Alternative, you can retrieve a instances attributes and implement your own serialization by calling `attributes()`.
+Alternatively, you can retrieve an instance's attributes and implement your own serialization by calling `attributes()`.
 
     var contact = Contact.inst({first_name: "Leo"});
     assertEqual( contact.attributes(), {first_name: "Leo"} );
@@ -278,7 +278,7 @@ Alternative, you can retrieve a instances attributes and implement your own seri
 
 ##Persistence
 
-While storing records in memory is useful for quick retrieval, persisting them in one sort of another is often required. Spine includes a number of pre-existing storage modules, such as Ajax and HTML5 Local Storage, which you can use for persistence. Alternatively you can roll your own custom one, take a look at `spine.model.ajax.js` for inspiration. 
+While storing records in memory is useful for quick retrieval, persisting them in one way or another is often required. Spine includes a number of pre-existing storage modules, such as Ajax and HTML5 Local Storage, which you can use for persistence. Alternatively you can roll your own custom one, take a look at `spine.model.ajax.js` for inspiration. 
 
 To persist a model using HTML5 Local Storage, simply extend it with `Spine.Model.Local`.
 
@@ -310,7 +310,7 @@ update  &rarr; PUT    /collection/id
 destroy &rarr; DELETE /collection/id
 </code></pre>
 
-For example, after a record has been created client side Spine will send off a HTTP POST to your server, including a JSON representation of the record. Let's say we created a `Contact` with a name of `"Lars"`, this is the request that would be send to the server:
+For example, after a record has been created client side Spine will send off an HTTP POST to your server, including a JSON representation of the record. Let's say we created a `Contact` with a name of `"Lars"`, this is the request that would be send to the server:
 
     POST /contacts HTTP/1.0
     Host: localhost:3000
@@ -350,7 +350,7 @@ This might seem like an odd architectural decision at first, but let me explain.
 
 The second advantage is that a de-coupled server greatly simplifies your code. You don't need to cater for the scenario that the record may be displayed in your interface, but isn't editable until a server response returns. Lastly, if you ever decided to add offline support to your application, having a de-coupled server makes this a dodel. 
 
-Obviously there are caveats for those advantages, but I think those are easily addressed. Server-side model validation is on contentious issue, for example - what if that fails? However, this is solved by client side validation. Validation should fail before it records even get sent to the server. If validation does fail, it's an error in your validation logic rather than with user input. 
+Obviously there are caveats for those advantages, but I think those are easily addressed. Server-side model validation is a contentious issue, for example - what if that fails? However, this is solved by client-side validation. Validation should fail before a record ever gets sent to the server. If validation does fail server-side, it's an error in your client-side validation logic rather than with user input. 
 
 When the server does return an unsuccessful response, an *ajaxError* event will be fired on the model, including the record, XMLHttpRequest object, Ajax settings and the thrown error. 
 
@@ -360,7 +360,7 @@ When the server does return an unsuccessful response, an *ajaxError* event will 
 
 ##Events
 
-You already seen that models have some events associated with them, such as *error* and *ajaxError*, but what about callbacks to create/update/destroy operations? Well, conveniently Spine includes those too, allowing you to bind to the following events:
+You've already seen that models have some events associated with them, such as *error* and *ajaxError*, but what about callbacks to create/update/destroy operations? Well, conveniently Spine includes those too, allowing you to bind to the following events:
 
 * *save* - record was saved (either created/updated)
 * *update* - record was updated
@@ -383,13 +383,13 @@ For model level callbacks, any associated record is always passed to the callbac
       // Contact was updated
     });
     
-The callbacks context will be the record that the event listener was placed on. You'll find models events crucial when it comes to binding records to the view, making sure the view is kept in sync with your application's data. 
+The callback's context will be the record that the event listener was placed on. You'll find model events crucial when it comes to binding records to the view, making sure the view is kept in sync with your application's data. 
 
 #Controllers
 
-Controllers are the last part to the trinity of Spine and are very simple, being more of a set of conventions than actual code. Controllers the glue inside your application, tying the various components together. Generally, controllers deal with adding and responding to DOM events, rendering templates and keeping views and models in sync.
+Controllers are the last part to the trinity of Spine and are very simple, being more of a set of conventions than actual code. Controllers are the glue inside your application, tying the various components together. Generally, controllers deal with adding and responding to DOM events, rendering templates and keeping views and models in sync.
 
-Controllers, like models, extend `Spine.Class` so inherits all of its properties. This means you can use `extend()` and `include()` to add properties onto controllers, and can take advantages of all Spine's context management. To create a controller, inherit a class from `Spine.Controller`.
+Controllers, like models, extend `Spine.Class` and so inherit all of its properties. This means you can use `extend()` and `include()` to add properties onto controllers, and can take advantage of all of Spine's context management. To create a controller, inherit a class from `Spine.Controller`.
 
     var Tasks = Spine.Controller.create({
       init: function(){
@@ -397,7 +397,7 @@ Controllers, like models, extend `Spine.Class` so inherits all of its properties
       }
     });
     
-The convention inside Spine is to give the controller a plural camel cased name of the model it is most associated with, in this case `Task`. Usually, you'll only be adding instance properties onto controllers, so you can just pass them as the first argument to `create()`. Instantiating controllers is the same as creating an instance of any other class, by calling `inst()`.
+The convention inside Spine is to give the controller a plural camel cased name of the model it is most associated with, in this case `Tasks`. Usually, you'll only be adding instance properties onto controllers, so you can just pass them as the first argument to `create()`. Instantiating controllers is the same as creating an instance of any other class, by calling `inst()`.
 
     var tasks = Tasks.inst();
     
@@ -419,7 +419,7 @@ Spine gives you a shortcut for adding event listeners onto DOM elements, with th
       events: {"click .item", "click"},
       
       click: function(e){
-        // Invoked with .item is clicked
+        // Invoked when .item is clicked
       }
     });
     
@@ -435,7 +435,7 @@ Spine will take care of callback context for you, making sure it keeps to the cu
       }
     });
 
-Since Spine uses [delegation](http://api.jquery.com/delegate) for events, it does't matter if the contents of `el` change. The appropriate events will still be fired when necessary. 
+Since Spine uses [delegation](http://api.jquery.com/delegate) for events, it doesn't matter if the contents of `el` change. The appropriate events will still be fired when necessary. 
 
 As well as DOM events, `Spine.Controller` has been extended with `Spine.Events`, meaning that you can bind and trigger custom events. 
 
@@ -451,7 +451,7 @@ As well as DOM events, `Spine.Controller` has been extended with `Spine.Events`,
       toggle: function(){ /* ... */ }
     });
 
-Spine also has a global object `Spine.App`, that you can bind and trigger global events. This is one way that you can get controller's communication with one other, without resorting to deep-coupling. `Spine.App` is aliased inside controllers to `this.App`.
+Spine also has a global object `Spine.App`, that you can bind and trigger global events. This is one way that you can get controllers communicating with one other, without resorting to deep-coupling. `Spine.App` is aliased inside controllers to `this.App`.
 
     var GlobalController = Spine.Controller.create({
       init: function(){
@@ -510,7 +510,7 @@ As you've probably guessed, Spine provides a shortcut for adding proxies too, us
     
 ##Patterns
 
-So, we've covered all the main options available in controllers, so let's have a look at some typical use cases. 
+We've covered all the main options available in controllers, so let's have a look at some typical use cases. 
 
 The render pattern is a really useful way of binding models and views together. When the controller is instantiated, it adds an event listener to the relevant model, invoking a callback when the model is refreshed or changed. The callback will update `el`, usually by replacing its contents with a rendered template. 
 
@@ -590,7 +590,7 @@ The element pattern essentially gives you the same functionality as the render p
       }
     });
     
-In the example above, `Contacts` has responsibility for adding records when they're initially created, and `ContactItem` responsibility for the record's update and destroy events, re-rendering the record when necessary. Albeit more complicated, this gives us some advantages over the previous render pattern. 
+In the example above, `Contacts` has responsibility for adding records when they're initially created, and `ContactItem` has responsibility for the record's update and destroy events, re-rendering the record when necessary. Albeit more complicated, this gives us some advantages over the previous render pattern. 
 
 For one thing, it's more performant; the list doesn't need to be re-drawn whenever a single element changes. Furthermore, we now have a lot more control over individual items. We can place event handlers, as demonstrated with the `click` callback, and manage rendering on an item by item basis.
     
