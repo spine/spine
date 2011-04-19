@@ -120,7 +120,7 @@ Because we're using real prototypal inheritance, properties are resolved dynamic
 
 ##Context
 
-Context changes constantly in JavaScript, and it's very important your code is executing in the correct one. The most common cause of this is with event listeners, where callbacks will be invoked in the context of `window` or the element, rather than than their original context. To resolve this, Spine's classes provides a few helper functions for maintaing context.
+Context changes constantly in JavaScript, and it's very important your code is executing in the correct one. The most common cause of this is with event listeners, where callbacks will be invoked in the context of `window` or the element, rather than their original context. To resolve this, Spine's classes provides a few helper functions for maintaing context.
 
 You can pass a function to `proxy()` to guarantee that it will be invoked in the current context.
 

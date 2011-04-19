@@ -148,7 +148,7 @@ assertEqual( Friend.inst().defaultName, "(empty)" );
 
 <h2>Context</h2>
 
-<p>Context changes constantly in JavaScript, and it's very important your code is executing in the correct one. The most common cause of this is with event listeners, where callbacks will be invoked in the context of <code>window</code> or the element, rather than than their original context. To resolve this, Spine's classes provides a few helper functions for maintaing context.</p>
+<p>Context changes constantly in JavaScript, and it's very important your code is executing in the correct one. The most common cause of this is with event listeners, where callbacks will be invoked in the context of <code>window</code> or the element, rather than their original context. To resolve this, Spine's classes provides a few helper functions for maintaing context.</p>
 
 <p>You can pass a function to <code>proxy()</code> to guarantee that it will be invoked in the current context.</p>
 
