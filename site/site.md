@@ -416,7 +416,7 @@ Inside your controller's `init()` function, you'll generally add event listeners
 Spine gives you a shortcut for adding event listeners onto DOM elements, with the `events` property. 
 
     var Tasks = Spine.Controller.create({
-      events: {"click .item", "click"},
+      events: {"click .item": "click"},
       
       click: function(e){
         // Invoked when .item is clicked
@@ -428,7 +428,7 @@ Spine gives you a shortcut for adding event listeners onto DOM elements, with th
 Spine will take care of callback context for you, making sure it keeps to the current controller. Callbacks will be passed an event object, and you can access the original element the event was targeted on using `event.target`.
 
     var Tasks = Spine.Controller.create({
-      events: {"click .item", "click"},
+      events: {"click .item": "click"},
       
       click: function(event){
         var item = jQuery(event.target);
