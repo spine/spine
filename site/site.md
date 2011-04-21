@@ -508,11 +508,76 @@ As you've probably guessed, Spine provides a shortcut for adding proxies too, us
       }
     });
     
-##Patterns
+#Routing
+
+Spine provides application routing based on the URL's hash fragment, for example the URL `http://example.com/#/users` has the hash fragment `/users`. Hash fragments can be completely arbitrary and don't trigger page reloads, maintaining page state. Your application can also be indexed by hash fragments using Google's [Ajax Crawling specification](http://code.google.com/web/ajaxcrawling/index.html).
+
+Unfortunately, Spine can't take advantage of the new HTML5 History API due to the fact that it requires every URL to have a real HTML representation. Although the browser won't request the new URL when you use the History API, it will be requested if the page is subsequently reloaded. In other words you can't make up arbitrary URLs, like you can with hash fragments; every URL passed to the API needs to exist. 
+
+Internally Spine uses the *hashchange* event to detect changes in the URLs hash. This event has only been developed recently, and only available in newer browsers. To support antiquated browsers, you can use the excellent [jQuery hashchange plugin](http://benalman.com/projects/jquery-hashchange-plugin/), which emulates the event using iframes and other clever trickery. 
+
+So, how to use the API? It's very simple, first you need to include [spine.route.js](lib/spine.route.js), which contains the module `Spine.Route`. Then you can start adding routes inside your controller. `Spine.Route` gives you a `routes()` function inside controllers, which you can call passing a hash of routes and callbacks.
+
+    var App = Spine.Controller.create({
+      init: function(){
+        this.routes({
+          "/users/:id": function(id){
+            // Activate controller or something
+            console.log("/users/", id)
+          },
+          "/users": function(any){
+            console.log("/users")
+          }
+        });
+      }
+    }).inst();
+        
+Route parameters, are in the form of `:name`, and are passed as arguments to the associated callback. You can also use globs to match anything via an asterisk, like so: 
+
+    App.routes({
+      "/pages/*glob": function(name){
+        console.log("/pages/", name);
+      }
+    });
+
+Routes are added in reverse order of specificity, so the most specific routes should be added first, and generic 'catch alls' should be added later. It's worth noting, especially if you're putting routes in the `init()` function of controllers, that routes shouldn't be added more than once. The examples above are fine, since the `App` controller is only ever going to be instantiated a single time. 
+
+One alternative is to skip out controllers, and add routes directly using `Spine.Route.add()`, passing in either a hash or a single route. 
+    
+    Spine.Route.add(/\/groups(\/)?/, function(){
+      console.log('groups')
+    });
+    
+Like you can see in the example above, routes can also be raw regexes, giving you full control over matching.
+
+##Initial Setup
+
+When the page loads initially, even if the URL has a hash fragment, the `hashchange` event won't be called. It'll only be called for subsequent changes. This means, after our application has been setup, we need to manually tell Spine that we want to run the routes & check the URL's hash. This can be done by invoking `Spine.Route.change()`.
+    
+    Spine.Route.change();
+    
+##Navigate
+    
+Lastly, Spine gives controllers a `navigate()` function, which can be passed a fragment to change the URL's hash. You can also pass `navigate()` multiple arguments, which will be joined by a forward slash (`/`) to create the fragment. 
+
+    var Users = Spine.Controller.create({
+      init: function(){
+        /* Navigate to #/users/:id */
+        this.route("/users", this.item.id);
+      }
+    });
+    
+    Users.inst({item: User.first()});
+    
+Using `navigate()` ensures that the URL's fragment is kept in sync with the relevant controllers. It's important to note that `navigate()` __won't__ trigger any events or route callbacks. 
+    
+#Patterns
 
 We've covered all the main options available in controllers, so let's have a look at some typical use cases. 
 
-The render pattern is a really useful way of binding models and views together. When the controller is instantiated, it adds an event listener to the relevant model, invoking a callback when the model is refreshed or changed. The callback will update `el`, usually by replacing its contents with a rendered template. 
+##The Render Pattern
+
+The *render pattern* is a really useful way of binding models and views together. When the controller is instantiated, it adds an event listener to the relevant model, invoking a callback when the model is refreshed or changed. The callback will update `el`, usually by replacing its contents with a rendered template. 
 
     var Contacts = Spine.Controller.create({
       init: function(){
@@ -530,7 +595,7 @@ The render pattern is a really useful way of binding models and views together. 
     
 This is a simple but blunt method for data binding, updating every element whenever a single record is changed. This is fine for uncomplicated and small lists, but you may find you need more control over individual elements, such as adding event handlers to items. This is where the *element pattern* comes in.
 
-###The Element pattern
+##The Element pattern
 
 The element pattern essentially gives you the same functionality as the render pattern, but a lot more control. It consists of two controllers, one that controls a collection of items, and the other deals with each individual item. Let's dive right into the code to give you a good indication of how it works.
 
