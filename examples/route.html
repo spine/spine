@@ -6,24 +6,45 @@
   <script src="../lib/spine.route.js" type="text/javascript" charset="utf-8"></script>
   
   <script type="text/javascript" charset="utf-8">
-    var Con1 = Spine.Controller.create({
+    var Users = Spine.Controller.create({
       init: function(){
-        
+        this.navigate("/users");
       },
       
       active: function(number){
         console.log("active", number)
       }
+    });
+    
+    // Add routes in App controller
+    var App = Spine.Controller.create({
+      init: function(){
+        this.users = Users.inst();
+        this.routes({
+          "/users/:number": function(num){
+            this.users.active(num);
+          },
+          "/users/*glob": function(any){
+            console.log('any', any);
+          }
+        });
+      }
     }).inst();
     
-    Spine.App.extend({
-      routes: {
-        this.route("/con1/:number", this.active)
-      },
-      
-      active: function(num){
-        Con1.active(num)
+    // Add routes manually
+    
+    // Add a group of routes
+    Spine.Route.add({
+      "/groups/:id": function(id){
+        console.log('groups id', id)
       }
+    });
+    
+    // More generic routes added last
+    
+    // Use your own regex
+    Spine.Route.add(/\/groups(\/)?/, function(){
+      console.log('groups')
     });
     
     // Fire event on load
