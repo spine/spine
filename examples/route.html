@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head> 
+  <script src="jquery.js" type="text/javascript" charset="utf-8"></script>
+  <script src="../spine.js" type="text/javascript" charset="utf-8"></script>
+  <script src="../lib/spine.route.js" type="text/javascript" charset="utf-8"></script>
+  
+  <script type="text/javascript" charset="utf-8">
+    var Con1 = Spine.Controller.create({
+      init: function(){
+        
+      },
+      
+      active: function(number){
+        console.log("active", number)
+      }
+    }).inst();
+    
+    Spine.App.extend({
+      routes: {
+        this.route("/con1/:number", this.active)
+      },
+      
+      active: function(num){
+        Con1.active(num)
+      }
+    });
+    
+    // Fire event on load
+    Spine.Route.change();
+  </script>
+</head>
+<body>
+  
+</body>
+</html>
