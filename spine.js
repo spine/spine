@@ -9,9 +9,9 @@
   
   Spine.version = "0.0.2";
   
-  var $ = this.jQuery || this.Zepto;
+  var $ = Spine.$ = this.jQuery || this.Zepto;
   
-  var makeArray = function(args){
+  var makeArray = Spine.makeArray = function(args){
     return Array.prototype.slice.call(args, 0);
   };
   
@@ -430,6 +430,8 @@
   
   // Controllers
   
+  var eventSplitter = /^(\w+)\s*(.*)$/;
+  
   var Controller = Spine.Controller = Class.create({
     tag: "div",
     
@@ -449,21 +451,17 @@
       if (this.elements) this.refreshElements();
       if (this.proxied) this.proxyAll.apply(this, this.proxied);
     },
-    
-    render: function(){},
-    
+        
     $: function(selector){
       return $(selector, this.el);
     },
-    
-    eventSplitter: /^(\w+)\s*(.*)$/,
-    
+        
     delegateEvents: function(){
       for (var key in this.events) {
         var methodName = this.events[key];
         var method     = this.proxy(this[methodName]);
 
-        var match      = key.match(this.eventSplitter);
+        var match      = key.match(eventSplitter);
         var eventName  = match[1], selector = match[2];
 
         if (selector === '') {
@@ -491,6 +489,12 @@
   Spine.App = Controller.create({
     create: function(properties){
       this.parent.include(properties);
+      return this;
+    },
+    
+    extend: function(properties){
+      this.parent.include(properties);
+      return this;
     }
   }).inst();
   Controller.fn.App = Spine.App;
