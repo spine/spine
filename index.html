@@ -632,9 +632,9 @@ contact.bind("save", function(){
 
 <h2>Initial Setup</h2>
 
-<p>When the page loads initially, even if the URL has a hash fragment, the <code>hashchange</code> event won't be called. It'll only be called for subsequent changes. This means, after our application has been setup, we need to manually tell Spine that we want to run the routes &amp; check the URL's hash. This can be done by invoking <code>Spine.Route.change()</code>.</p>
+<p>When the page loads initially, even if the URL has a hash fragment, the <code>hashchange</code> event won't be called. It'll only be called for subsequent changes. This means, after our application has been setup, we need to manually tell Spine that we want to run the routes &amp; check the URL's hash. This can be done by invoking <code>Spine.Route.setup()</code>.</p>
 
-<pre><code>Spine.Route.change();
+<pre><code>Spine.Route.setup();
 </code></pre>
 
 <h2>Navigate</h2>

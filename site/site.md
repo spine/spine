@@ -552,9 +552,9 @@ Like you can see in the example above, routes can also be raw regexes, giving yo
 
 ##Initial Setup
 
-When the page loads initially, even if the URL has a hash fragment, the `hashchange` event won't be called. It'll only be called for subsequent changes. This means, after our application has been setup, we need to manually tell Spine that we want to run the routes & check the URL's hash. This can be done by invoking `Spine.Route.change()`.
+When the page loads initially, even if the URL has a hash fragment, the `hashchange` event won't be called. It'll only be called for subsequent changes. This means, after our application has been setup, we need to manually tell Spine that we want to run the routes & check the URL's hash. This can be done by invoking `Spine.Route.setup()`.
     
-    Spine.Route.change();
+    Spine.Route.setup();
     
 ##Navigate
     
