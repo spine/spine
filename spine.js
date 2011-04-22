@@ -155,6 +155,7 @@
   Class.prototype.proxy    = Class.proxy;
   Class.prototype.proxyAll = Class.proxyAll;
   Class.inst               = Class.init;
+  Class.sub                = Class.create;
 
   // Models
   
@@ -169,154 +170,152 @@
   
   Model.extend(Events);
 
-  // Alias create
-  Model.createSub = Model.create;
-  Model.setup = function(name, atts){
-    var model = Model.createSub();
-    if (name) model.name = name;
-    if (atts) model.attributes = atts;
-    return model;
-  };
-
   Model.extend({
-   created: function(sub){
-     this.records = {};
-     this.attributes = [];
-     
-     this.bind("create",  this.proxy(function(record){ 
-       this.trigger("change", "create", record);
-     }));
-     this.bind("update",  this.proxy(function(record){ 
-       this.trigger("change", "update", record);
-     }));
-     this.bind("destroy", this.proxy(function(record){ 
-       this.trigger("change", "destroy", record);
-     }));
-   },
+    setup: function(name, atts){
+      var model = Model.sub();
+      if (name) model.name = name;
+      if (atts) model.attributes = atts;
+      return model;
+    },
+    
+    created: function(sub){
+      this.records = {};
+      this.attributes = [];
 
-   find: function(id){
-     var record = this.records[id];
-     if ( !record ) throw("Unknown record");
-     return record.dup();
-   },
+      this.bind("create",  this.proxy(function(record){ 
+        this.trigger("change", "create", record);
+      }));
+      this.bind("update",  this.proxy(function(record){ 
+        this.trigger("change", "update", record);
+      }));
+      this.bind("destroy", this.proxy(function(record){ 
+        this.trigger("change", "destroy", record);
+      }));
+    },
 
-   exists: function(id){
-     try {
-       return this.find(id);
-     } catch (e) {
-       return false;
-     }
-   },
+    find: function(id){
+      var record = this.records[id];
+      if ( !record ) throw("Unknown record");
+      return record.dup();
+    },
 
-   refresh: function(values){
-     this.records = {};
-     
-     for (var i=0, il = values.length; i < il; i++) {    
-       var record = this.init(values[i]);
-       record.newRecord = false;
-       this.records[record.id] = record;
-     }
-     
-     this.trigger("refresh");
-   },
+    exists: function(id){
+      try {
+        return this.find(id);
+      } catch (e) {
+        return false;
+      }
+    },
 
-   select: function(callback){
-     var result = [];
+    refresh: function(values){
+      this.records = {};
 
-     for (var key in this.records)
-       if (callback(this.records[key]))
-         result.push(this.records[key]);
+      for (var i=0, il = values.length; i < il; i++) {    
+        var record = this.init(values[i]);
+        record.newRecord = false;
+        this.records[record.id] = record;
+      }
 
-     return this.dupArray(result);
-   },
+      this.trigger("refresh");
+    },
 
-   findByAttribute: function(name, value){
-     for (var key in this.records)
-       if (this.records[key][name] == value)
-         return this.records[key].dup();
-   },
+    select: function(callback){
+      var result = [];
 
-   findAllByAttribute: function(name, value){
-     return(this.select(function(item){
-       return(item[name] == value);
-     }));
-   },
+      for (var key in this.records)
+        if (callback(this.records[key]))
+          result.push(this.records[key]);
 
-   each: function(callback){
-     for (var key in this.records)
-       callback(this.records[key]);
-   },
+      return this.dupArray(result);
+    },
 
-   all: function(){
-     return this.dupArray(this.recordsValues());
-   },
+    findByAttribute: function(name, value){
+      for (var key in this.records)
+        if (this.records[key][name] == value)
+          return this.records[key].dup();
+    },
 
-   first: function(){
-     var record = this.recordsValues()[0];
-     return(record && record.dup());
-   },
+    findAllByAttribute: function(name, value){
+      return(this.select(function(item){
+        return(item[name] == value);
+      }));
+    },
 
-   last: function(){
-     var values = this.recordsValues()
-     var record = values[values.length - 1];
-     return(record && record.dup());
-   },
+    each: function(callback){
+      for (var key in this.records)
+        callback(this.records[key]);
+    },
 
-   count: function(){
-     return this.recordsValues().length;
-   },
+    all: function(){
+      return this.dupArray(this.recordsValues());
+    },
 
-   deleteAll: function(){
-     for (var key in this.records)
-       delete this.records[key];
-   },
+    first: function(){
+      var record = this.recordsValues()[0];
+      return(record && record.dup());
+    },
 
-   destroyAll: function(){
-     for (var key in this.records)
-       this.records[key].destroy();
-   },
+    last: function(){
+      var values = this.recordsValues()
+      var record = values[values.length - 1];
+      return(record && record.dup());
+    },
 
-   update: function(id, atts){
-     this.find(id).updateAttributes(atts);
-   },
+    count: function(){
+      return this.recordsValues().length;
+    },
 
-   create: function(atts){
-     var record = this.init(atts);
-     record.save();
-     return record;
-   },
+    deleteAll: function(){
+      for (var key in this.records)
+        delete this.records[key];
+    },
 
-   destroy: function(id){
-     this.find(id).destroy();
-   },
-   
-   sync: function(callback){
-     this.bind("change", callback);
-   },
-   
-   fetch: function(callback){
-     callback ? this.bind("fetch", callback) : this.trigger("fetch");
-   },
-   
-   toJSON: function(){
-     return this.recordsValues();
-   },
+    destroyAll: function(){
+      for (var key in this.records)
+        this.records[key].destroy();
+    },
 
-   // Private
+    update: function(id, atts){
+      this.find(id).updateAttributes(atts);
+    },
 
-   recordsValues: function(){
-     var result = [];
-     for (var key in this.records)
-       result.push(this.records[key]);
-     return result;
-   },
+    create: function(atts){
+      var record = this.init(atts);
+      record.save();
+      return record;
+    },
 
-   dupArray: function(array){
-     var result = [];
-     for (var i=0; i < array.length; i++)
-      result.push(array[i].dup());
-     return result;
-   }
+    destroy: function(id){
+      this.find(id).destroy();
+    },
+
+    sync: function(callback){
+      this.bind("change", callback);
+    },
+
+    fetch: function(callback){
+      callback ? this.bind("fetch", callback) : this.trigger("fetch");
+    },
+
+    toJSON: function(){
+      return this.recordsValues();
+    },
+
+    // Private
+
+    recordsValues: function(){
+      var result = [];
+      for (var key in this.records)
+        result.push(this.records[key]);
+      return result;
+    },
+
+    dupArray: function(array){
+      var result = [];
+      for (var i=0; i < array.length; i++)
+        result.push(array[i].dup());
+      return result;
+    }
   });
 
   Model.include({
@@ -438,16 +437,16 @@
     
     initializer: function(options){
       this.options = options;
-      
+
       for (var key in this.options)
         this[key] = this.options[key];
-      
+
       if (!this.el) this.el = document.createElement(this.tag);
       this.el = $(this.el);
-      
+
       if ( !this.events ) this.events = this.parent.events;
       if ( !this.elements ) this.elements = this.parent.elements;
-      
+
       if (this.events) this.delegateEvents();
       if (this.elements) this.refreshElements();
       if (this.proxied) this.proxyAll.apply(this, this.proxied);
