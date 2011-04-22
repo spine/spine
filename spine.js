@@ -88,9 +88,8 @@
   var moduleKeywords = ["included", "extended", "setup"];
 
   var Class = Spine.Class = {
-    initializer: function(){},
-    init: function(){},
-
+    inherited: function(){},
+    
     prototype: {
       initializer: function(){},
       init: function(){}
@@ -103,19 +102,18 @@
 
       if (include) object.include(include);
       if (extend)  object.extend(extend);
-      
-      object.initializer.apply(object, arguments);
-      object.init.apply(object, arguments);
+
+      object.inherited();
       return object;
     },
 
-    inst: function(){
-      var instance = Object.create(this.prototype);
-      instance.parent = this;
+    init: function(){
+      var initance = Object.create(this.prototype);
+      initance.parent = this;
 
-      instance.initializer.apply(instance, arguments);
-      instance.init.apply(instance, arguments);
-      return instance;
+      initance.initializer.apply(initance, arguments);
+      initance.init.apply(initance, arguments);
+      return initance;
     },
 
     proxy: function(func){
@@ -154,6 +152,7 @@
   
   Class.prototype.proxy    = Class.proxy;
   Class.prototype.proxyAll = Class.proxyAll;
+  Class.inst               = Class.init;
 
   // Models
   
@@ -178,7 +177,7 @@
   };
 
   Model.extend({
-   initializer: function(){
+   inherited: function(){
      this.records = {};
      this.attributes = [];
      
@@ -211,7 +210,7 @@
      this.records = {};
      
      for (var i=0, il = values.length; i < il; i++) {    
-       var record = this.inst(values[i]);
+       var record = this.init(values[i]);
        record.newRecord = false;
        this.records[record.id] = record;
      }
@@ -280,7 +279,7 @@
    },
 
    create: function(atts){
-     var record = this.inst(atts);
+     var record = this.init(atts);
      record.save();
      return record;
    },
@@ -381,7 +380,7 @@
     },
 
     dup: function(){
-      var result = this.parent.inst(this.attributes());
+      var result = this.parent.init(this.attributes());
       result.newRecord = this.newRecord;
       return result;
     },
@@ -491,6 +490,6 @@
       this.parent.include(properties);
       return this;
     }
-  }).inst();
+  }).init();
   Controller.fn.App = Spine.App;
 })();

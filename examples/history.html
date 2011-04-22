@@ -19,7 +19,7 @@
     // Add routes in App controller
     var App = Spine.Controller.create({
       init: function(){
-        this.users = Users.inst();
+        this.users = Users.init();
         this.routes({
           "/users/:number": function(num){
             this.users.active(num);
@@ -29,7 +29,7 @@
           }
         });
       }
-    }).inst();
+    }).init();
     
     // Add routes manually
     

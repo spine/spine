@@ -76,19 +76,19 @@ Alternatively you can add instance properties using `include()`, and class prope
       name: "Tonje"
     });
 
-Since Spine doesn't use constructor functions, due to limitations with prototypal inheritance, classes are instantiated with `inst()`.
+Since Spine doesn't use constructor functions, due to limitations with prototypal inheritance, classes are instantiated with `init()`.
 
     var User = Spine.Class.create({
       name: "Tonje"
     });
     
-    var user = User.inst();
+    var user = User.init();
     
     assertEqual( user.name, "Tonje" );
     user.name = "Trish";
     assertEqual( user.name, "Trish" );
 
-Any arguments passed to `inst()` will be forwarded to `init()`, the classes' instantiation callback.
+Any arguments passed to `init()` will be forwarded to `init()`, the classes' instantiation callback.
 
     var User = Spine.Class.create({
       init: function(name){
@@ -96,7 +96,7 @@ Any arguments passed to `inst()` will be forwarded to `init()`, the classes' ins
       }
     });
 
-    User.inst("Martina");
+    User.init("Martina");
     assertEqual( user.name, "Martina" );
 
 Sub-classes are created the same way base classes are, with `create()`.
@@ -105,7 +105,7 @@ Sub-classes are created the same way base classes are, with `create()`.
     
 All of the subclass's parent properties are inherited.
 
-    var friend = Friend.inst("Tim");
+    var friend = Friend.init("Tim");
     
     assertEqual( friend.name, "Tim" );
     
@@ -116,7 +116,7 @@ Because we're using real prototypal inheritance, properties are resolved dynamic
     
     User.include({defaultName: "(empty)"});
 
-    assertEqual( Friend.inst().defaultName, "(empty)" );
+    assertEqual( Friend.init().defaultName, "(empty)" );
 
 ##Context
 
@@ -185,9 +185,9 @@ Models are Spine classes, so you can treat them as such, extending and including
       }
     });
     
-Model instances are created with `inst()`, passing in an optional set of attributes.
+Model instances are created with `init()`, passing in an optional set of attributes.
     
-    var contact = Contact.inst({first_name: "Alex", last_name: "MacCaw"});
+    var contact = Contact.init({first_name: "Alex", last_name: "MacCaw"});
     assertEqual( contact.fullName(), "Alex MacCaw" );
     
 ##Saving/Retrieving Records
@@ -196,7 +196,7 @@ Once an instance is created it can be saved in memory by calling `save()`.
 
     var Contact = Spine.Model.setup("Contact", ["first_name", "last_name"]);
     
-    var contact = Contact.inst({first_name: "Joe"});
+    var contact = Contact.init({first_name: "Joe"});
     contact.save();
     
 When a record is saved, Spine automatically creates an ID if it doesn't already exist.
@@ -267,7 +267,7 @@ Spine's models include special support for JSON serialization. To serialize a re
     
 Alternatively, you can retrieve an instance's attributes and implement your own serialization by calling `attributes()`.
 
-    var contact = Contact.inst({first_name: "Leo"});
+    var contact = Contact.init({first_name: "Leo"});
     assertEqual( contact.attributes(), {first_name: "Leo"} );
     
     Contact.include({
@@ -397,17 +397,17 @@ Controllers, like models, extend `Spine.Class` and so inherit all of its propert
       }
     });
     
-The convention inside Spine is to give the controller a plural camel cased name of the model it is most associated with, in this case `Tasks`. Usually, you'll only be adding instance properties onto controllers, so you can just pass them as the first argument to `create()`. Instantiating controllers is the same as creating an instance of any other class, by calling `inst()`.
+The convention inside Spine is to give the controller a plural camel cased name of the model it is most associated with, in this case `Tasks`. Usually, you'll only be adding instance properties onto controllers, so you can just pass them as the first argument to `create()`. Instantiating controllers is the same as creating an instance of any other class, by calling `init()`.
 
-    var tasks = Tasks.inst();
+    var tasks = Tasks.init();
     
 Every controller has an element associated with it, which you can access under the instance property `el`. You can also set this element manually by passing it through on instantiation. 
 
-    var tasks = Tasks.inst({el: $("#tasks")});
+    var tasks = Tasks.init({el: $("#tasks")});
 
-In fact, anything you pass to `inst()` will be set as properties on the newly created instance. For example, you could pass a record that a controller would be associated with.
+In fact, anything you pass to `init()` will be set as properties on the newly created instance. For example, you could pass a record that a controller would be associated with.
 
-    var taskItem = TaskItem.inst({item: Task.first()});
+    var taskItem = TaskItem.init({item: Task.first()});
 
 Inside your controller's `init()` function, you'll generally add event listeners to models and views, referencing a function inside the controller. 
 
@@ -530,7 +530,7 @@ So, how to use the API? It's very simple, first you need to include [spine.route
           }
         });
       }
-    }).inst();
+    }).init();
         
 Route parameters, are in the form of `:name`, and are passed as arguments to the associated callback. You can also use globs to match anything via an asterisk, like so: 
 
@@ -567,7 +567,7 @@ Lastly, Spine gives controllers a `navigate()` function, which can be passed a f
       }
     });
     
-    Users.inst({item: User.first()});
+    Users.init({item: User.first()});
     
 Using `navigate()` ensures that the URL's fragment is kept in sync with the relevant controllers. It's important to note that `navigate()` __won't__ trigger any events or route callbacks. 
     
@@ -646,7 +646,7 @@ The element pattern essentially gives you the same functionality as the render p
       },
 
       addOne: function(item){
-        var contact = ContactItem.inst({item: item});
+        var contact = ContactItem.init({item: item});
         this.el.append(contact.render().el);
       },
 

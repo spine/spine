@@ -16,10 +16,13 @@
       }
     });
     
+    // Fire event on load
+    Spine.Route.setup(true);
+        
     // Add routes in App controller
     var App = Spine.Controller.create({
       init: function(){
-        this.users = Users.inst();
+        this.users = Users.init();
         this.routes({
           "/users/:number": function(num){
             this.users.active(num);
@@ -29,7 +32,7 @@
           }
         });
       }
-    }).inst();
+    }).init();
     
     // Add routes manually
     
@@ -46,9 +49,6 @@
     Spine.Route.add(/\/groups(\/)?/, function(){
       console.log('groups')
     });
-    
-    // Fire event on load
-    Spine.Route.change();
   </script>
 </head>
 <body>
