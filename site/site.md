@@ -516,6 +516,8 @@ Unfortunately, Spine can't take advantage of the new HTML5 History API due to th
 
 Internally Spine uses the *hashchange* event to detect changes in the URLs hash. This event has only been developed recently, and only available in newer browsers. To support antiquated browsers, you can use the excellent [jQuery hashchange plugin](http://benalman.com/projects/jquery-hashchange-plugin/), which emulates the event using iframes and other clever trickery. 
 
+##Adding routes
+
 So, how to use the API? It's very simple, first you need to include [spine.route.js](lib/spine.route.js), which contains the module `Spine.Route`. Then you can start adding routes inside your controller. `Spine.Route` gives you a `routes()` function inside controllers, which you can call passing a hash of routes and callbacks.
 
     var App = Spine.Controller.create({

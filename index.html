@@ -593,6 +593,8 @@ contact.bind("save", function(){
 
 <p>Internally Spine uses the <em>hashchange</em> event to detect changes in the URLs hash. This event has only been developed recently, and only available in newer browsers. To support antiquated browsers, you can use the excellent <a href="http://benalman.com/projects/jquery-hashchange-plugin/">jQuery hashchange plugin</a>, which emulates the event using iframes and other clever trickery.</p>
 
+<h2>Adding routes</h2>
+
 <p>So, how to use the API? It's very simple, first you need to include <a href="lib/spine.route.js">spine.route.js</a>, which contains the module <code>Spine.Route</code>. Then you can start adding routes inside your controller. <code>Spine.Route</code> gives you a <code>routes()</code> function inside controllers, which you can call passing a hash of routes and callbacks.</p>
 
 <pre><code>var App = Spine.Controller.create({
