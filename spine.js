@@ -490,11 +490,6 @@
     create: function(properties){
       this.parent.include(properties);
       return this;
-    },
-    
-    extend: function(properties){
-      this.parent.include(properties);
-      return this;
     }
   }).inst();
   Controller.fn.App = Spine.App;

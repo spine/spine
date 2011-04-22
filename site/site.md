@@ -665,8 +665,9 @@ All resources are located in the *lib* folder in Spine's repository.
 
 * *lib/spine.list.js* - controller for managing lists, such as menus
 * *lib/spine.controller.manager.js* - class for managing controllers, basically a state machine
-* *lib/spine.model.ajax* - module for adding Ajax support to Spine's models
-* *lib/spine.model.local* - module for adding Local Storage support to Spine's models
+* *lib/spine.model.ajax.js* - module for adding Ajax support to Spine's models
+* *lib/spine.model.local.js* - module for adding Local Storage support to Spine's models
+* *lib/spine.route.js* - module for adding route support to Spine
 
 #FAQ
 
