@@ -31,13 +31,14 @@
       var ev   = args.shift();
             
       var list, calls, i, l;
-      if (!(calls = this._callbacks)) return this;
-      if (!(list  = this._callbacks[ev])) return this;
+      if (!(calls = this._callbacks)) return false;
+      if (!(list  = this._callbacks[ev])) return false;
       
       for (i = 0, l = list.length; i < l; i++)
         if (list[i].apply(this, args) === false)
-          return false;
-      return this;
+          break;
+
+      return true;
     },
     
     unbind: function(ev, callback){
@@ -50,12 +51,16 @@
       if (!(calls = this._callbacks)) return this;
       if (!(list  = this._callbacks[ev])) return this;
       
-      for (i = 0, l = list.length; i < l; i++) {
+      if ( !callback ) {
+        delete this._callbacks[ev];
+        return this;
+      }
+      
+      for (i = 0, l = list.length; i < l; i++)
         if (callback === list[i]) {
           list.splice(i, 1);
           break;
         }
-      }
         
       return this;
     }
@@ -415,7 +420,7 @@
     },
     
     bind: function(events, callback){
-      this.parent.bind(events, this.proxy(function(record){
+      return this.parent.bind(events, this.proxy(function(record){
         if ( record && this.eql(record) )
           callback.apply(this, arguments);
       }));
@@ -424,7 +429,7 @@
     trigger: function(events){
       var args = makeArray(arguments);
       args.splice(1, 0, this);
-      this.parent.trigger.apply(this.parent, args);
+      return this.parent.trigger.apply(this.parent, args);
     }
   });
   
