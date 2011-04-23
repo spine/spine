@@ -511,8 +511,6 @@ As you've probably guessed, Spine provides a shortcut for adding proxies too, us
 
 Spine provides application routing based on the URL's hash fragment, for example the URL `http://example.com/#/users` has the hash fragment `/users`. Hash fragments can be completely arbitrary and don't trigger page reloads, maintaining page state. Your application can also be indexed by hash fragments using Google's [Ajax Crawling specification](http://code.google.com/web/ajaxcrawling/index.html).
 
-Unfortunately, Spine can't take advantage of the new HTML5 History API due to the fact that it requires every URL to have a real HTML representation. Although the browser won't request the new URL when you use the History API, it will be requested if the page is subsequently reloaded. In other words you can't make up arbitrary URLs, like you can with hash fragments; every URL passed to the API needs to exist. 
-
 Internally Spine uses the *hashchange* event to detect changes in the URLs hash. This event has only been developed recently, and only available in newer browsers. To support antiquated browsers, you can use the excellent [jQuery hashchange plugin](http://benalman.com/projects/jquery-hashchange-plugin/), which emulates the event using iframes and other clever trickery. 
 
 ##Adding routes
@@ -571,6 +569,23 @@ Lastly, Spine gives controllers a `navigate()` function, which can be passed a f
     Users.init({item: User.first()});
     
 Using `navigate()` ensures that the URL's fragment is kept in sync with the relevant controllers. It's important to note that `navigate()` __won't__ trigger any events or route callbacks. 
+
+##HTML5 History
+
+Spine also gives you the option of using HTML5's History API, which has the advantage of being able to alter the url without a page refresh or using hash fragments. This means cleaner URLs in a format your users are accustomed to. 
+
+To use the History API, instead of hash fragments, pass `{history: true}` to `setup()`:
+
+    Spine.Route.setup({history: true});
+    
+HTML5 History support will only be enabled if this option is present, and the API is available. Otherwise, Spine's routing will revert back to using hash fragments. 
+
+However, there are some things you need to be aware of when using the History API. Firstly, ever URL you send to `navigate()` needs to have a real HTML representation. Although the browser won't request the new URL at that point, it will be requested if the page is subsequently reloaded. In other words you can't make up arbitrary URLs, like you can with hash fragments; every URL passed to the API needs to exist. One way of implementing this is with server side support. 
+
+When browsers request a URL (expecting a HTML response) you first make sure on server-side that the endpoint exists and is valid. Then you can just serve up the main application, which will read the URL, invoking the appropriate routes. For example, let's say your user navigates to `http://example.com/users/1`. On the server-side, you check that the URL `/users/1` is valid, and that the User record with an ID of `1` exists. Then you can go ahead and just serve up the JavaScript application. 
+
+The caveat to this approach is that it doesn't give search engine crawlers any real content. If you want your application to be crawl-able, you'll have to detect crawler bot requests, and serve them a 'parallel universe of content'. That is beyond the scope of this documentation though. 
+    
     
 #Patterns
 
@@ -697,10 +712,10 @@ __0.0.2:__ 17/04/2011 - first public release
 <script type="text/javascript" charset="utf-8">
   jQuery(function($){
     function underscore(str) {
-      return str.replace(/::/g, '/')
-                .replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
+      return str.replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
                 .replace(/([a-z\d])([A-Z])/g, '$1_$2')
                 .replace(/-/g, '_')
+                .replace(/ /, '_')
                 .toLowerCase();
     }
 

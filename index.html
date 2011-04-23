@@ -588,8 +588,6 @@ contact.bind("save", function(){
 
 <p>Spine provides application routing based on the URL's hash fragment, for example the URL <code>http://example.com/#/users</code> has the hash fragment <code>/users</code>. Hash fragments can be completely arbitrary and don't trigger page reloads, maintaining page state. Your application can also be indexed by hash fragments using Google's <a href="http://code.google.com/web/ajaxcrawling/index.html">Ajax Crawling specification</a>.</p>
 
-<p>Unfortunately, Spine can't take advantage of the new HTML5 History API due to the fact that it requires every URL to have a real HTML representation. Although the browser won't request the new URL when you use the History API, it will be requested if the page is subsequently reloaded. In other words you can't make up arbitrary URLs, like you can with hash fragments; every URL passed to the API needs to exist.</p>
-
 <p>Internally Spine uses the <em>hashchange</em> event to detect changes in the URLs hash. This event has only been developed recently, and only available in newer browsers. To support antiquated browsers, you can use the excellent <a href="http://benalman.com/projects/jquery-hashchange-plugin/">jQuery hashchange plugin</a>, which emulates the event using iframes and other clever trickery.</p>
 
 <h2>Adding routes</h2>
@@ -653,6 +651,23 @@ Users.init({item: User.first()});
 </code></pre>
 
 <p>Using <code>navigate()</code> ensures that the URL's fragment is kept in sync with the relevant controllers. It's important to note that <code>navigate()</code> <strong>won't</strong> trigger any events or route callbacks.</p>
+
+<h2>HTML5 History</h2>
+
+<p>Spine also gives you the option of using HTML5's History API, which has the advantage of being able to alter the url without a page refresh or using hash fragments. This means cleaner URLs in a format your users are accustomed to.</p>
+
+<p>To use the History API, instead of hash fragments, pass <code>{history: true}</code> to <code>setup()</code>:</p>
+
+<pre><code>Spine.Route.setup({history: true});
+</code></pre>
+
+<p>HTML5 History support will only be enabled if this option is present, and the API is available. Otherwise, Spine's routing will revert back to using hash fragments.</p>
+
+<p>However, there are some things you need to be aware of when using the History API. Firstly, ever URL you send to <code>navigate()</code> needs to have a real HTML representation. Although the browser won't request the new URL at that point, it will be requested if the page is subsequently reloaded. In other words you can't make up arbitrary URLs, like you can with hash fragments; every URL passed to the API needs to exist. One way of implementing this is with server side support.</p>
+
+<p>When browsers request a URL (expecting a HTML response) you first make sure on server-side that the endpoint exists and is valid. Then you can just serve up the main application, which will read the URL, invoking the appropriate routes. For example, let's say your user navigates to <code>http://example.com/users/1</code>. On the server-side, you check that the URL <code>/users/1</code> is valid, and that the User record with an ID of <code>1</code> exists. Then you can go ahead and just serve up the JavaScript application.</p>
+
+<p>The caveat to this approach is that it doesn't give search engine crawlers any real content. If you want your application to be crawl-able, you'll have to detect crawler bot requests, and serve them a 'parallel universe of content'. That is beyond the scope of this documentation though.</p>
 
 <h1>Patterns</h1>
 
@@ -784,10 +799,10 @@ Well, it's all about perceived speed - which makes a huge difference to the user
 <script type="text/javascript" charset="utf-8">
   jQuery(function($){
     function underscore(str) {
-      return str.replace(/::/g, '/')
-                .replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
+      return str.replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
                 .replace(/([a-z\d])([A-Z])/g, '$1_$2')
                 .replace(/-/g, '_')
+                .replace(/ /, '_')
                 .toLowerCase();
     }
 
