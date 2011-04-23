@@ -8,7 +8,7 @@ task :generate do
 <!DOCTYPE html>
 <html>
 <head>
-  <meta name="charset" content="utf-8">
+  <meta charset=utf-8>
   <title>Spine</title>
   <link rel="stylesheet" href="site/site.css" type="text/css" charset="utf-8">
   <link rel="stylesheet" href="site/highlight.css" type="text/css" charset="utf-8">
