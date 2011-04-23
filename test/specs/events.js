@@ -17,7 +17,7 @@ describe("Events", function(){
     expect(spy).toHaveBeenCalled();
   });
   
-  it("should fire correct events", function(){    
+  it("should trigger correct events", function(){    
     EventTest.bind("daddyo", spy);
     EventTest.trigger("motherio");
     expect(spy).not.toHaveBeenCalled();
