@@ -686,7 +686,9 @@ All resources are located in the *lib* folder in Spine's repository.
 * *lib/spine.route.js* - module for adding route support to Spine
 
 Any questions, just ask on the [Google Group](https://groups.google.com/forum/?hl=en#!forum/spinejs).  
-Found a bug? Open a [ticket on GitHub](https://github.com/maccman/spine/issues). 
+Found a bug? Open a [ticket on GitHub](https://github.com/maccman/spine/issues).
+
+Spine has a full Jasmine test suite - you can run it from inside the browser [here](test/index.html).  
 
 #FAQ
 
