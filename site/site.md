@@ -27,15 +27,15 @@ But don't take my word for it. Take a look at the source of the example applicat
 Spine includes some great example applications to show you what's possible with the framework, and give you a practical understanding of the library. Although Spine is cross browser, it's worth noting that some of the examples are for WebKit based browsers only (Chrome/Safari), due to browser specific CSS (i.e. they'll just look really ugly in other browsers). 
 
 Todos is a very simple to-do application. Users can CRUD tasks, and mark them as complete.
-The source is [available on GitHub](http://github.com/maccman/spine.todos).
+The source is [available on GitHub](http://github.com/maccman/spine.todos). [[Demo]](http://maccman.github.com/spine.todos)
 
 ![Spine Todos](https://lh4.googleusercontent.com/_IH1OempnqUc/TZF16JZSTlI/AAAAAAAABKM/ojAu7OBqXp8/s500/Screen%20shot%202011-03-29%20at%2019.01.44.png)
 
-Spine contacts is a simple address book, allowing users to CRUD contacts. The full source is [available on GitHub](http://github.com/maccman/spine.contacts). *WebKit only*.
+Spine contacts is a simple address book, allowing users to CRUD contacts. The full source is [available on GitHub](http://github.com/maccman/spine.contacts). *WebKit only*. [[Demo]](http://maccman.github.com/spine.contacts)
 
 ![Spine Contacts](https://lh5.googleusercontent.com/_IH1OempnqUc/TZpgYfnlUBI/AAAAAAAABKg/UYLhdmoc15o/s500/contacts.png)
 
-Holla is the most advanced example, and [can be found on GitHub](http://github.com/maccman/holla). Holla is a group chat application, and uses a combination of [Rails](http://rubyonrails.org), [Juggernaut](http://github.com/maccman/juggernaut) and Spine to let users chat in realtime. *WebKit only*.
+Holla is the most advanced example, and [can be found on GitHub](http://github.com/maccman/holla). Holla is a group chat application, and uses a combination of [Rails](http://rubyonrails.org), [Juggernaut](http://github.com/maccman/juggernaut) and Spine to let users chat in realtime. *WebKit only*. [[Demo]](http://maccman-holla.heroku.com)
 
 ![Holla](https://lh4.googleusercontent.com/_IH1OempnqUc/TZF1gMnidmI/AAAAAAAABKE/b9rp9RdtA3o/s500/Screen%20shot%202011-03-29%20at%2018.58.12.png)
  
