@@ -807,36 +807,36 @@ Well, it's all about perceived speed - which makes a huge difference to the user
                 .toLowerCase();
     }
 
-    var $div = $("<div />").attr("id", "sidebar");
+    var sidebar = $("<div />").attr("id", "sidebar");
     
     $("h1").each(function(){
       var name = $(this).text();
       $(this).attr("id", "h-" + dasherize(name));
 
-      $div.append(
+      sidebar.append(
         $("<a />").attr("href", "#" + $(this).attr("id")).text(name)
       )
 
-      var $subs = $(this).nextUntil("h1").filter("h2");
+      var subs = $(this).nextUntil("h1").filter("h2");
 
-      if( $subs.length > 0 ) {
-        var $list = $("<ul />");
-        $subs.each(function(){
-          var sub_name = $(this).text();
-          $(this).attr("id", "s-" + dasherize(name) + '-' + dasherize(sub_name));
+      if( subs.length > 0 ) {
+        var list = $("<ul />");
+        subs.each(function(){
+          var subName = $(this).text();
+          $(this).attr("id", "s-" + dasherize(name) + '-' + dasherize(subName));
 
-          $list.append(
+          list.append(
             $("<li />").append(
-              $("<a />").text(sub_name).attr("href", "#" + $(this).attr("id"))
+              $("<a />").text(subName).attr("href", "#" + $(this).attr("id"))
             )
           )
         });
         
-        $div.append($list);
+        sidebar.append(list);
       }
     });
     
-    $("body").prepend($div);
+    $("body").prepend(sidebar);
   });
 </script>
 
