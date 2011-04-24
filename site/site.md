@@ -685,6 +685,8 @@ All resources are located in the *lib* folder in Spine's repository.
 * *lib/spine.model.local.js* - module for adding Local Storage support to Spine's models
 * *lib/spine.route.js* - module for adding route support to Spine
 
+Any questions, just ask on the [Google Group](https://groups.google.com/forum/?hl=en#!forum/spinejs). Found a bug? Open a [ticket](https://github.com/maccman/spine/issues). 
+
 #FAQ
 
 * *Whoah - your API looks really similar to Backbone. Why should I use this instead?*
