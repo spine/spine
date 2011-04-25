@@ -32,7 +32,7 @@ describe("Routing", function(){
     Route.navigate("/users", 2);
     expect(window.location.hash).toEqual("#/users/2");
   });
-
+  
   it("can trigger routes", function(){
     Route.add({
       "/users":  $.proxy(spy, jasmine),
@@ -66,5 +66,33 @@ describe("Routing", function(){
     navigate("/page/gah", function(){
       expect(spy).toHaveBeenCalledWith("gah");
     });
-  });  
+  });
+  
+  it("shouldn't trigger routes when navigating", function(){
+    Route.add({
+      "/users/:id": spy
+    });
+    
+    Route.navigate("/users/1");
+    
+    waits(50);
+    
+    runs(function(){
+      expect(spy).not.toHaveBeenCalled();
+    });
+  });
+  
+  it("has option to trigger routes when navigating", function(){
+    Route.add({
+      "/users/:id": spy
+    });
+    
+    Route.navigate("/users/1", true);
+    
+    waits(50);
+    
+    runs(function(){
+      expect(spy).toHaveBeenCalled();
+    });
+  });
 });
