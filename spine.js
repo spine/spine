@@ -15,6 +15,15 @@
     return Array.prototype.slice.call(args, 0);
   };
   
+  // Shim Array, as these functions aren't in IE
+  if (typeof Array.prototype.indexOf === "undefined")
+    Array.prototype.indexOf = function(value){
+      for ( var i = 0; i < this.length; i++ )
+    		if ( this[ i ] === value )
+    			return i;
+    	return -1;
+    };
+  
   var Events = Spine.Events = {
     bind: function(ev, callback) {
       var evs   = ev.split(" ");
