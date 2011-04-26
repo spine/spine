@@ -224,7 +224,7 @@ To retrieve every contact, use `all()`.
 
     var contacts = Contact.all();
     for (var i=0; i < contacts.length; i++)
-      console.log( contact.first_name );
+      console.log( contacts[i].first_name );
 
 You can pass a function that'll be iterated over every record using `each()`.
 
