@@ -223,7 +223,7 @@ You can also use `first()` or `last()` on the model to retrieve the first and la
 To retrieve every contact, use `all()`.
 
     var contacts = Contact.all();
-    for (var i=0; i < contacts.length; i++) {
+    for (var i=0; i < contacts.length; i++)
       console.log( contact.first_name );
 
 You can pass a function that'll be iterated over every record using `each()`.
