@@ -558,14 +558,17 @@ Lastly, Spine gives controllers a `navigate()` function, which can be passed a f
 
     var Users = Spine.Controller.create({
       init: function(){
-        /* Navigate to #/users/:id */
-        this.route("/users", this.item.id);
+        // Navigate to #/users/:id
+        this.navigate("/users", this.item.id);
       }
     });
     
     Users.init({item: User.first()});
     
-Using `navigate()` ensures that the URL's fragment is kept in sync with the relevant controllers. It's important to note that `navigate()` __won't__ trigger any events or route callbacks. 
+Using `navigate()` ensures that the URL's fragment is kept in sync with the relevant controllers. By default, calling `navigate()` __won't__ trigger any events or route callbacks. If you want to trigger routes, pass a `true` boolean as the last argument to `navigate()`.
+
+    // Trigger routes by passing true
+    Spine.Route.navigate("/users", true);
 
 ##HTML5 History
 

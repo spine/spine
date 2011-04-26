@@ -639,15 +639,19 @@ contact.bind("save", function(){
 
 <pre><code>var Users = Spine.Controller.create({
   init: function(){
-    /* Navigate to #/users/:id */
-    this.route("/users", this.item.id);
+    // Navigate to #/users/:id
+    this.navigate("/users", this.item.id);
   }
 });
 
 Users.init({item: User.first()});
 </code></pre>
 
-<p>Using <code>navigate()</code> ensures that the URL's fragment is kept in sync with the relevant controllers. It's important to note that <code>navigate()</code> <strong>won't</strong> trigger any events or route callbacks.</p>
+<p>Using <code>navigate()</code> ensures that the URL's fragment is kept in sync with the relevant controllers. By default, calling <code>navigate()</code> <strong>won't</strong> trigger any events or route callbacks. If you want to trigger routes, pass a <code>true</code> boolean as the last argument to <code>navigate()</code>.</p>
+
+<pre><code>// Trigger routes by passing true
+Spine.Route.navigate("/users", true);
+</code></pre>
 
 <h2>HTML5 History</h2>
 
