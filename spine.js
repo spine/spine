@@ -1,16 +1,16 @@
-(function(){
+(function(global){
   
   var Spine;
   if (typeof exports !== "undefined") {
     Spine = exports;
   } else {
-    Spine = this.Spine = {};
+    Spine = global.Spine = {};
   }
   
   Spine.version = "0.0.3";
   
-  var $ = Spine.$ = this.jQuery || this.Zepto;
-  
+  var $ = Spine.$ = global.jQuery || global.Zepto;
+
   var makeArray = Spine.makeArray = function(args){
     return Array.prototype.slice.call(args, 0);
   };
@@ -74,7 +74,7 @@
       return this;
     }
   };
-  
+
   var Log = Spine.Log = {
     trace: true,
     
@@ -455,7 +455,11 @@
       for (var key in this.options)
         this[key] = this.options[key];
 
-      if (!this.el) this.el = document.createElement(this.tag);
+      if( !this.el )
+        // Test for DOM environment
+        this.el = ('document' in global && typeof global.document.createElement == 'function')
+          ? global.document.createElement(this.tag) : {};
+
       this.el = $(this.el);
 
       if ( !this.events ) this.events = this.parent.events;
@@ -507,4 +511,4 @@
     }
   }).init();
   Controller.fn.App = Spine.App;
-})();
+})(this);
