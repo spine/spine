@@ -57,10 +57,13 @@ describe("Model", function(){
     Asset.find(asset.id).updateAttributes({name: "foo.pdf"});
     
     expect(asset.name).toEqual("test.pdf");
-    asset.reload();
+    var original = asset.reload();
     expect(asset.name).toEqual("foo.pdf");
+    
+    // Reload should return a clone, more useful that way
+    expect(original.__proto__.__proto__).toEqual(Asset.prototype)
   });
-  
+    
   it("can select records", function(){
     var asset1 = Asset.create({name: "test.pdf"});
     var asset2 = Asset.create({name: "foo.pdf"});
@@ -256,6 +259,20 @@ describe("Model", function(){
       
       var asset = Asset.create({name: ""});
       expect(spy).toHaveBeenCalledWith(asset, "Name required");
+    });
+    
+    it("it should pass clones with events", function(){
+      Asset.bind("create", function(asset){
+        expect(asset.__proto__).not.toBe(Asset.prototype);
+        expect(asset.__proto__.__proto__).toBe(Asset.prototype);
+      });
+      
+      Asset.bind("update", function(asset){
+        expect(asset.__proto__).not.toBe(Asset.prototype);
+        expect(asset.__proto__.__proto__).toBe(Asset.prototype);
+      });
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.updateAttributes({name: "lonely heart.png"});
     });
   });
 });

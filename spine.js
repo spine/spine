@@ -381,13 +381,13 @@
     save: function(){
       var error = this.validate();
       if (error) {
-        if ( !this.trigger("error", error) )
+        if ( !this.trigger("error", this, error) )
           throw("Validation failed: " + error);
       }
       
-      this.trigger("beforeSave");
+      this.trigger("beforeSave", this);
       this.newRecord ? this.create() : this.update();
-      this.trigger("save");
+      this.trigger("save", this);
     },
 
     updateAttribute: function(name, value){
@@ -401,9 +401,9 @@
     },
 
     destroy: function(){
-      this.trigger("beforeDestroy");
+      this.trigger("beforeDestroy", this);
       delete this.parent.records[this.id];
-      this.trigger("destroy");
+      this.trigger("destroy", this);
     },
 
     dup: function(){
@@ -417,9 +417,10 @@
     },
 
     reload: function(){
-      if ( !this.newRecord )
-      this.load(this.parent.find(this.id).attributes());
-      return this;
+      if ( this.newRecord ) return this;
+      var original = this.parent.find(this.id);
+      this.load(original.attributes());
+      return original;
     },
 
     toJSON: function(){
@@ -433,17 +434,19 @@
     // Private
 
     update: function(){
-      this.trigger("beforeUpdate");
-      this.parent.records[this.id].load(this.attributes());
-      this.trigger("update");
+      this.trigger("beforeUpdate", this);
+      var records = this.parent.records;
+      records[this.id].load(this.attributes());
+      this.trigger("update", records[this.id].clone());
     },
 
     create: function(){
-      this.trigger("beforeCreate");
+      this.trigger("beforeCreate", this);
       if ( !this.id ) this.id = Spine.guid();
-      this.newRecord = false;
-      this.parent.records[this.id] = this.dup();
-      this.trigger("create");
+      this.newRecord   = false;
+      var records      = this.parent.records;
+      records[this.id] = this.dup();
+      this.trigger("create", records[this.id].clone());
     },
     
     bind: function(events, callback){
@@ -453,10 +456,8 @@
       }));
     },
     
-    trigger: function(events){
-      var args = makeArray(arguments);
-      args.splice(1, 0, this);
-      return this.parent.trigger.apply(this.parent, args);
+    trigger: function(){
+      return this.parent.trigger.apply(this.parent, arguments);
     }
   });
   
