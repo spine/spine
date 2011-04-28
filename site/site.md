@@ -381,6 +381,25 @@ For model level callbacks, any associated record is always passed to the callbac
     
 The callback's context will be the record that the event listener was placed on. You'll find model events crucial when it comes to binding records to the view, making sure the view is kept in sync with your application's data. 
 
+##Dynamic records
+
+One rather neat addition to Spine's models is dynamic records, which use prototypal inheritance to stay updated. Any calls to `find()`, `all()`, `first()`, `last()` etc, and model event callbacks return a *clone* of the saved record. This means that whenever a record is updated, all of its clones will immediately reflect that update.
+
+Let's give you a code example; we're going to create an asset, and a clone of that asset. You'll notice that when the asset is updated, the clone has also automatically changed. 
+
+    var asset = Asset.create({name: "whatshisname"});
+    
+    // Completely new asset instance
+    var clone = Asset.find(asset.id);
+
+    // Change saved asset
+    asset.updateAttributes({name: "bob"});
+    
+    // Clone reflects changes
+    assertEqual(clone.name, "bob");
+    
+This means that you never have to bother calling some sort of `reload()` functions on instances. You can be sure that all instances are constantly in sync with their saved versions. 
+
 #Controllers
 
 Controllers are the last part to the trinity of Spine and are very simple, being more of a set of conventions than actual code. Controllers are the glue inside your application, tying the various components together. Generally, controllers deal with adding and responding to DOM events, rendering templates and keeping views and models in sync.
