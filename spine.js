@@ -314,6 +314,18 @@
     toJSON: function(){
       return this.recordsValues();
     },
+    
+    fromJSON: function(objects){
+      var self = this;
+      if (typeof objects == "string")
+        objects = JSON.parse(objects)
+      if (typeof objects == "array")
+        return($.map(objects, function(){
+          return self.init(this);
+        }));
+      else
+       return this.init(objects);
+    },
 
     // Private
 

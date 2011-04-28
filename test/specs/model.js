@@ -121,6 +121,14 @@ describe("Model", function(){
     expect(JSON.stringify(asset)).toEqual('{"name":"Johnson me!"}');
   });
   
+  it("can be serialized from JSON", function(){
+    var asset = Asset.fromJSON('{"name":"Un-Johnson me!"}')
+    expect(asset.name).toEqual("Un-Johnson me!");
+    
+    var assets = Asset.fromJSON('[{"name":"Un-Johnson me!"}]')
+    expect(assets[0] && assets[0].name).toEqual("Un-Johnson me!");
+  });
+  
   it("can validate", function(){
     Asset.include({
       validate: function(){
