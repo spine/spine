@@ -57,7 +57,7 @@ describe("Model", function(){
     Asset.find(asset.id).updateAttributes({name: "foo.pdf"});
     
     expect(asset.name).toEqual("test.pdf");
-    asset = asset.reload();
+    asset.reload();
     expect(asset.name).toEqual("foo.pdf");
   });
   
@@ -154,6 +154,37 @@ describe("Model", function(){
   it("can generate GUID", function(){
     var asset = Asset.create({name: "who's in the house?"});
     expect(asset.id.length).toEqual(36);
+  });
+  
+  it("can be duplicated", function(){
+    var asset = Asset.create({name: "who's your daddy?"});
+    expect(asset.dup().__proto__).toBe(Asset.prototype);
+    
+    expect(asset.name).toEqual("who's your daddy?");
+    asset.name = "I am your father";
+    expect(asset.reload().name).toBe("who's your daddy?");
+  });
+  
+  it("can be cloned", function(){
+    var asset = Asset.create({name: "what's cooler than cool?"});    
+    expect(asset.clone().__proto__).not.toBe(Asset.prototype);
+    expect(asset.clone().__proto__.__proto__).toBe(Asset.prototype);
+    
+    expect(asset.name).toEqual("what's cooler than cool?");
+    asset.name = "ice cold";
+    expect(asset.reload().name).toBe("what's cooler than cool?");
+  });
+  
+  it("clones are dynamic", function(){
+    var asset = Asset.create({name: "hotel california"});    
+
+    // reload reference
+    var clone = Asset.find(asset.id);
+    
+    asset.name = "checkout anytime";
+    asset.save();
+    
+    expect(clone.name).toEqual("checkout anytime");
   });
   
   describe("with spy", function(){

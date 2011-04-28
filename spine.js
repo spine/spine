@@ -210,7 +210,7 @@
     find: function(id){
       var record = this.records[id];
       if ( !record ) throw("Unknown record");
-      return record.dup();
+      return record.clone();
     },
 
     exists: function(id){
@@ -240,13 +240,13 @@
         if (callback(this.records[key]))
           result.push(this.records[key]);
 
-      return this.dupArray(result);
+      return this.cloneArray(result);
     },
 
     findByAttribute: function(name, value){
       for (var key in this.records)
         if (this.records[key][name] == value)
-          return this.records[key].dup();
+          return this.records[key].clone();
     },
 
     findAllByAttribute: function(name, value){
@@ -261,18 +261,18 @@
     },
 
     all: function(){
-      return this.dupArray(this.recordsValues());
+      return this.cloneArray(this.recordsValues());
     },
 
     first: function(){
       var record = this.recordsValues()[0];
-      return(record && record.dup());
+      return(record && record.clone());
     },
 
     last: function(){
       var values = this.recordsValues()
       var record = values[values.length - 1];
-      return(record && record.dup());
+      return(record && record.clone());
     },
 
     count: function(){
@@ -336,7 +336,7 @@
       return result;
     },
 
-    dupArray: function(array){
+    cloneArray: function(array){
       var result = [];
       for (var i=0; i < array.length; i++)
         result.push(array[i].dup());
@@ -411,9 +411,15 @@
       result.newRecord = this.newRecord;
       return result;
     },
+    
+    clone: function(){
+      return Object.create(this);
+    },
 
     reload: function(){
-      return(this.parent.find(this.id));
+      if ( !this.newRecord )
+      this.load(this.parent.find(this.id).attributes());
+      return this;
     },
 
     toJSON: function(){
@@ -428,7 +434,7 @@
 
     update: function(){
       this.trigger("beforeUpdate");
-      this.parent.records[this.id] = this.dup();
+      this.parent.records[this.id].load(this.attributes());
       this.trigger("update");
     },
 
