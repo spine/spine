@@ -388,6 +388,7 @@
       this.trigger("beforeSave", this);
       this.newRecord ? this.create() : this.update();
       this.trigger("save", this);
+      return this;
     },
 
     updateAttribute: function(name, value){
