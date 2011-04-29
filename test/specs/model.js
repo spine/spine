@@ -3,6 +3,7 @@ describe("Model", function(){
   
   beforeEach(function(){
     Asset = Spine.Model.setup("Asset", ["name"]);
+    Spine.id = 'id';
   });
   
   it("can create records", function(){
@@ -157,6 +158,14 @@ describe("Model", function(){
   it("can generate GUID", function(){
     var asset = Asset.create({name: "who's in the house?"});
     expect(asset.id.length).toEqual(36);
+  });
+
+  it("can use a different field for the id", function(){
+    Spine.id = '_id';
+    var asset = Asset.create({name: "do you know who you are?"});
+    expect(asset._id).toBeTruthy();
+
+    expect(Asset.find(asset._id)).toEqual(asset);
   });
   
   it("can be duplicated", function(){

@@ -208,7 +208,7 @@
     },
 
     find: function(id){
-      var record = this.records[Spine.id];
+      var record = this.records[id];
       if ( !record ) throw("Unknown record");
       return record.clone();
     },
