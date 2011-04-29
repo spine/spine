@@ -208,7 +208,7 @@
     },
 
     find: function(id){
-      var record = this.records[id];
+      var record = this.records[Spine.id];
       if ( !record ) throw("Unknown record");
       return record.clone();
     },
@@ -227,7 +227,7 @@
       for (var i=0, il = values.length; i < il; i++) {    
         var record = this.init(values[i]);
         record.newRecord = false;
-        this.records[record.id] = record;
+        this.records[record[Spine.id]] = record;
       }
 
       this.trigger("refresh");
@@ -369,12 +369,12 @@
         var attr = this.parent.attributes[i];
         result[attr] = this[attr];
       }
-      result.id = this.id;
+      result[Spine.id] = this[Spine.id];
       return result;
     },
 
     eql: function(rec){
-      return(rec && rec.id === this.id && 
+      return(rec && rec[Spine.id] === this[Spine.id] && 
              rec.parent === this.parent);
     },
 
@@ -403,7 +403,7 @@
 
     destroy: function(){
       this.trigger("beforeDestroy", this);
-      delete this.parent.records[this.id];
+      delete this.parent.records[this[Spine.id]];
       this.trigger("destroy", this);
     },
 
@@ -419,7 +419,7 @@
 
     reload: function(){
       if ( this.newRecord ) return this;
-      var original = this.parent.find(this.id);
+      var original = this.parent.find(this[Spine.id]);
       this.load(original.attributes());
       return original;
     },
@@ -429,7 +429,7 @@
     },
     
     exists: function(){
-      return(this.id && this.id in this.parent.records);
+      return(this[Spine.id] && this[Spine.id] in this.parent.records);
     },
 
     // Private
@@ -437,17 +437,17 @@
     update: function(){
       this.trigger("beforeUpdate", this);
       var records = this.parent.records;
-      records[this.id].load(this.attributes());
-      this.trigger("update", records[this.id].clone());
+      records[this[Spine.id]].load(this.attributes());
+      this.trigger("update", records[this[Spine.id]].clone());
     },
 
     create: function(){
       this.trigger("beforeCreate", this);
-      if ( !this.id ) this.id = Spine.guid();
+      if ( !this[Spine.id] ) this[Spine.id] = Spine.guid();
       this.newRecord   = false;
       var records      = this.parent.records;
-      records[this.id] = this.dup();
-      this.trigger("create", records[this.id].clone());
+      records[this[Spine.id]] = this.dup();
+      this.trigger("create", records[this[Spine.id]].clone());
     },
     
     bind: function(events, callback){
