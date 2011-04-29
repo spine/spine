@@ -520,11 +520,7 @@
   Controller.include(Events);
   Controller.include(Log);
   
-  Spine.App = Controller.create({
-    create: function(properties){
-      this.parent.include(properties);
-      return this;
-    }
-  }).init();
+  Spine.App = Class.create();
+  Spine.App.extend(Events)
   Controller.fn.App = Spine.App;
 })();

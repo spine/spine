@@ -44,6 +44,12 @@ describe("Controller", function(){
     expect(users.weirdScope.apply({})).toBe(users);
   });
   
+  it("has App", function(){
+    var users = Users.init();
+    expect(users.App).toBeTruthy();
+    expect(users.App.bind).toBeTruthy();
+  });
+  
   describe("with spy", function(){
     var spy;
     
