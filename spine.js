@@ -355,6 +355,10 @@
     isNew: function(){
       return this.newRecord;
     },
+    
+    isValid: function(){
+      return(!this.validate());
+    },
 
     validate: function(){ },
 
@@ -380,7 +384,7 @@
 
     save: function(){
       var error = this.validate();
-      if (error) {
+      if ( error ) {
         if ( !this.trigger("error", this, error) )
           throw("Validation failed: " + error);
       }

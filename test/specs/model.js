@@ -144,9 +144,13 @@ describe("Model", function(){
       Asset.create({name: ""})
     }).toThrow();
     
+    expect(Asset.init({name: ""}).isValid()).toBeFalsy();
+    
     expect(function(){
       Asset.create({name: "Yo big dog"})
     }).not.toThrow();
+    
+    expect(Asset.init({name: "Yo big dog"}).isValid()).toBeTruthy();
   });
   
   it("has attribute hash", function(){
