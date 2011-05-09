@@ -307,8 +307,8 @@
       this.bind("change", callback);
     },
 
-    fetch: function(callback){
-      callback ? this.bind("fetch", callback) : this.trigger("fetch");
+    fetch: function(callbackOrParams){
+      $.isFunction(callbackOrParams) ? this.bind("fetch", callbackOrParams) : this.trigger("fetch", callbackOrParams);
     },
 
     toJSON: function(){
