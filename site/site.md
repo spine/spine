@@ -18,9 +18,15 @@ So, what's so special about Spine, how does it stand out from the crowd?
 * Full __model__ layer and ORM
 * Ajax and HTML5 Local Storage adapters baked in
 * Asynchronous server communication
+* Works in __all major browsers__ (Chrome, Safari, Firefox, IE >= 7)
 * Simple and lightweight
+* Thorough documentation
 
 But don't take my word for it. Take a look at the source of the example applications below, and decide for yourself. 
+
+#Tutorials
+
+Spine has a growing __[set of tutorials](http://maccman.github.com/spine.tutorials/)__, from layouts, tabs and sidebars to forms, updating records and validation.
 
 #Examples
 
@@ -701,7 +707,7 @@ For one thing, it's more performant; the list doesn't need to be re-drawn whenev
 All resources are located in the *lib* folder in Spine's repository. 
 
 * *lib/spine.list.js* - controller for managing lists, such as menus
-* *lib/spine.controller.manager.js* - class for managing controllers, basically a state machine
+* *lib/spine.manager.js* - class for managing controllers, basically a state machine
 * *lib/spine.model.ajax.js* - module for adding Ajax support to Spine's models
 * *lib/spine.model.local.js* - module for adding Local Storage support to Spine's models
 * *lib/spine.route.js* - module for adding route support to Spine
