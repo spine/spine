@@ -254,6 +254,8 @@ If `validate()` returns anything, the validation will fail and an *error* event 
     Contact.bind("error", function(rec, msg){
       alert("Contact failed to save - " + msg);
     });
+    
+In addition, `save()`, `create()` and `updateAttributes()` will all return false if validation fails.
 
 ##Serialization
 

@@ -106,7 +106,7 @@
     created: function(){},
     
     prototype: {
-      initializer: function(){},
+      initialize: function(){},
       init: function(){}
     },
 
@@ -127,7 +127,7 @@
       var initance = Object.create(this.prototype);
       initance.parent = this;
 
-      initance.initializer.apply(initance, arguments);
+      initance.initialize.apply(initance, arguments);
       initance.init.apply(initance, arguments);
       return initance;
     },
@@ -295,8 +295,7 @@
 
     create: function(atts){
       var record = this.init(atts);
-      record.save();
-      return record;
+      return record.save();
     },
 
     destroy: function(id){
@@ -307,8 +306,8 @@
       this.bind("change", callback);
     },
 
-    fetch: function(params){
-      $.isFunction(params) ? this.bind("fetch", params) : this.trigger("fetch", params);
+    fetch: function(callback){
+      callback ? this.bind("fetch", callback) : this.trigger("fetch");
     },
 
     toJSON: function(){
@@ -385,8 +384,8 @@
     save: function(){
       var error = this.validate();
       if ( error ) {
-        if ( !this.trigger("error", this, error) )
-          throw("Validation failed: " + error);
+        this.trigger("error", this, error)
+        return false;
       }
       
       this.trigger("beforeSave", this);
@@ -473,7 +472,7 @@
   var Controller = Spine.Controller = Class.create({
     tag: "div",
     
-    initializer: function(options){
+    initialize: function(options){
       this.options = options;
 
       for (var key in this.options)

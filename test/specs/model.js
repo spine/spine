@@ -140,16 +140,10 @@ describe("Model", function(){
       }
     });
     
-    expect(function(){
-      Asset.create({name: ""})
-    }).toThrow();
-    
+    expect(Asset.create({name: ""})).toBeFalsy();
     expect(Asset.init({name: ""}).isValid()).toBeFalsy();
     
-    expect(function(){
-      Asset.create({name: "Yo big dog"})
-    }).not.toThrow();
-    
+    expect(Asset.create({name: "Yo big dog"}).toBeTruthy();
     expect(Asset.init({name: "Yo big dog"}).isValid()).toBeTruthy();
   });
   
