@@ -7,7 +7,7 @@
     Spine = this.Spine = {};
   }
   
-  Spine.version = "0.0.3";
+  Spine.version = "0.0.4";
   
   var $ = Spine.$ = this.jQuery || this.Zepto;
   

@@ -6,7 +6,7 @@ Spine is opinionated and, although at first glance it might look similar to othe
 
 Spine is tiny, the library comes in at around 500 lines of JavaScript, that's about 2K minified & compressed. However, it's not about size, it's how you use it, and Spine certainly packs a punch! 
 
-__Latest version:__ [0.0.3](spine.js) ([minified](spine.min.js)).
+__Latest version:__ [0.0.4](spine.js) ([minified](spine.min.js)).
 Or check out the [source code](http://github.com/maccman/spine).
 
 #Overview
@@ -740,6 +740,8 @@ Spine has a full Jasmine test suite - you can run it from inside the browser [he
 #Change Log
 
 __0.0.2:__ 17/04/2011 - first public release
+__0.0.3:__ 25/04/2011 - IE support, tests and fixes
+__0.0.4:__ 11/05/2011 - Spine.Manager, Spine.List and Spine.Tabs
 
 <script type="text/javascript" charset="utf-8">
   jQuery(function($){
