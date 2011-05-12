@@ -246,7 +246,12 @@ describe("Model", function(){
     });
     
     it("can fire error events", function(){
+      var errorAsset;
+      
       Asset.bind("error", spy);
+      Asset.bind("error", function(asset,message) {
+        errorAsset = asset;
+      });
             
       Asset.include({
         validate: function(){
@@ -256,7 +261,8 @@ describe("Model", function(){
       });
       
       var asset = Asset.create({name: ""});
-      expect(spy).toHaveBeenCalledWith(asset, "Name required");
+      expect(spy).toHaveBeenCalledWith(errorAsset, "Name required");
+      expect(asset).toEqual(false);
     });
     
     it("it should pass clones with events", function(){
