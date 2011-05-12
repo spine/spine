@@ -124,12 +124,12 @@
     },
 
     init: function(){
-      var initance = Object.create(this.prototype);
-      initance.parent = this;
+      var instance = Object.create(this.prototype);
+      instance.parent = this;
 
-      initance.initialize.apply(initance, arguments);
-      initance.init.apply(initance, arguments);
-      return initance;
+      instance.initialize.apply(initance, arguments);
+      instance.init.apply(initance, arguments);
+      return instance;
     },
 
     proxy: function(func){
