@@ -261,7 +261,7 @@ If `validate()` returns anything, the validation will fail and an *error* event 
       alert("Contact failed to save - " + msg);
     });
     
-In addition, `save()`, `create()` and `updateAttributes()` will all return false if validation fails.
+In addition, `save()`, `create()` and `updateAttributes()` will all return false if validation fails. For more information about validation, see the [form tutorial](http://maccman.github.com/spine.tutorials/form.html).
 
 ##Serialization
 
@@ -280,10 +280,14 @@ Alternatively, you can retrieve an instance's attributes and implement your own 
         return serializeToXML(this.attributes());
       }
     });
+    
+If you're using an older browser which doesn't have native JSON support (i.e. IE 7), you'll need to include [json2.js](https://github.com/douglascrockford/JSON-js/blob/master/json2.js) which adds legacy support. 
 
 ##Persistence
 
 While storing records in memory is useful for quick retrieval, persisting them in one way or another is often required. Spine includes a number of pre-existing storage modules, such as Ajax and HTML5 Local Storage, which you can use for persistence. Alternatively you can roll your own custom one, take a look at `spine.model.ajax.js` for inspiration. 
+
+Spine's persistence is implemented via modules, so for HTML5 Local Storage persistence you'll need to include [spine.model.local.js](lib/spine.model.local.js) script in the page and for Ajax persistence you'll need [spine.model.ajax.js](lib/spine.model.ajax.js).
 
 To persist a model using HTML5 Local Storage, simply extend it with `Spine.Model.Local`.
 
