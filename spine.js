@@ -9,7 +9,7 @@
   
   Spine.version = "0.0.4";
   
-  var $ = Spine.$ = this.jQuery || this.Zepto;
+  var $ = Spine.$ = this.jQuery || this.Zepto || function(){ return arguments[0]; };
   
   var makeArray = Spine.makeArray = function(args){
     return Array.prototype.slice.call(args, 0);
@@ -315,15 +315,17 @@
     },
     
     fromJSON: function(objects){
-      var self = this;
+      if ( !objects ) return;
       if (typeof objects == "string")
         objects = JSON.parse(objects)
-      if (typeof objects == "array")
-        return($.map(objects, function(){
-          return self.init(this);
-        }));
-      else
-       return this.init(objects);
+      if (typeof objects.length == "number") {
+        var results = [];
+        for (var i=0; i < objects.length; i++)
+          results.push(this.init(objects[i]));
+        return results;
+      } else {
+        return this.init(objects);
+      }
     },
 
     // Private
