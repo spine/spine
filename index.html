@@ -294,7 +294,7 @@ for (var i=0; i &lt; contacts.length; i++)
 
 <p>Validating models is dirt simple, simply override the <code>validate()</code> function with your own custom one.</p>
 
-<pre><code>Contact.extend({
+<pre><code>Contact.include({
   validate: function(){
     if (!this.first_name)
       return "First name is required";

@@ -248,7 +248,7 @@ Or select a subset of records with `select()`.
 
 Validating models is dirt simple, simply override the `validate()` function with your own custom one.
 
-    Contact.extend({
+    Contact.include({
       validate: function(){
         if (!this.first_name)
           return "First name is required";
