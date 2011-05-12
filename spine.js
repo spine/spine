@@ -127,8 +127,8 @@
       var instance = Object.create(this.prototype);
       instance.parent = this;
 
-      instance.initialize.apply(initance, arguments);
-      instance.init.apply(initance, arguments);
+      instance.initialize.apply(instance, arguments);
+      instance.init.apply(instance, arguments);
       return instance;
     },
 
