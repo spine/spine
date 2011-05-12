@@ -273,4 +273,27 @@ describe("Model", function(){
       asset.updateAttributes({name: "lonely heart.png"});
     });
   });
+  
+  describe("Children", function(){
+    var Child;
+    
+    beforeEach(function(){
+      Child = Spine.Model.setup("Child", ["name"]);
+      Asset.attributes = [ "name", "child" ];
+      Asset.include({
+        init: function(atts){
+          if (atts) this.load(atts);
+          var child = this.child;
+          this.child = Child.sub();
+          //this.child.attributes = Child.attributes;
+          if (child) this.child.refresh(child.records || child);
+        }
+      });
+    });
+    
+    it("should have same attributes", function(){
+      var asset = Asset.create({name: "that guy"});
+      expect(asset.child.attributes).toEqual(Child.attributes);
+    });
+  });
 });

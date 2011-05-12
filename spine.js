@@ -194,7 +194,7 @@
     
     created: function(sub){
       this.records = {};
-      this.attributes = [];
+      if (!this.attributes) this.attributes = [];
 
       this.bind("create",  this.proxy(function(record){ 
         this.trigger("change", "create", record);
