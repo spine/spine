@@ -143,7 +143,7 @@ describe("Model", function(){
     expect(Asset.create({name: ""})).toBeFalsy();
     expect(Asset.init({name: ""}).isValid()).toBeFalsy();
     
-    expect(Asset.create({name: "Yo big dog"}).toBeTruthy();
+    expect(Asset.create({name: "Yo big dog"})).toBeTruthy();
     expect(Asset.init({name: "Yo big dog"}).isValid()).toBeTruthy();
   });
   
@@ -255,7 +255,8 @@ describe("Model", function(){
         }
       });
       
-      var asset = Asset.create({name: ""});
+      var asset = Asset.init({name: ""});
+      expect(asset.save()).toBeFalsy();
       expect(spy).toHaveBeenCalledWith(asset, "Name required");
     });
     
