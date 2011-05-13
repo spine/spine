@@ -193,22 +193,26 @@
     },
     
     created: function(sub){
-      this.records = {};
+      if (!this.records) {
+          this.records = {};
+          
+          this.bind("create",  this.proxy(function(record){ 
+            this.trigger("change", "create", record);
+          }));
+          this.bind("update",  this.proxy(function(record){ 
+            this.trigger("change", "update", record);
+          }));
+          this.bind("destroy", this.proxy(function(record){ 
+            this.trigger("change", "destroy", record);
+          }));
+      }
       
       if (this.attributes)
         this.attributes = makeArray(this.attributes);
       else
         this.attributes = [];
 
-      this.bind("create",  this.proxy(function(record){ 
-        this.trigger("change", "create", record);
-      }));
-      this.bind("update",  this.proxy(function(record){ 
-        this.trigger("change", "update", record);
-      }));
-      this.bind("destroy", this.proxy(function(record){ 
-        this.trigger("change", "destroy", record);
-      }));
+      
     },
 
     find: function(id){
