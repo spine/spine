@@ -104,10 +104,11 @@
   var Class = Spine.Class = {
     inherited: function(){},
     created: function(){},
-    
+
     prototype: {
-      initialize: function(){},
-      init: function(){}
+      preinit: function (){},
+      init: function () {},
+      postinit: function(){}
     },
 
     create: function(include, extend){
@@ -127,8 +128,9 @@
       var instance = Object.create(this.prototype);
       instance.parent = this;
 
-      instance.initialize.apply(instance, arguments);
+      instance.preinit.apply(instance, arguments);
       instance.init.apply(instance, arguments);
+      instance.postinit.apply(instance, arguments);
       return instance;
     },
 
@@ -215,7 +217,7 @@
     refresh: function(values){
       this.records = {};
 
-      for (var i=0, il = values.length; i < il; i++) {    
+      for (var i=0, il = values.length; i < il; i++) {
         var record = this.init(values[i]);
         record.newRecord = false;
         this.records[record.id] = record;
@@ -458,6 +460,10 @@
       }));
     },
     
+    unbind: function(events) {
+        this.parent.unbind(events);
+    },
+    
     trigger: function(){
       return this.parent.trigger.apply(this.parent, arguments);
     }
@@ -470,12 +476,14 @@
   var Controller = Spine.Controller = Class.create({
     tag: "div",
     
-    initialize: function(options){
-      this.options = options;
+    preinit: function(options) {
+        this.options = options;
 
-      for (var key in this.options)
-        this[key] = this.options[key];
-
+        for (var key in this.options)
+            this[key] = this.options[key];
+    },
+          
+    postinit: function(options){
       if (!this.el) this.el = document.createElement(this.tag);
       this.el = $(this.el);
 
