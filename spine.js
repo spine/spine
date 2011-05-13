@@ -196,11 +196,8 @@
     
     created: function(sub){
       this.records = {};
-      
-      if (this.attributes)
-        this.attributes = makeArray(this.attributes);
-      else
-        this.attributes = [];
+      this.attributes = this.attributes ? 
+        makeArray(this.attributes) : [];
     },
 
     find: function(id){
@@ -406,7 +403,7 @@
       this.trigger("beforeDestroy", this);
       delete this.parent.records[this.id];
       this.trigger("destroy", this);
-      this.trigger("change", "destroy", this);
+      this.trigger("change", this, "destroy");
     },
 
     dup: function(){
@@ -442,7 +439,7 @@
       records[this.id].load(this.attributes());
       var clone = records[this.id].clone();
       this.trigger("update", clone);
-      this.trigger("change", "update", clone);
+      this.trigger("change", clone, "update");
     },
 
     create: function(){
@@ -453,7 +450,7 @@
       records[this.id] = this.dup();
       var clone        = records[this.id].clone();
       this.trigger("create", clone);
-      this.trigger("change", "create", clone);
+      this.trigger("change", clone, "create");
     },
     
     bind: function(events, callback){
