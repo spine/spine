@@ -199,16 +199,6 @@
         this.attributes = makeArray(this.attributes);
       else
         this.attributes = [];
-
-      this.bind("create",  this.proxy(function(record){ 
-        this.trigger("change", "create", record);
-      }));
-      this.bind("update",  this.proxy(function(record){ 
-        this.trigger("change", "update", record);
-      }));
-      this.bind("destroy", this.proxy(function(record){ 
-        this.trigger("change", "destroy", record);
-      }));
     },
 
     find: function(id){
@@ -414,6 +404,7 @@
       this.trigger("beforeDestroy", this);
       delete this.parent.records[this.id];
       this.trigger("destroy", this);
+      this.trigger("change", "destroy", this);
     },
 
     dup: function(){
@@ -447,7 +438,9 @@
       this.trigger("beforeUpdate", this);
       var records = this.parent.records;
       records[this.id].load(this.attributes());
-      this.trigger("update", records[this.id].clone());
+      var clone = records[this.id].clone();
+      this.trigger("update", clone);
+      this.trigger("change", "update", clone);
     },
 
     create: function(){
@@ -456,7 +449,9 @@
       this.newRecord   = false;
       var records      = this.parent.records;
       records[this.id] = this.dup();
-      this.trigger("create", records[this.id].clone());
+      var clone        = records[this.id].clone();
+      this.trigger("create", clone);
+      this.trigger("change", "create", clone);
     },
     
     bind: function(events, callback){
