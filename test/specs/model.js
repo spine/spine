@@ -188,25 +188,55 @@ describe("Model", function(){
     expect(clone.name).toEqual("checkout anytime");
   });
   
-  it("should be able to have models as attributes", function(){
-    var User = Spine.Model.setup("User", ["assets"]);
-    
-    User.include({
-      init: function(atts){
-        if (atts) this.load(atts);
-        var assets  = this.assets;
-        this.assets = Asset.sub();
-        if (assets) this.assets.refresh(assets.records || assets);
-      }
+  describe("models as attribues", function() {
+    var User;
+
+    beforeEach(function() {
+      User = Spine.Model.setup("User", ["assets"]);
+
+      User.include({
+        init: function(atts) {
+          if (atts) this.load(atts);
+          var assets = this.assets;
+          this.assets = Asset.sub();
+          if (assets) this.assets.refresh(assets.records || assets);
+        }
+      });
     });
-    
-    var user = User.create({name: "that guy"});
-    expect(user.assets.attributes).toEqual(Asset.attributes);
-    
-    var asset = user.assets.create({name: "test.pdf"});
-    user.save();
-    
-    expect(User.first().assets.first()).toEqual(asset);
+
+    it("should be able to have models as attributes", function() {
+      var user = User.create({
+        name: "that guy"
+      });
+      expect(user.assets.attributes).toEqual(Asset.attributes);
+
+      var asset = user.assets.create({
+        name: "test.pdf"
+      });
+      user.save();
+
+      expect(User.first().assets.first()).toEqual(asset);
+    });
+
+      it("should fire one change event for a model as attribute", function() {
+        var noop = {
+          spy: function() {}
+        };
+        spyOn(noop, "spy");
+        var spy = noop.spy;
+
+        var user = User.create({
+          name: "that guy"
+        });
+
+        Asset.bind("change", spy);
+
+        var asset = user.assets.create({
+          name: "test.pdf"
+        });
+
+        expect(spy.callCount).toEqual(1);
+      });
   });
   
   describe("with spy", function(){
