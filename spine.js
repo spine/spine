@@ -460,6 +460,10 @@
       }));
     },
     
+    unbind: function(events) {
+        this.parent.unbind(events);
+    },
+    
     trigger: function(){
       return this.parent.trigger.apply(this.parent, arguments);
     }

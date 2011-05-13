@@ -309,6 +309,24 @@ describe("Model", function(){
       expect(spy).toHaveBeenCalledWith(asset, "destroy");
     });
     
+    it("can fire change events on instance", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.bind("change", spy);
+      
+      asset.save();
+      expect(spy).toHaveBeenCalledWith(asset, "update");
+    });
+    
+    it("can unbind events on instance", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+      
+      asset.bind("change", spy);
+      asset.unbind("change");
+      
+      asset.save();
+      expect(spy.callCount).toEqual(0);
+    });
+    
     it("can fire error events", function(){
       Asset.bind("error", spy);
             
