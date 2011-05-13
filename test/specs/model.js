@@ -266,6 +266,19 @@ describe("Model", function(){
       expect(spy).toHaveBeenCalledWith(asset);
     });
     
+    it("can fire change events on record", function(){
+      Asset.bind("change", spy);
+      
+      var asset = Asset.create({name: "cartoon world.png"});
+      expect(spy).toHaveBeenCalledWith(asset, "create");
+
+      asset.save();
+      expect(spy).toHaveBeenCalledWith(asset, "update");
+      
+      asset.destroy();
+      expect(spy).toHaveBeenCalledWith(asset, "destroy");
+    });
+    
     it("can fire error events", function(){
       Asset.bind("error", spy);
             
