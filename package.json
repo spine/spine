@@ -1,16 +1,20 @@
-{ "name" : "spine"
-, "description" : "MVC Framework."
-, "version" : "0.0.4"
-, "author" : "maccman"
-, "licenses" :
-  [ { "type" : "MIT"
-    , "url" : "https://github.com/maccman/spine/blob/master/LICENSE"
-    }
-  ]
-, "repository" :
-  { "type" : "git"
-  , "url" : "http://github.com/maccman/spine.git"
+{ 
+  "name": "spine", 
+  "description": "MVC Framework.", 
+  "version": "0.0.4", 
+  "author": "maccman", 
+  "licenses":
+    [{ 
+      "type": "MIT", 
+      "url": "https://github.com/maccman/spine/blob/master/LICENSE"
+    }], 
+  "repository": { 
+    "type" : "git", 
+    "url": "http://github.com/maccman/spine.git"
+  }, 
+  "engine" : [ "node >=0.1.102" ], 
+  "main" : "./spine.js",
+  "dependencies" : {
+    "spine.app": "0.0.2"
   }
-, "engine" : [ "node >=0.1.102" ]
-, "main" : "./spine.js"
 }
