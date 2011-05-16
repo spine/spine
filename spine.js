@@ -213,15 +213,17 @@
     },
 
     refresh: function(values){
+      values = this.fromJSON(values);
       this.records = {};
 
       for (var i=0, il = values.length; i < il; i++) {    
-        var record = this.init(values[i]);
+        var record = values[i];
         record.newRecord = false;
         this.records[record.id] = record;
       }
 
       this.trigger("refresh");
+      return this;
     },
 
     select: function(callback){
@@ -331,7 +333,7 @@
     cloneArray: function(array){
       var result = [];
       for (var i=0; i < array.length; i++)
-        result.push(array[i].dup());
+        result.push(array[i].clone());
       return result;
     }
   });
@@ -342,6 +344,7 @@
 
     init: function(atts){
       if (atts) this.load(atts);
+      this.trigger("init", this);
     },
 
     isNew: function(){
@@ -396,10 +399,11 @@
       this.load(atts);
       return this.save();
     },
-
+    
     destroy: function(){
       this.trigger("beforeDestroy", this);
       delete this.parent.records[this.id];
+      this.destroyed = true;
       this.trigger("destroy", this);
       this.trigger("change", this, "destroy");
     },
