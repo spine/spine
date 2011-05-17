@@ -10,6 +10,8 @@ task :generate do
 <head>
   <meta charset=utf-8>
   <title>Spine</title>
+  <meta name="description" content="Spine is a lightweight MVC framework for building JavaScript applications.">
+  <meta name="keywords" content="spine,javascript,mvc,framework,backbone,node,web,app">
   <link rel="stylesheet" href="site/site.css" type="text/css" charset="utf-8">
   <link rel="stylesheet" href="site/highlight.css" type="text/css" charset="utf-8">
   <script src="site/jquery.js" type="text/javascript" charset="utf-8"></script>      
