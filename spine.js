@@ -213,6 +213,9 @@
     },
 
     refresh: function(values){
+      if(Model.ajaxPrefix && this.prefix) {
+        values = values[this.prefix];
+      }
       values = this.fromJSON(values);
       this.records = {};
 
@@ -299,8 +302,8 @@
       this.bind("change", callback);
     },
 
-    fetch: function(callback){
-      callback ? this.bind("fetch", callback) : this.trigger("fetch");
+    fetch: function(callbackOrParams){
+      typeof(callbackOrParams) == 'function' ? this.bind("fetch", callbackOrParams) : this.trigger("fetch", callbackOrParams);
     },
 
     toJSON: function(){
