@@ -213,9 +213,6 @@
     },
 
     refresh: function(values){
-      if(Model.ajaxPrefix && this.prefix) {
-        values = values[this.prefix];
-      }
       values = this.fromJSON(values);
       this.records = {};
 
@@ -314,6 +311,9 @@
       if ( !objects ) return;
       if (typeof objects == "string")
         objects = JSON.parse(objects)
+      if(Model.ajaxPrefix && this.prefix) {
+        objects = objects[this.prefix];
+      }
       if (typeof objects.length == "number") {
         var results = [];
         for (var i=0; i < objects.length; i++)
