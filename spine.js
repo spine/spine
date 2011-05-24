@@ -313,6 +313,9 @@
       if ( !objects ) return;
       if (typeof objects == "string")
         objects = JSON.parse(objects)
+      if(Model.ajaxPrefix && this.prefix) {
+        objects = objects[this.prefix];
+      }
       if (typeof objects.length == "number") {
         var results = [];
         for (var i=0; i < objects.length; i++)

@@ -68,7 +68,7 @@ describe("Routing", function(){
     });
   });
   
-  it("shouldn't trigger routes when navigating", function(){
+  it("should trigger routes when navigating", function(){
     Route.add({
       "/users/:id": spy
     });
@@ -78,7 +78,7 @@ describe("Routing", function(){
     waits(50);
     
     runs(function(){
-      expect(spy).not.toHaveBeenCalled();
+      expect(spy).toHaveBeenCalled();
     });
   });
   
