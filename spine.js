@@ -18,10 +18,12 @@
   // Shim Array, as these functions aren't in IE
   if (typeof Array.prototype.indexOf === "undefined")
     Array.prototype.indexOf = function(value){
-      for ( var i = 0; i < this.length; i++ )
-    		if ( this[ i ] === value )
-    			return i;
-    	return -1;
+      for ( var i = 0; i < this.length; i++ ) {
+        if ( this[ i ] === value ) {
+          return i;
+        }
+      }
+      return -1;
     };
   
   var Events = Spine.Events = {
@@ -43,10 +45,10 @@
       if (!(calls = this._callbacks)) return false;
       if (!(list  = this._callbacks[ev])) return false;
       
-      for (i = 0, l = list.length; i < l; i++)
-        if (list[i].apply(this, args) === false)
-          break;
-
+      for (i = 0, l = list.length; i < l; i++) {
+        if (list[i].apply(this, args) === false) { break; }
+      }
+      
       return true;
     },
     
@@ -65,12 +67,13 @@
         return this;
       }
       
-      for (i = 0, l = list.length; i < l; i++)
+      for (i = 0, l = list.length; i < l; i++) {
         if (callback === list[i]) {
           list.splice(i, 1);
           break;
         }
-        
+      }
+      
       return this;
     }
   };
@@ -141,14 +144,17 @@
     
     proxyAll: function(){
       var functions = makeArray(arguments);
-      for (var i=0; i < functions.length; i++)
+      for (var i=0; i < functions.length; i++) {
         this[functions[i]] = this.proxy(this[functions[i]]);
+      }
     },
 
     include: function(obj){
-      for(var key in obj)
-        if (moduleKeywords.indexOf(key) == -1)
+      for(var key in obj) {
+        if (moduleKeywords.indexOf(key) == -1) {
           this.fn[key] = obj[key];
+        }
+      }
       
       var included = obj.included;
       if (included) included.apply(this);
@@ -156,9 +162,11 @@
     },
 
     extend: function(obj){
-      for(var key in obj)
-        if (moduleKeywords.indexOf(key) == -1)
+      for(var key in obj) {
+        if (moduleKeywords.indexOf(key) == -1) {
           this[key] = obj[key];
+        }
+      }
       
       var extended = obj.extended;
       if (extended) extended.apply(this);
@@ -229,17 +237,21 @@
     select: function(callback){
       var result = [];
 
-      for (var key in this.records)
-        if (callback(this.records[key]))
+      for (var key in this.records) {
+        if (callback(this.records[key])) {
           result.push(this.records[key]);
+        }
+      }
 
       return this.cloneArray(result);
     },
 
     findByAttribute: function(name, value){
-      for (var key in this.records)
-        if (this.records[key][name] == value)
+      for (var key in this.records) {
+        if (this.records[key][name] == value) {
           return this.records[key].clone();
+        }
+      }
     },
 
     findAllByAttribute: function(name, value){
@@ -249,8 +261,9 @@
     },
 
     each: function(callback){
-      for (var key in this.records)
+      for (var key in this.records) {
         callback(this.records[key]);
+      }
     },
 
     all: function(){
@@ -263,8 +276,8 @@
     },
 
     last: function(){
-      var values = this.recordsValues()
-      var record = values[values.length - 1];
+      var values = this.recordsValues(),
+          record = values[values.length - 1];
       return(record && record.clone());
     },
 
@@ -273,13 +286,15 @@
     },
 
     deleteAll: function(){
-      for (var key in this.records)
+      for (var key in this.records) {
         delete this.records[key];
+      }
     },
 
     destroyAll: function(){
-      for (var key in this.records)
+      for (var key in this.records) {
         this.records[key].destroy();
+      }
     },
 
     update: function(id, atts){
@@ -309,15 +324,17 @@
     
     fromJSON: function(objects){
       if ( !objects ) return;
-      if (typeof objects == "string")
-        objects = JSON.parse(objects)
+      if (typeof objects == "string") {
+        objects = JSON.parse(objects);
+      } 
       if(Model.ajaxPrefix && this.prefix) {
         objects = objects[this.prefix];
       }
       if (typeof objects.length == "number") {
         var results = [];
-        for (var i=0; i < objects.length; i++)
+        for (var i=0; i < objects.length; i++) {
           results.push(this.init(objects[i]));
+        }
         return results;
       } else {
         return this.init(objects);
@@ -361,8 +378,9 @@
     validate: function(){ },
 
     load: function(atts){
-      for(var name in atts)
+      for(var name in atts) {
         this[name] = atts[name];
+      }
     },
 
     attributes: function(){
@@ -383,7 +401,7 @@
     save: function(){
       var error = this.validate();
       if ( error ) {
-        this.trigger("error", this, error)
+        this.trigger("error", this, error);
         return false;
       }
       
@@ -529,6 +547,6 @@
   Controller.include(Log);
   
   Spine.App = Class.create();
-  Spine.App.extend(Events)
+  Spine.App.extend(Events);
   Controller.fn.App = Spine.App;
 })();
