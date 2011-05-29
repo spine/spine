@@ -114,7 +114,7 @@ All of the subclass's parent properties are inherited.
     
 Because we're using real prototypal inheritance, properties are resolved dynamically at runtime. This means that you can change the properties of a parent class, and all its sub-classes with reflect those changes immediately. 
 
-    var User   = Super.Class.create();
+    var User   = Spine.Class.create();
     var Friend = User.create();
     
     User.include({defaultName: "(empty)"});
