@@ -114,7 +114,7 @@ All of the subclass's parent properties are inherited.
     
 Because we're using real prototypal inheritance, properties are resolved dynamically at runtime. This means that you can change the properties of a parent class, and all its sub-classes with reflect those changes immediately. 
 
-    var User   = Super.Class.create();
+    var User   = Spine.Class.create();
     var Friend = User.create();
     
     User.include({defaultName: "(empty)"});
@@ -743,9 +743,9 @@ Spine has a full Jasmine test suite - you can run it from inside the browser [he
 
 #Change Log
 
-__0.0.2:__ 17/04/2011 - first public release
-__0.0.3:__ 25/04/2011 - IE support, tests and fixes
-__0.0.4:__ 11/05/2011 - Spine.Manager, Spine.List and Spine.Tabs
+__0.0.2:__ 17/04/2011 - first public release  
+__0.0.3:__ 25/04/2011 - IE support, tests and fixes  
+__0.0.4:__ 11/05/2011 - Spine.Manager, Spine.List and Spine.Tabs  
 
 <script type="text/javascript" charset="utf-8">
   jQuery(function($){
