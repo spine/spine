@@ -743,9 +743,9 @@ Spine has a full Jasmine test suite - you can run it from inside the browser [he
 
 #Change Log
 
-__0.0.2:__ 17/04/2011 - first public release
-__0.0.3:__ 25/04/2011 - IE support, tests and fixes
-__0.0.4:__ 11/05/2011 - Spine.Manager, Spine.List and Spine.Tabs
+__0.0.2:__ 17/04/2011 - first public release  
+__0.0.3:__ 25/04/2011 - IE support, tests and fixes  
+__0.0.4:__ 11/05/2011 - Spine.Manager, Spine.List and Spine.Tabs  
 
 <script type="text/javascript" charset="utf-8">
   jQuery(function($){
