@@ -385,7 +385,7 @@
     save: function(){
       var error = this.validate();
       if ( error ) {
-        this.trigger("error", this, error)
+        this.trigger("error", this, error);
         return false;
       }
       
@@ -531,6 +531,6 @@
   Controller.include(Log);
   
   Spine.App = Class.create();
-  Spine.App.extend(Events)
+  Spine.App.extend(Events);
   Controller.fn.App = Spine.App;
 })();
