@@ -2,6 +2,9 @@ describe("Ajax", function(){
   var User;
     
   beforeEach(function(){
+    Spine.Ajax.requests = [];
+    Spine.Ajax.pending  = false;
+    
     User = Spine.Model.setup("User", ["first", "last"]);
     User.extend(Spine.Model.Ajax);
   });
@@ -13,7 +16,7 @@ describe("Ajax", function(){
     
     var args = jQuery.ajax.mostRecentCall.args[0];
     var success = args.success, error = args.error;
-
+  
     expect(jQuery.ajax).toHaveBeenCalledWith({
       type:         'POST', 
       contentType:  'application/json', 
@@ -21,7 +24,6 @@ describe("Ajax", function(){
       data:         '{"first":"Hans","last":"Zimmer","id":"IDD"}', 
       url:          '/users', 
       processData:  false,
-      serial:       'spine',
       success:      success,
       error:        error
     });
@@ -36,7 +38,7 @@ describe("Ajax", function(){
     
     var args = jQuery.ajax.mostRecentCall.args[0];
     var success = args.success, error = args.error;
-
+  
     expect(jQuery.ajax).toHaveBeenCalledWith({
       type:         'PUT', 
       contentType:  'application/json', 
@@ -44,7 +46,6 @@ describe("Ajax", function(){
       data:         '{"first":"John2","last":"Williams2","id":"IDD"}', 
       url:          '/users/IDD', 
       processData:  false,
-      serial:      'spine',
       success:      success,
       error:        error
     });
@@ -58,16 +59,16 @@ describe("Ajax", function(){
     User.first().destroy();
     
     var args = jQuery.ajax.mostRecentCall.args[0];
-    var error = args.error;
-
+    var success = args.success, error = args.error;
+  
     expect(jQuery.ajax).toHaveBeenCalledWith({
       type:        'DELETE', 
       contentType: 'application/json', 
       dataType:    'json', 
       url :        '/users/IDD', 
       data:        {},
-      error:       error,
-      serial:      'spine'
+      success:     success,
+      error:       error
     });
   });
   
@@ -85,7 +86,7 @@ describe("Ajax", function(){
     
     expect(User.first().attributes()).toEqual(newAtts);
   });
-
+  
   it("can change record ID after PUT/POST", function(){
     spyOn(jQuery, "ajax");
     
@@ -99,5 +100,23 @@ describe("Ajax", function(){
     success(newAtts);
     expect(User.first().id).toEqual("IDD2");
     expect(User.records["IDD2"]).toEqual(User.first());
-  });  
+  });
+  
+  it("should send requests syncronously", function(){
+    spyOn(jQuery, "ajax");
+    
+    User.create({first: "First"});
+    
+    expect(jQuery.ajax).toHaveBeenCalled();
+        
+    var args    = jQuery.ajax.mostRecentCall.args[0];
+    var success = args.success;
+    jQuery.ajax.reset()
+    
+    User.create({first: "Second"});
+
+    expect(jQuery.ajax).not.toHaveBeenCalled();
+    success();
+    expect(jQuery.ajax).toHaveBeenCalled();
+  })
 });
