@@ -8,6 +8,36 @@ describe("Ajax", function(){
     User = Spine.Model.setup("User", ["first", "last"]);
     User.extend(Spine.Model.Ajax);
   });
+
+    describe("GET", function(){
+	beforeEach(function(){
+	});
+
+	afterEach(function(){
+	    clearContext();
+	});
+	
+	it("can GET non-prefixed values on fetch", function(){
+	    fakeAjax({urls: {'/users': {successData: '[{"first":"Hans","last":"Zimmer","id":"IDD"}]'}}});
+	    User.fetch();
+
+	    expect(User.all().length).toEqual(1);
+	    hans = User.find("IDD");
+	    expect(hans.first).toEqual("Hans");
+	    expect(hans.last).toEqual("Zimmer");
+	});
+
+	it("can GET prefixed values on fetch", function(){
+	    User.ajaxPrefix = "users";
+	    fakeAjax({urls: {'/users': {successData: '{"users":[{"first":"Hans","last":"Zimmer","id":"IDD"}]}'}}});
+	    User.fetch();
+
+	    expect(User.all().length).toEqual(1);
+	    hans = User.find("IDD");
+	    expect(hans.first).toEqual("Hans");
+	    expect(hans.last).toEqual("Zimmer");
+	});
+    });
   
   it("can send POST on create", function(){
     spyOn(jQuery, "ajax");
