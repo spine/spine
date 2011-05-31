@@ -118,5 +118,27 @@ describe("Ajax", function(){
     expect(jQuery.ajax).not.toHaveBeenCalled();
     success();
     expect(jQuery.ajax).toHaveBeenCalled();
+  });
+  
+  it("can prefix data", function(){
+    User.ajaxPrefix = "users";
+    
+    spyOn(jQuery, "ajax");
+    
+    User.create({first: "Hans", last: "Zimmer", id: "IDD"});
+    
+    var args = jQuery.ajax.mostRecentCall.args[0];
+    var success = args.success, error = args.error;
+  
+    expect(jQuery.ajax).toHaveBeenCalledWith({
+      type:         'POST', 
+      contentType:  'application/json', 
+      dataType:     'json', 
+      data:         '{"users":{"first":"Hans","last":"Zimmer","id":"IDD"}}', 
+      url:          '/users', 
+      processData:  false,
+      success:      success,
+      error:        error
+    });
   })
 });
