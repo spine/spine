@@ -285,9 +285,9 @@ If you're using an older browser which doesn't have native JSON support (i.e. IE
 
 ##Persistence
 
-While storing records in memory is useful for quick retrieval, persisting them in one way or another is often required. Spine includes a number of pre-existing storage modules, such as Ajax and HTML5 Local Storage, which you can use for persistence. Alternatively you can roll your own custom one, take a look at `spine.model.ajax.js` for inspiration. 
+While storing records in memory is useful for quick retrieval, persisting them in one way or another is often required. Spine includes a number of pre-existing storage modules, such as Ajax and HTML5 Local Storage, which you can use for persistence. Alternatively you can roll your own custom one, take a look at `spine.ajax.js` for inspiration. 
 
-Spine's persistence is implemented via modules, so for HTML5 Local Storage persistence you'll need to include [spine.model.local.js](lib/spine.model.local.js) script in the page and for Ajax persistence you'll need [spine.model.ajax.js](lib/spine.model.ajax.js).
+Spine's persistence is implemented via modules, so for HTML5 Local Storage persistence you'll need to include [spine.local.js](lib/spine.local.js) script in the page and for Ajax persistence you'll need [spine.ajax.js](lib/spine.ajax.js).
 
 To persist a model using HTML5 Local Storage, simply extend it with `Spine.Model.Local`.
 
@@ -712,8 +712,8 @@ All resources are located in the *lib* folder in Spine's repository.
 
 * *lib/spine.list.js* - controller for managing lists, such as menus
 * *lib/spine.manager.js* - class for managing controllers, basically a state machine
-* *lib/spine.model.ajax.js* - module for adding Ajax support to Spine's models
-* *lib/spine.model.local.js* - module for adding Local Storage support to Spine's models
+* *lib/spine.ajax.js* - module for adding Ajax support to Spine's models
+* *lib/spine.local.js* - module for adding Local Storage support to Spine's models
 * *lib/spine.route.js* - module for adding route support to Spine
 
 Any questions, just ask on the [Google Group](https://groups.google.com/forum/?hl=en#!forum/spinejs).  
