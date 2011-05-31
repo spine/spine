@@ -143,7 +143,7 @@ assertEqual( friend.name, "Tim" );
 
 <p>Because we're using real prototypal inheritance, properties are resolved dynamically at runtime. This means that you can change the properties of a parent class, and all its sub-classes with reflect those changes immediately.</p>
 
-<pre><code>var User   = Super.Class.create();
+<pre><code>var User   = Spine.Class.create();
 var Friend = User.create();
 
 User.include({defaultName: "(empty)"});
@@ -337,9 +337,9 @@ Contact.include({
 
 <h2>Persistence</h2>
 
-<p>While storing records in memory is useful for quick retrieval, persisting them in one way or another is often required. Spine includes a number of pre-existing storage modules, such as Ajax and HTML5 Local Storage, which you can use for persistence. Alternatively you can roll your own custom one, take a look at <code>spine.model.ajax.js</code> for inspiration.</p>
+<p>While storing records in memory is useful for quick retrieval, persisting them in one way or another is often required. Spine includes a number of pre-existing storage modules, such as Ajax and HTML5 Local Storage, which you can use for persistence. Alternatively you can roll your own custom one, take a look at <code>spine.ajax.js</code> for inspiration.</p>
 
-<p>Spine's persistence is implemented via modules, so for HTML5 Local Storage persistence you'll need to include <a href="lib/spine.model.local.js">spine.model.local.js</a> script in the page and for Ajax persistence you'll need <a href="lib/spine.model.ajax.js">spine.model.ajax.js</a>.</p>
+<p>Spine's persistence is implemented via modules, so for HTML5 Local Storage persistence you'll need to include <a href="lib/spine.local.js">spine.local.js</a> script in the page and for Ajax persistence you'll need <a href="lib/spine.ajax.js">spine.ajax.js</a>.</p>
 
 <p>To persist a model using HTML5 Local Storage, simply extend it with <code>Spine.Model.Local</code>.</p>
 
@@ -801,8 +801,8 @@ var Contacts = Spine.Controller.create({
 <ul>
 <li><em>lib/spine.list.js</em> - controller for managing lists, such as menus</li>
 <li><em>lib/spine.manager.js</em> - class for managing controllers, basically a state machine</li>
-<li><em>lib/spine.model.ajax.js</em> - module for adding Ajax support to Spine's models</li>
-<li><em>lib/spine.model.local.js</em> - module for adding Local Storage support to Spine's models</li>
+<li><em>lib/spine.ajax.js</em> - module for adding Ajax support to Spine's models</li>
+<li><em>lib/spine.local.js</em> - module for adding Local Storage support to Spine's models</li>
 <li><em>lib/spine.route.js</em> - module for adding route support to Spine</li>
 </ul>
 
@@ -834,8 +834,8 @@ Well, it's all about perceived speed - which makes a huge difference to the user
 
 <h1>Change Log</h1>
 
-<p><strong>0.0.2:</strong> 17/04/2011 - first public release
-<strong>0.0.3:</strong> 25/04/2011 - IE support, tests and fixes
+<p><strong>0.0.2:</strong> 17/04/2011 - first public release<br/>
+<strong>0.0.3:</strong> 25/04/2011 - IE support, tests and fixes<br/>
 <strong>0.0.4:</strong> 11/05/2011 - Spine.Manager, Spine.List and Spine.Tabs</p>
 
 <script type="text/javascript" charset="utf-8">
