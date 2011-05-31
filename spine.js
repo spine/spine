@@ -317,6 +317,8 @@
       if ( !objects ) return;
       if ( typeof objects == "string" )
         objects = JSON.parse(objects)
+      if(this.ajaxPrefix)
+        objects = objects[this.ajaxPrefix];
       if ( isArray(objects) ) {
         var results = [];
         for (var i=0; i < objects.length; i++)
