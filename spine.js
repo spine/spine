@@ -15,6 +15,10 @@
     return Array.prototype.slice.call(args, 0);
   };
   
+  var isArray = Spine.isArray = function(value){
+    return Object.prototype.toString.call(value) == "[object Array]";
+  };
+  
   // Shim Array, as these functions aren't in IE
   if (typeof Array.prototype.indexOf === "undefined")
     Array.prototype.indexOf = function(value){
@@ -311,12 +315,9 @@
     
     fromJSON: function(objects){
       if ( !objects ) return;
-      if (typeof objects == "string")
+      if ( typeof objects == "string" )
         objects = JSON.parse(objects)
-      if(Model.ajaxPrefix && this.prefix) {
-        objects = objects[this.prefix];
-      }
-      if (typeof objects.length == "number") {
+      if ( isArray(objects) ) {
         var results = [];
         for (var i=0; i < objects.length; i++)
           results.push(this.init(objects[i]));
