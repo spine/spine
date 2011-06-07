@@ -62,7 +62,7 @@
       
       var list, calls, i, l;
       if (!(calls = this._callbacks)) return this;
-      if (!(list  = this._callbacks[ev])) return this;
+      if (!(list  = calls[ev])) return this;
       
       if ( !callback ) {
         delete this._callbacks[ev];
@@ -71,7 +71,9 @@
       
       for (i = 0, l = list.length; i < l; i++)
         if (callback === list[i]) {
+          list = list.slice();
           list.splice(i, 1);
+          calls[ev] = list;
           break;
         }
         

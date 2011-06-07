@@ -42,6 +42,31 @@ describe("Events", function(){
     expect(spy).not.toHaveBeenCalled();
   });
   
+  it("should allow a callback unbind itself", function(){
+    var a = jasmine.createSpy("a");
+    var b = jasmine.createSpy("b");
+    var c = jasmine.createSpy("c");
+    
+    b.andCallFake(function () {
+        EventTest.unbind("once", b);
+    });
+    
+    EventTest.bind("once", a);
+    EventTest.bind("once", b);
+    EventTest.bind("once", c);
+    EventTest.trigger("once");
+    
+    expect(a).toHaveBeenCalled();
+    expect(b).toHaveBeenCalled();
+    expect(c).toHaveBeenCalled();
+    
+    EventTest.trigger("once");
+    
+    expect(a.callCount).toBe(2);
+    expect(b.callCount).toBe(1);
+    expect(c.callCount).toBe(2);
+  });
+  
   it("can cancel propogation", function(){
     EventTest.bind("motherio", function(){ return false });
     EventTest.bind("motherio", spy);
