@@ -16,7 +16,7 @@
   };
   
   var isArray = Spine.isArray = function(value){
-    return Object.prototype.toString.call(value) == "[object Array]";
+    return Object.prototype.toString.call(value) === "[object Array]";
   };
   
   // Shim Array, as these functions aren't in IE
@@ -42,6 +42,8 @@
     trigger: function() {
       var args = makeArray(arguments);
       var ev   = args.shift();
+
+      if (Events.debug) console.log('EVENT', ev, args, this);
             
       var list, calls, i, l;
       if (!(calls = this._callbacks)) return false;
@@ -86,7 +88,7 @@
 
     log: function(){
       if ( !this.trace ) return;
-      if (typeof console == "undefined") return;
+      if (typeof console === "undefined") return;
       var args = makeArray(arguments);
       if (this.logPrefix) args.unshift(this.logPrefix);
       console.log.apply(console, args);
@@ -151,7 +153,7 @@
 
     include: function(obj){
       for(var key in obj)
-        if (moduleKeywords.indexOf(key) == -1)
+        if (moduleKeywords.indexOf(key) === -1)
           this.fn[key] = obj[key];
       
       var included = obj.included;
@@ -161,7 +163,7 @@
 
     extend: function(obj){
       for(var key in obj)
-        if (moduleKeywords.indexOf(key) == -1)
+        if (moduleKeywords.indexOf(key) === -1)
           this[key] = obj[key];
       
       var extended = obj.extended;
@@ -179,7 +181,7 @@
   
   Spine.guid = function(){
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+      var r = Math.random()*16|0, v = c === 'x' ? r : (r&0x3|0x8);
       return v.toString(16);
     }).toUpperCase();      
   };
@@ -242,13 +244,13 @@
 
     findByAttribute: function(name, value){
       for (var key in this.records)
-        if (this.records[key][name] == value)
+        if (this.records[key][name] === value)
           return this.records[key].clone();
     },
 
     findAllByAttribute: function(name, value){
       return(this.select(function(item){
-        return(item[name] == value);
+        return(item[name] === value);
       }));
     },
 
@@ -304,9 +306,9 @@
     },
 
     fetch: function(callbackOrParams){
-      typeof(callbackOrParams) == "function" ? 
+      typeof(callbackOrParams) === "function" ? 
         this.bind("fetch", callbackOrParams) : 
-          this.trigger("fetch", callbackOrParams);
+          this.trigger.apply(this, ["fetch"].concat(Array.prototype.slice.call(arguments)));
     },
 
     toJSON: function(){
@@ -315,7 +317,7 @@
     
     fromJSON: function(objects){
       if ( !objects ) return;
-      if ( typeof objects == "string" )
+      if ( typeof objects === "string" )
         objects = JSON.parse(objects)
       if ( isArray(objects) ) {
         var results = [];
