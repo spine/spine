@@ -42,6 +42,8 @@
     trigger: function() {
       var args = makeArray(arguments);
       var ev   = args.shift();
+
+      if (Events.debug) console.log('EVENT', ev, args, this);
             
       var list, calls, i, l;
       if (!(calls = this._callbacks)) return false;
@@ -306,7 +308,7 @@
     fetch: function(callbackOrParams){
       typeof(callbackOrParams) == "function" ? 
         this.bind("fetch", callbackOrParams) : 
-          this.trigger("fetch", callbackOrParams);
+          this.trigger.apply(this, ["fetch"].concat(Array.prototype.slice.call(arguments)));
     },
 
     toJSON: function(){
