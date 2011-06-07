@@ -244,13 +244,13 @@
 
     findByAttribute: function(name, value){
       for (var key in this.records)
-        if (this.records[key][name] == value)
+        if (this.records[key][name] === value)
           return this.records[key].clone();
     },
 
     findAllByAttribute: function(name, value){
       return(this.select(function(item){
-        return(item[name] == value);
+        return(item[name] === value);
       }));
     },
 
