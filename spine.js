@@ -306,7 +306,7 @@
     fetch: function(callbackOrParams){
       typeof(callbackOrParams) == "function" ? 
         this.bind("fetch", callbackOrParams) : 
-          this.trigger("fetch", callbackOrParams);
+          this.trigger.apply(this, ["fetch"].concat(makeArray(arguments)));
     },
 
     toJSON: function(){
