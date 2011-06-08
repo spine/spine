@@ -49,7 +49,7 @@
       
       for (i = 0, l = list.length; i < l; i++)
         if (list[i].apply(this, args) === false)
-          break;
+          return false;
 
       return true;
     },
