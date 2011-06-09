@@ -209,6 +209,18 @@ describe("Model", function(){
     expect(User.first().assets.first()).toEqual(asset);
   });
   
+  it("should be able to be subclassed", function(){
+    Asset.extend({
+      aProperty: true
+    });
+    
+    var File = Asset.setup("File");
+    
+    expect(File.aProperty).toBeTruthy();
+    expect(File.name).toBe("File");
+    expect(File.attributes).toEqual(Asset.attributes);
+  });
+  
   describe("with spy", function(){
     var spy;
     

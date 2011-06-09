@@ -192,7 +192,7 @@
 
   Model.extend({
     setup: function(name, atts){
-      var model = Model.sub();
+      var model = this.sub();
       if (name) model.name = name;
       if (atts) model.attributes = atts;
       return model;

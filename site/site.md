@@ -193,6 +193,11 @@ Model instances are created with `init()`, passing in an optional set of attribu
     var contact = Contact.init({first_name: "Alex", last_name: "MacCaw"});
     assertEqual( contact.fullName(), "Alex MacCaw" );
     
+Models can be also be easily subclassed:
+
+    var Contact = Spine.Model.setup("Contact", ["first_name", "last_name"]);
+    var User = Contact.setup("User");
+    
 ##Saving/Retrieving Records
 
 Once an instance is created it can be saved in memory by calling `save()`.
