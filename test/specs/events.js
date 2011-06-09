@@ -74,4 +74,11 @@ describe("Events", function(){
     EventTest.trigger("motherio");
     expect(spy).not.toHaveBeenCalled();
   });
+  
+  it("should clear events on inherited objects", function(){
+    EventTest.bind("yoyo", spy);
+    var Sub = EventTest.sub();
+    Sub.trigger("yoyo");
+    expect(spy).not.toHaveBeenCalled();
+  });
 });

@@ -31,10 +31,11 @@
   var Events = Spine.Events = {
     bind: function(ev, callback) {
       var evs   = ev.split(" ");
-      var calls = this._callbacks || (this._callbacks = {});
+      var calls = (this.hasOwnProperty("_callbacks") && this._callbacks) || 
+                  (this._callbacks = {});
       
       for (var i=0; i < evs.length; i++)
-        (this._callbacks[evs[i]] || (this._callbacks[evs[i]] = [])).push(callback);
+        (calls[evs[i]] || (calls[evs[i]] = [])).push(callback);
 
       return this;
     },
@@ -44,7 +45,7 @@
       var ev   = args.shift();
             
       var list, calls, i, l;
-      if (!(calls = this._callbacks)) return false;
+      if (!(calls = this.hasOwnProperty("_callbacks") && this._callbacks)) return false;
       if (!(list  = this._callbacks[ev])) return false;
       
       for (i = 0, l = list.length; i < l; i++)
