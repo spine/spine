@@ -155,8 +155,8 @@ Or pass multiple function names to `proxyAll()` in order to re-write them perman
     
 `Spine.Events` gives you three functions, `bind()`, `trigger()`, and `unbind()`. All three have a very similar API to jQuery's event handling one, if you're familiar with that. `bind(name, callback)` takes a event name and callback. `trigger(name, [*data])` takes an event name and optional data to be passed to handlers. `unbind(name, [callback])` takes a event name and optional callback.
     
-    Tasks.bind("create", function(){ /* ... */ });
-    Tasks.trigger("create", ["some", "data"]);
+    Tasks.bind("create", function(foo, bar){ /* ... */ });
+    Tasks.trigger("create", "some", "data");
 
 You can bind to multiple events by separating them with spaces. Callbacks are invoked in the context the event is associated with. 
 
