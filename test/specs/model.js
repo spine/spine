@@ -221,6 +221,15 @@ describe("Model", function(){
     expect(File.attributes).toEqual(Asset.attributes);
   });
   
+  it("dup should take a newRecord argument, which controls if a new record is returned", function(){
+    var asset = Asset.create({name: "hotel california"});    
+    expect(asset.dup().id).toBeUndefined();
+    expect(asset.dup().newRecord).toBeTruthy();
+
+    expect(asset.dup(false).id).toBe(asset.id);
+    expect(asset.dup(false).newRecord).toBeFalsy();
+  });
+  
   describe("with spy", function(){
     var spy;
     

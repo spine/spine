@@ -417,9 +417,13 @@
       this.trigger("change", this, "destroy");
     },
 
-    dup: function(){
+    dup: function(newRecord){
       var result = this.parent.init(this.attributes());
-      result.newRecord = this.newRecord;
+      if (newRecord === false) {
+        result.newRecord = this.newRecord;
+      } else {
+        delete result.id;
+      }        
       return result;
     },
     
@@ -458,7 +462,7 @@
       if ( !this.id ) this.id = Spine.guid();
       this.newRecord   = false;
       var records      = this.parent.records;
-      records[this.id] = this.dup();
+      records[this.id] = this.dup(false);      
       var clone        = records[this.id].clone();
       this.trigger("create", clone);
       this.trigger("change", clone, "create");
