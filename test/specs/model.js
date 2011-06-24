@@ -2,7 +2,7 @@ describe("Model", function(){
   var Asset;
   
   beforeEach(function(){
-    Asset = Spine.Model.setup("Asset", ["name"]);
+    Asset = Spine.Model("Asset", "name");
   });
   
   it("can create records", function(){
@@ -188,36 +188,15 @@ describe("Model", function(){
     expect(clone.name).toEqual("checkout anytime");
   });
   
-  it("should be able to have models as attributes", function(){
-    var User = Spine.Model.setup("User", ["assets"]);
-    
-    User.include({
-      init: function(atts){
-        if (atts) this.load(atts);
-        var assets  = this.assets;
-        this.assets = Asset.sub();
-        if (assets) this.assets.refresh(assets.records || assets);
-      }
-    });
-    
-    var user = User.create({name: "that guy"});
-    expect(user.assets.attributes).toEqual(Asset.attributes);
-    
-    var asset = user.assets.create({name: "test.pdf"});
-    user.save();
-    
-    expect(User.first().assets.first()).toEqual(asset);
-  });
-  
   it("should be able to be subclassed", function(){
     Asset.extend({
       aProperty: true
     });
     
-    var File = Asset.setup("File");
+    var File = Asset.sub().setup("File");
     
     expect(File.aProperty).toBeTruthy();
-    expect(File.name).toBe("File");
+    expect(File.className).toBe("File");
     expect(File.attributes).toEqual(Asset.attributes);
   });
   

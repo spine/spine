@@ -6,7 +6,7 @@ namedParam   = /:([\w\d]+)/g
 splatParam   = /\*([\w\d]+)/g
 escapeRegExp = /[-[\]{}()+?.,\\^$|#\s]/g
 
-class Spine.Route
+class Spine.Route extends Spine.Module
   @historySupport: "history" of window
   
   @routes: []
@@ -22,7 +22,7 @@ class Spine.Route
     else
       @routes.push(new @(path, callback))
     
-  @setup: (options) ->
+  @setup: (options = {}) ->
     @options = $.extend({}, @options, options)
       
     if (@options.history)
@@ -34,7 +34,7 @@ class Spine.Route
       $(window).bind("hashchange", @change)
     @change()
     
-  @unbind: 
+  @unbind: ->
     if @history
       $(window).unbind("popstate", @change)
     else
@@ -70,18 +70,16 @@ class Spine.Route
     
   # Private
   
-  @getPath: ->
-    window.location.pathname
+  @getPath: -> window.location.pathname
   
-  @getHash: ->
-    window.location.hash
-  
-  @getHost: ->
-    (document.location + "").replace(@getPath() + @getHash(), "")
+  @getHash: -> window.location.hash
   
   @getFragment: -> @getHash().replace(hashStrip, "")
   
-  @change: =>
+  @getHost: ->
+    (document.location + "").replace(@getPath() + @getHash(), "")
+    
+  @change: ->
     path = if @history then @getPath() else @getFragment()
     return if path is @path
     @path = path
@@ -96,7 +94,7 @@ class Spine.Route
     @callback = callback
 
     if typeof path is "string"
-      while match = namedParam.exec(path) != null
+      while (match = namedParam.exec(path)) != null
         @names.push(match[1])
         
       path = path.replace(escapeRegExp, "\\$&")
@@ -107,18 +105,21 @@ class Spine.Route
     else
       @route = path
 
-  match: (path, options) ->
+  match: (path, options = {}) ->
     match = @route.exec(path)
     return false unless match
+    options.match = match
     params = match.slice(1)
-    options.match = params
     
     if @names.length
       for param, i in params
         options[@names[i]] = param
 
-    @callback.apply(@callback, options)
+    @callback.call(null, options)
     true
+
+# Coffee-script bug
+Spine.Route.change = Spine.Route.proxy(Spine.Route.change)
 
 Spine.Controller.include
   route: (path, callback) ->

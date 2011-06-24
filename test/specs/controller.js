@@ -3,7 +3,7 @@ describe("Controller", function(){
   var element;
   
   beforeEach(function(){
-    Users = Spine.Controller.create();
+    Users = Spine.Controller.sub();
     element = $("<div />");
   });
     
@@ -32,24 +32,7 @@ describe("Controller", function(){
     expect(users.foo).toBeTruthy();
     expect(users.foo.hasClass("foo")).toBeTruthy();
   });
-  
-  it("can proxy functions", function(){
-    Users.include({
-      proxied: ["weirdScope"],
-      weirdScope: function(){ return this }
-    });
     
-    var users = Users.init();
-    expect(users.weirdScope()).toBe(users);    
-    expect(users.weirdScope.apply({})).toBe(users);
-  });
-  
-  it("has App", function(){
-    var users = Users.init();
-    expect(users.App).toBeTruthy();
-    expect(users.App.bind).toBeTruthy();
-  });
-  
   describe("with spy", function(){
     var spy;
     

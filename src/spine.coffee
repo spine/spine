@@ -3,17 +3,17 @@ $ = @jQuery or Zepto or -> arguments[0]
 Events = 
   bind: (ev, callback) ->
     evs   = ev.split(" ")
-    calls = @_callbacks || @_callbacks = {}
+    calls = @hasOwnProperty("_callbacks") and @_callbacks or= {}
   
     for name in evs
-      @_callbacks[name] or= []
-      @_callbacks[name].push(callback)
+      calls[name] or= []
+      calls[name].push(callback)
     @
 
   trigger: (args...) ->
     ev = args.shift()
-  
-    list = @_callbacks?[ev]
+      
+    list = @hasOwnProperty("_callbacks") and @_callbacks?[ev]
     return false unless list
   
     for callback in list
@@ -33,10 +33,10 @@ Events =
       delete @_callbacks[ev]
       return @
 
-    for cb, i in list when c is callback
+    for cb, i in list when cb is callback
       list = list.slice()
       list.splice(i, 1)
-      calls[ev] = list
+      @_callbacks[ev] = list
       break
     @
 
@@ -82,12 +82,15 @@ class Model extends Module
   @attributes: []
   
   @setup: (name, attributes...) ->
-    @name       = name
+    @className  = name
     @records    = {}
-    @attributes = attributes if attributes
+    @attributes = attributes if attributes.length
     @attributes and= makeArray(@attributes)
     @attributes or=  []
+    @unbind()
     @
+    
+  @toString: -> "#{@className}(#{@attributes.join(", ")})"
 
   @find: (id) ->
     record = @records[id]
@@ -194,9 +197,7 @@ class Model extends Module
     result
 
   @cloneArray: (array) ->
-    result = []
-    result.push value.clone() for value in array
-    result
+    (value.clone() for value in array)
 
   # Instance
  
@@ -226,7 +227,7 @@ class Model extends Module
     result
 
   eql: (rec) ->
-    rec and rec.id is @id and rec.parent is @constructor
+    rec and rec.id is @id and rec.constructor is @constructor
 
   save: ->
     error = @validate()
@@ -254,9 +255,12 @@ class Model extends Module
     @trigger("destroy", @)
     @trigger("change", @, "destroy")
 
-  dup: ->
+  dup: (newRecord) ->
     result = new @constructor(@attributes())
-    result.newRecord = @newRecord
+    if newRecord is false
+      result.newRecord = @newRecord
+    else
+      delete result.id
     result
   
   clone: ->
@@ -270,6 +274,9 @@ class Model extends Module
 
   toJSON: ->
     @attributes()
+    
+  toString: ->
+    "<#{@constructor.className} (#{JSON.stringify(@)})>"
   
   exists: ->
     @id && @id of @constructor.records
@@ -287,9 +294,9 @@ class Model extends Module
   create: ->
     @trigger("beforeCreate", @)
     @id          = guid() unless @id
-    @newRecord   = false
+    @newRecord   = false    
     records      = @constructor.records
-    records[@id] = @dup()
+    records[@id] = @dup(false)
     clone        = records[@id].clone()
     @trigger("create", clone)
     @trigger("change", clone, "create")
@@ -346,7 +353,7 @@ class Controller extends Module
   delay: (func, timeout) ->
     setTimeout(@proxy(func), timeout || 0)
     
-  html: -> @el.html.apply(@el, arguments)
+  html: (element) -> @el.html(element.el or element)
 
   append: (elements...) -> 
     elements = (e.el or e for e in elements)
@@ -393,20 +400,23 @@ Spine.Events  = Events
 Spine.Log     = Log
 Spine.Module  = Module
 Spine.Controller = Controller
-
-Spine.Model = ->
-  class model extends Model
-  model.setup.apply(model, arguments)
+Spine.Model   = ->
+  existingModel = Model
+  class Model extends existingModel
+  Model.setup.apply(Model, arguments)
   
 # Backwards compatability
 
-Module.create = Module.sub = (instance, static) ->
+Module.create = Module.sub =
+Controller.create = Controller.sub =
+Model.sub = (instance, static) ->
   class result extends this
-  result.include(instance)
-  result.extend(static)
+  result.include(instance) if instance
+  result.extend(static) if static
+  result.unbind?()
   result
 
-Module.init = (a1, a2, a3, a4, a5) ->
+Module.init = Controller.init = Model.init = (a1, a2, a3, a4, a5) ->
   new this(a1, a2, a3, a4, a5)
 
 Spine.Class = Module

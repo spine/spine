@@ -25,12 +25,6 @@ describe("Class", function(){
     expect(Bob.instanceProperty).toBeTruthy();
   });
   
-  it("calls instances' initializer", function(){
-    spyOn(User.fn, "init");
-    User.init();
-    expect(User.fn.init).toHaveBeenCalled();
-  });
-  
   it("can be extendable", function(){
     User.extend({
       classProperty: true
@@ -61,33 +55,5 @@ describe("Class", function(){
     spyOn(module, "extended");
     User.extend(module);
     expect(module.extended).toHaveBeenCalled();    
-  });
-  
-  it("should trigger inheritance callbacks", function(){
-    spyOn(User, "inherited");
-    var Friend = User.create();    
-    expect(User.inherited).toHaveBeenCalled();    
-  });
-  
-  it("can proxy functions", function(){
-    User.extend({
-      weirdScope: function(){ return this }
-    });
-    
-    expect(User.weirdScope()).toBe(User);
-    
-    var scope = {};
-    expect(User.weirdScope.apply(scope)).toBe(scope);
-    expect(User.proxy(User.weirdScope).apply(scope)).toBe(User);
-  });
-  
-  it("can rewrite proxy functions", function(){
-    User.extend({
-      weirdScope: function(){ return this }
-    });
-    
-    expect(User.weirdScope()).toBe(User);
-    User.proxyAll("weirdScope");
-    expect(User.weirdScope.apply({})).toBe(User);
-  });
+  });  
 });
