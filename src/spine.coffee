@@ -75,9 +75,13 @@ class Module
     => func.apply(arguments)
 
 class Model extends Module
-  @setup (name) ->
-    @name    = name
-    @records = {}
+  @records: {}
+  @attributes: []
+  
+  @setup (name, attributes...) ->
+    @name       = name
+    @records    = {}
+    @attributes = attributes if attributes
     @attributes and= makeArray(@attributes)
     @attributes or=  []
 
