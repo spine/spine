@@ -30,7 +30,7 @@ class Spine.Manager extends Spine.Module
     @addOne(cont) for cont in controllers
     
   addOne: (controller) ->
-    bind "change", (current, args) ->
+    @bind "change", (current, args) ->
       if controller is current
         controller.activate.apply(args)
       else

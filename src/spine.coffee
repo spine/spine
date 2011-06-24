@@ -87,6 +87,7 @@ class Model extends Module
     @attributes = attributes if attributes
     @attributes and= makeArray(@attributes)
     @attributes or=  []
+    @
 
   @find: (id) ->
     record = @records[id]
@@ -220,12 +221,12 @@ class Model extends Module
 
   attributes: ->
     result = {}
-    result[key] = @[key] for key in @contructor.attributes
+    result[key] = @[key] for key in @constructor.attributes
     result.id   = @id
     result
 
   eql: (rec) ->
-    rec and rec.id is @id and rec.parent is @contructor
+    rec and rec.id is @id and rec.parent is @constructor
 
   save: ->
     error = @validate()
@@ -248,13 +249,13 @@ class Model extends Module
   
   destroy: ->
     @trigger("beforeDestroy", @)
-    delete @contructor.records[@id]
+    delete @constructor.records[@id]
     @destroyed = true
     @trigger("destroy", @)
     @trigger("change", @, "destroy")
 
   dup: ->
-    result = new @contructor(@attributes())
+    result = new @constructor(@attributes())
     result.newRecord = @newRecord
     result
   
@@ -263,7 +264,7 @@ class Model extends Module
 
   reload: ->
     return @ if @newRecord
-    original = @contructor.find(@id)
+    original = @constructor.find(@id)
     @load(original.attributes())
     return original
 
@@ -277,7 +278,7 @@ class Model extends Module
 
   update: ->
     @trigger("beforeUpdate", @)
-    records = @contructor.records
+    records = @constructor.records
     records[@id].load @attributes()
     clone = records[@id].clone()
     @trigger("update", clone)
@@ -287,19 +288,19 @@ class Model extends Module
     @trigger("beforeCreate", @)
     @id          = guid() unless @id
     @newRecord   = false
-    records      = @contructor.records
+    records      = @constructor.records
     records[@id] = @dup()
     clone        = records[@id].clone()
     @trigger("create", clone)
     @trigger("change", clone, "create")
   
   bind: (events, callback) ->
-    @contructor.bind events, (record) =>
+    @constructor.bind events, (record) =>
       if record && @eql(record)
         callback.apply(@, arguments)
   
   trigger: ->
-    @contructor.trigger.apply(@contructor, arguments)
+    @constructor.trigger.apply(@constructor, arguments)
 
 Model.extend(Events)
 
@@ -316,19 +317,18 @@ class Controller extends Module
     @el = document.createElement(@tag) unless @el
     @el = $(@el)
 
-    @events = @contructor.events unless @events
-    @elements = @contructor.elements unless @elements
+    @events = @constructor.events unless @events
+    @elements = @constructor.elements unless @elements
 
     @delegateEvents() if @events
     @refreshElements() if @elements
       
-  $: (selector) ->
-    $(selector, @el)
+  $: (selector) -> $(selector, @el)
       
   delegateEvents: ->
     for key of @events
       methodName = @events[key]
-      method     = @[methodName].bind(@)
+      method     = @proxy(@[methodName])
       
       match      = key.match(@eventSplitter)
       eventName  = match[1]
@@ -344,11 +344,16 @@ class Controller extends Module
       @[value] = @$(key)
   
   delay: (func, timeout) ->
-    setTimeout(func.bind(@), timeout || 0)
+    setTimeout(@proxy(func), timeout || 0)
     
   html: -> @el.html.apply(@el, arguments)
-  append: -> @el.append.apply(@el, arguments)
-  appendTo: -> @el.appendTo.apply(@el, arguments)
+
+  append: (elements...) -> 
+    elements = (e.el or e for e in elements)
+    @el.append.apply(@el, elements)
+    
+  appendTo: (element) -> 
+    @el.appendTo(element.el or element)
 
 Controller.include(Events)
 Controller.include(Log)
@@ -383,8 +388,12 @@ else
   
 Spine.version = "2.0.0"
 Spine.isArray = isArray
+Spine.$       = $
 Spine.Events  = Events
 Spine.Log     = Log
 Spine.Module  = Module
-Spine.Model   = Model
 Spine.Controller = Controller
+
+Spine.Model = ->
+  class model extends Model
+  model.setup.apply(model, arguments)

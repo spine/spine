@@ -88,7 +88,7 @@ class Spine.Route
     @matchRoute(@path)
   
   @matchRoute: (path, options) ->
-    for route in routes
+    for route in @routes
       return if route.match(path, options)
 
   constructor: (path, callback) ->
@@ -96,14 +96,14 @@ class Spine.Route
     @callback = callback
 
     if typeof path is "string"
-      while match = namedParam.exec(path) not null
+      while match = namedParam.exec(path) != null
         @names.push(match[1])
         
-        path = path.replace(escapeRegExp, "\\$&")
-                   .replace(namedParam, "([^\/]*)")
-                   .replace(splatParam, "(.*?)")
-                   
-        @route = new RegExp('^' + path + '$')
+      path = path.replace(escapeRegExp, "\\$&")
+                 .replace(namedParam, "([^\/]*)")
+                 .replace(splatParam, "(.*?)")
+                 
+      @route = new RegExp('^' + path + '$')
     else
       @route = path
 
@@ -120,13 +120,14 @@ class Spine.Route
     @callback.apply(@callback, options)
     true
 
-Spine.Controller.fn.route = (path, callback) ->
-  Spine.Route.add(path, @proxy(callback))
+Spine.Controller.include
+  route: (path, callback) ->
+    Spine.Route.add(path, @proxy(callback))
   
-Spine.Controller.fn.routes = (routes) ->
-  @route(key, value) for key, value of routes
+  routes: (routes) ->
+    @route(key, value) for key, value of routes
 
-Spine.Controller.fn.navigate = ->
-  Spine.Route.navigate.apply(Spine.Route, arguments)
+  navigate: ->
+    Spine.Route.navigate.apply(Spine.Route, arguments)
   
 module?.exports = Spine.Route
