@@ -55,7 +55,7 @@ Log =
 moduleKeywords = ["included", "extended"]
 
 class Module
-  include: (obj) ->
+  @include: (obj) ->
     for key, value of obj when key not in moduleKeywords
       @::[key] = value
 
@@ -63,7 +63,7 @@ class Module
     included.apply(this) if included
     @
 
-  extend: (obj) ->
+  @extend: (obj) ->
     for key, value of obj when key not in moduleKeywords
       @[key] = value
     
@@ -71,6 +71,9 @@ class Module
     extended.apply(this) if extended
     @
     
+  @proxy: (func) ->
+    => func.apply(arguments)
+
   proxy: (func) ->
     => func.apply(arguments)
 
