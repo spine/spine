@@ -32,12 +32,12 @@ class Spine.Manager extends Spine.Module
   addOne: (controller) ->
     @bind "change", (current, args) ->
       if controller is current
-        controller.activate.apply(args)
+        controller.activate.apply(controller, args)
       else
-        controller.deactivate.apply(args)
+        controller.deactivate.apply(controller, args)
     
     controller.active (args...) =>
-      trigger("change", controller, args)
+      @trigger("change", controller, args)
   
 Spine.Manager.include(Spine.Events)
 

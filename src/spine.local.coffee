@@ -13,6 +13,6 @@ Spine.Model.Local =
     result = localStorage[@name]
     return unless result
     result = JSON.parse(result)
-    this.refresh(result, reload: true)
+    this.refresh(result, clear: true)
     
 module?.exports = Spine.Model.Local

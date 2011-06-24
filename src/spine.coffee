@@ -397,3 +397,16 @@ Spine.Controller = Controller
 Spine.Model = ->
   class model extends Model
   model.setup.apply(model, arguments)
+  
+# Backwards compatability
+
+Module.create = Module.sub = (instance, static) ->
+  class result extends this
+  result.include(instance)
+  result.extend(static)
+  result
+
+Module.init = (a1, a2, a3, a4, a5) ->
+  new this(a1, a2, a3, a4, a5)
+
+Spine.Class = Module
