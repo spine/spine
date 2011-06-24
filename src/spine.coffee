@@ -72,10 +72,10 @@ class Module
     @
     
   @proxy: (func) ->
-    => func.apply(arguments)
+    => func.apply(@, arguments)
 
   proxy: (func) ->
-    => func.apply(arguments)
+    => func.apply(@, arguments)
 
 class Model extends Module
   @records: {}
