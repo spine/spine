@@ -6,7 +6,7 @@ namedParam   = /:([\w\d]+)/g
 splatParam   = /\*([\w\d]+)/g
 escapeRegExp = /[-[\]{}()+?.,\\^$|#\s]/g
 
-class Route
+class Spine.Route
   @historySupport: "history" of window
   
   @routes: []
@@ -127,3 +127,5 @@ Spine.Controller.fn.routes = (routes) ->
 
 Spine.Controller.fn.navigate = ->
   Spine.Route.navigate.apply(Spine.Route, arguments)
+  
+module?.exports = Spine.Route

@@ -34,7 +34,9 @@ Events =
       return @
 
     for cb, i in list when c is callback
+      list = list.slice()
       list.splice(i, 1)
+      calls[ev] = list
       break
     @
 
@@ -73,12 +75,11 @@ class Module
     => func.apply(arguments)
 
 class Model extends Module
-  # created: (sub) ->
-  #   @records = {}
-  #   if @attributes
-  #     makeArray(@attributes)
-  #   else 
-  #     @attributes = []
+  @setup (name) ->
+    @name    = name
+    @records = {}
+    @attributes and= makeArray(@attributes)
+    @attributes or=  []
 
   @find: (id) ->
     record = @records[id]
@@ -355,6 +356,9 @@ unless typeof Object.create is "function"
 
 isArray = (value) ->
   Object::toString.call(value) is "[object Array]"
+  
+makeArray = (args) ->
+  Array.prototype.slice.call(args, 0)
   
 guid = ->
   'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace /[xy]/g, (c) ->

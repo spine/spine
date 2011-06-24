@@ -1,3 +1,5 @@
+Spine or= require("spine")
+
 Spine.Model.Local =
   extended: ->
     this.sync(this.proxy(this.saveLocal))
@@ -12,3 +14,5 @@ Spine.Model.Local =
     return unless result
     result = JSON.parse(result)
     this.refresh(result, reload: true)
+    
+module?.exports = Spine.Model.Local

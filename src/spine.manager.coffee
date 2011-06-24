@@ -22,7 +22,7 @@
 Spine or= require("spine")
 $     = Spine.$
 
-class Manager extends Spine.Module
+class Spine.Manager extends Spine.Module
   constructor: ->
     @add.apply(@, arguments)
     
@@ -39,7 +39,7 @@ class Manager extends Spine.Module
     controller.active (args...) =>
       trigger("change", controller, args)
   
-Manager.include(Spine.Events)
+Spine.Manager.include(Spine.Events)
 
 Spine.Controller.include
   active: (args...) ->
@@ -60,3 +60,5 @@ Spine.Controller.include
   deactivate: ->
     @el.removeClass("active");
     @
+    
+module?.exports = Spine.Manager
