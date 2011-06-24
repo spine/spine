@@ -78,7 +78,7 @@ class Model extends Module
   @records: {}
   @attributes: []
   
-  @setup (name, attributes...) ->
+  @setup: (name, attributes...) ->
     @name       = name
     @records    = {}
     @attributes = attributes if attributes
@@ -177,7 +177,7 @@ class Model extends Module
     if typeof objects is "string"
       objects = JSON.parse(objects)
     if isArray(objects)
-      return (new @(value) for value in objects)
+      (new @(value) for value in objects)
     else
       new @(objects)
 
