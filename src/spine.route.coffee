@@ -52,18 +52,19 @@ class Spine.Route
     options = $.extend({}, @options, options)
     
     path = args.join("/")
-    if @path is path
+    return if @path is path
     @path = path
 
     @matchRoute(@path, options) if options.trigger
 
-    if options.shim
+    return if options.shim
     
     if @history
-      history.pushState
+      history.pushState(
         {}, 
         document.title, 
         @getHost() + @path
+      )
     else
       window.location.hash = @path
     
@@ -81,7 +82,7 @@ class Spine.Route
   @getFragment: -> @getHash().replace(hashStrip, "")
   
   @change: =>
-    path = (@history ? @getPath() : @getFragment());
+    path = if @history then @getPath() else @getFragment()
     return if path is @path
     @path = path
     @matchRoute(@path)
@@ -90,10 +91,10 @@ class Spine.Route
     for route in routes
       return if route.match(path, options)
 
-  constructor: -> (path, callback)
+  constructor: (path, callback) ->
     @names = []
     @callback = callback
-    
+
     if typeof path is "string"
       while match = namedParam.exec(path) not null
         @names.push(match[1])
@@ -105,20 +106,20 @@ class Spine.Route
         @route = new RegExp('^' + path + '$')
     else
       @route = path
-    
-    match: (path, options) ->
-      match = @route.exec(path)
-      return false unless match
-      params = match.slice(1)
-      options.match = params
-      
-      if @names.length
-        for param, i in params
-          options[@names[i]] = param
 
-      @callback.apply(@callback, options
-      true
-  
+  match: (path, options) ->
+    match = @route.exec(path)
+    return false unless match
+    params = match.slice(1)
+    options.match = params
+    
+    if @names.length
+      for param, i in params
+        options[@names[i]] = param
+
+    @callback.apply(@callback, options)
+    true
+
 Spine.Controller.fn.route = (path, callback) ->
   Spine.Route.add(path, @proxy(callback))
   
