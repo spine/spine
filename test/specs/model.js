@@ -193,7 +193,7 @@ describe("Model", function(){
       aProperty: true
     });
     
-    var File = Asset.sub().setup("File");
+    var File = Asset.setup("File");
     
     expect(File.aProperty).toBeTruthy();
     expect(File.className).toBe("File");

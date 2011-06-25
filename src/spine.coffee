@@ -81,7 +81,12 @@ class Model extends Module
   @records: {}
   @attributes: []
   
-  @setup: (name, attributes...) ->
+  @setup: ->
+    class Instance extends this
+    Instance.configure.apply(Instance, arguments)
+    Instance
+
+  @configure: (name, attributes...) ->
     @className  = name
     @records    = {}
     @attributes = attributes if attributes.length
@@ -369,9 +374,9 @@ Controller.include(Log)
 
 unless typeof Object.create is "function"
   Object.create = (o) ->
-    F = ->
-    F.prototype = o
-    new F()
+    Func = ->
+    Func.prototype = o
+    new Func()
 
 isArray = (value) ->
   Object::toString.call(value) is "[object Array]"
@@ -393,17 +398,14 @@ if typeof exports is not "undefined"
 else
   Spine = @Spine = {}
   
-Spine.version = "2.0.0"
-Spine.isArray = isArray
-Spine.$       = $
-Spine.Events  = Events
-Spine.Log     = Log
-Spine.Module  = Module
+Spine.version    = "2.0.0"
+Spine.isArray    = isArray
+Spine.$          = $
+Spine.Events     = Events
+Spine.Log        = Log
+Spine.Module     = Module
 Spine.Controller = Controller
-Spine.Model   = ->
-  existingModel = Model
-  class Model extends existingModel
-  Model.setup.apply(Model, arguments)
+Spine.Model      = -> Model.setup.apply(Model, arguments)
   
 # Backwards compatability
 
@@ -418,5 +420,8 @@ Model.sub = (instance, static) ->
 
 Module.init = Controller.init = Model.init = (a1, a2, a3, a4, a5) ->
   new this(a1, a2, a3, a4, a5)
+  
+Spine.Model.setup = (name, attributes) ->
+  Spine.Model(name, attributes...)
 
 Spine.Class = Module
