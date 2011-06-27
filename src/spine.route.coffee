@@ -27,12 +27,14 @@ class Spine.Route extends Spine.Module
       
     if (@options.history)
       @history = @historySupport && @options.history
+      
+    return if @options.shim
         
-    if @history and not @options.shim
+    if @history 
       $(window).bind("popstate", @change)
-    else if not options.shim
+    else
       $(window).bind("hashchange", @change)
-    @change()
+    @change() 
     
   @unbind: ->
     if @history
