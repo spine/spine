@@ -113,6 +113,7 @@ class Model extends Module
 
     for record in @fromJSON(values) 
       record.newRecord    = false
+      record.id           or= guid()
       @records[record.id] = record
 
     @trigger("refresh")
@@ -405,7 +406,7 @@ Spine.Events     = Events
 Spine.Log        = Log
 Spine.Module     = Module
 Spine.Controller = Controller
-Spine.Model      = -> Model.setup.apply(Model, arguments)
+Spine.Model      = Model
   
 # Backwards compatability
 
@@ -420,8 +421,5 @@ Model.sub = (instance, static) ->
 
 Module.init = Controller.init = Model.init = (a1, a2, a3, a4, a5) ->
   new this(a1, a2, a3, a4, a5)
-  
-Spine.Model.setup = (name, attributes) ->
-  Spine.Model(name, attributes...)
 
 Spine.Class = Module
