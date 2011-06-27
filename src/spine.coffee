@@ -1,4 +1,4 @@
-$ = @jQuery or Zepto or -> arguments[0]
+$ = @jQuery or @Zepto or -> arguments[0]
 
 Events = 
   bind: (ev, callback) ->
