@@ -2,7 +2,7 @@ describe("Model.Local", function(){
   var User;
   
   beforeEach(function(){
-    User = Spine.Model("User", "name")
+    User = Spine.Model.setup("User", "name")
   });
   
   it("should persist attributes", function(){

@@ -2,7 +2,7 @@ describe("Model", function(){
   var Asset;
   
   beforeEach(function(){
-    Asset = Spine.Model("Asset", "name");
+    Asset = Spine.Model.setup("Asset", "name");
   });
   
   it("can create records", function(){

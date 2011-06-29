@@ -49,7 +49,7 @@ Log =
     return unless @trace
     return if typeof console is "undefined"
     if @logPrefix then args.unshift(@logPrefix)
-    console.log.apply(console, args)
+    console.log(args...)
     @
 
 moduleKeywords = ["included", "extended"]
@@ -313,7 +313,7 @@ class Model extends Module
         callback.apply(@, arguments)
   
   trigger: ->
-    @constructor.trigger.apply(@constructor, arguments)
+    @constructor.trigger(arguments...)
 
 Model.extend(Events)
 
@@ -363,7 +363,7 @@ class Controller extends Module
 
   append: (elements...) -> 
     elements = (e.el or e for e in elements)
-    @el.append.apply(@el, elements)
+    @el.append(elements...)
     
   appendTo: (element) -> 
     @el.appendTo(element.el or element)

@@ -89,7 +89,7 @@ class Spine.Route extends Spine.Module
   
   @matchRoute: (path, options) ->
     for route in @routes
-      return if route.match(path, options)
+      return route if route.match(path, options)
 
   constructor: (path, callback) ->
     @names = []
