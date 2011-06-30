@@ -405,7 +405,7 @@ Spine.Module     = Module
 Spine.Controller = Controller
 Spine.Model      = Model
 
-module.exports = Spine if exports?
+module.exports = Spine if module?
   
 # Backwards compatability
 
