@@ -394,10 +394,8 @@ guid = ->
 
 # Globals
 
-if typeof exports is not "undefined"
-  Spine = exports
-else
-  Spine = @Spine = {}
+
+Spine = @Spine = {}
   
 Spine.version    = "2.0.0"
 Spine.isArray    = isArray
@@ -423,3 +421,5 @@ Module.init = Controller.init = Model.init = (a1, a2, a3, a4, a5) ->
   new this(a1, a2, a3, a4, a5)
 
 Spine.Class = Module
+
+module.exports = Spine if exports?
