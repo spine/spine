@@ -394,7 +394,6 @@ guid = ->
 
 # Globals
 
-
 Spine = @Spine = {}
   
 Spine.version    = "2.0.0"
@@ -405,6 +404,8 @@ Spine.Log        = Log
 Spine.Module     = Module
 Spine.Controller = Controller
 Spine.Model      = Model
+
+module.exports = Spine if exports?
   
 # Backwards compatability
 
@@ -421,5 +422,3 @@ Module.init = Controller.init = Model.init = (a1, a2, a3, a4, a5) ->
   new this(a1, a2, a3, a4, a5)
 
 Spine.Class = Module
-
-module.exports = Spine if exports?
