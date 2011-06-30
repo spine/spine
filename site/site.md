@@ -176,7 +176,7 @@ Although you may never use `Spine.Events` in your own classes, you will use it w
 
 Models are the core to Spine, and absolutely critical to your applications. Models are where your application's data is stored, and where any logic associated with that data is kept. Models should be de-coupled from the rest of your application, and completely independent. The data associated with models is stored in memory under `Model.records`.
 
-Creating models is slightly different from creating classes, since the `create()` function is already reserved by models. Models are created with the `setup()` function, passing in the model name and an array of attributes.
+Creating models is slightly different from creating classes, since the `create()` function is already reserved by classes. Models are created with the `setup()` function, passing in the model name and an array of attributes.
 
     var Contact = Spine.Model.setup("Contact", ["first_name", "last_name"]);
     
