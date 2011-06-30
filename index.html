@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -212,7 +211,7 @@ Tasks.trigger("create", "Take out the rubbish");
 
 <p>Models are the core to Spine, and absolutely critical to your applications. Models are where your application's data is stored, and where any logic associated with that data is kept. Models should be de-coupled from the rest of your application, and completely independent. The data associated with models is stored in memory under <code>Model.records</code>.</p>
 
-<p>Creating models is slightly different from creating classes, since the <code>create()</code> function is already reserved by models. Models are created with the <code>setup()</code> function, passing in the model name and an array of attributes.</p>
+<p>Creating models is slightly different from creating classes, since the <code>create()</code> function is already reserved by classes. Models are created with the <code>setup()</code> function, passing in the model name and an array of attributes.</p>
 
 <pre><code>var Contact = Spine.Model.setup("Contact", ["first_name", "last_name"]);
 </code></pre>
