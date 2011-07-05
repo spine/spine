@@ -359,7 +359,8 @@ class Controller extends Module
   delay: (func, timeout) ->
     setTimeout(@proxy(func), timeout || 0)
     
-  html: (element) -> @el.html(element.el or element)
+  html: (element) -> 
+    @el.html(element.el or element)
 
   append: (elements...) -> 
     elements = (e.el or e for e in elements)
