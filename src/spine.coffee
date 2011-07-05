@@ -414,7 +414,7 @@ Model.sub = (instance, static) ->
   result.unbind?()
   result
   
-Mode.setup = ->
+Model.setup = ->
   class Instance extends this
   Instance.configure(arguments...)
   Instance
