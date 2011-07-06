@@ -81,11 +81,6 @@ class Model extends Module
   @records: {}
   @attributes: []
   
-  @setup: ->
-    class Instance extends this
-    Instance.configure.apply(Instance, arguments)
-    Instance
-
   @configure: (name, attributes...) ->
     @className  = name
     @records    = {}
@@ -418,6 +413,11 @@ Model.sub = (instance, static) ->
   result.extend(static) if static
   result.unbind?()
   result
+  
+Model.setup = ->
+  class Instance extends this
+  Instance.configure(arguments...)
+  Instance
 
 Module.init = Controller.init = Model.init = (a1, a2, a3, a4, a5) ->
   new this(a1, a2, a3, a4, a5)

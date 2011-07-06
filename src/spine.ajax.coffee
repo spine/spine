@@ -88,7 +88,7 @@ Ajax = Spine.Ajax =
       @requests.push(arguments)
     else
       @pending = true;
-      @send.apply(this, arguments)
+      @send(arguments...)
 
 Include =
   url: ->
@@ -100,7 +100,7 @@ Include =
 Model.Ajax =
   extended: ->
     @change ->
-      Ajax.request.apply(Ajax, arguments)
+      Ajax.request(arguments...)
     @fetch (params) =>
       Ajax.request(@, "read", params)
     @include Include

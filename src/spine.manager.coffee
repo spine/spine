@@ -24,21 +24,31 @@ $     = Spine.$
 
 class Spine.Manager extends Spine.Module
   constructor: ->
+    @controllers = []
     @add.apply(@, arguments)
+    @bind "change", @change
     
   add: (controllers...) ->
     @addOne(cont) for cont in controllers
     
-  addOne: (controller) ->
-    @bind "change", (current, args) ->
-      if controller is current
-        controller.activate.apply(controller, args)
-      else
-        controller.deactivate.apply(controller, args)
-    
+  addOne: (controller) ->    
     controller.active (args...) =>
       @trigger("change", controller, args)
-  
+
+    @controllers.push(controller)
+      
+  deactivate: ->
+    @trigger("change", false, arguments...)
+    
+  # Private
+    
+  change: (current, args) ->
+    for cont in @controllers
+      if cont is current
+        cont.activate(args...)
+      else
+        cont.deactivate(args...)
+        
 Spine.Manager.include(Spine.Events)
 
 Spine.Controller.include
