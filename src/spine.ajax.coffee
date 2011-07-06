@@ -52,7 +52,7 @@ Ajax = Spine.Ajax =
         record.trigger("ajaxSuccess", record, status, xhr)
   
     if method is "read" and not params.success
-      params.success = ->
+      params.success = (data) ->
        (record.refresh or record.load).call(record, data)
   
     success = params.success

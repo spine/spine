@@ -124,7 +124,7 @@ describe("Model", function(){
     expect(JSON.stringify(asset)).toEqual('{"name":"Johnson me!"}');
   });
   
-  it("can be serialized from JSON", function(){
+  it("can be deserialized from JSON", function(){
     var asset = Asset.fromJSON('{"name":"Un-Johnson me!"}')
     expect(asset.name).toEqual("Un-Johnson me!");
     
