@@ -102,6 +102,25 @@ describe("Ajax", function(){
     expect(User.records["IDD2"]).toEqual(User.first());
   });
   
+  it("can filter returned JSON after PUT/POST", function(){
+    spyOn(jQuery, "ajax");
+    
+    User.filterJSON = function(objects) {
+      objects.id = objects._id;
+      delete(objects._id);
+    };
+    User.create({id: "IDD"});
+    
+    var args    = jQuery.ajax.mostRecentCall.args[0];
+    var success = args.success;
+    
+    var newAtts = {_id: "IDD2"};
+    
+    success(newAtts);
+    expect(User.first().id).toEqual("IDD2");
+    expect(User.records["IDD2"]).toEqual(User.first());
+  });
+
   it("should send requests syncronously", function(){
     spyOn(jQuery, "ajax");
     

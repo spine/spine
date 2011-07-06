@@ -184,6 +184,7 @@ class Model extends Module
     return unless objects
     if typeof objects is "string"
       objects = JSON.parse(objects)
+    @filterJSON?(objects)
     if isArray(objects)
       (new @(value) for value in objects)
     else

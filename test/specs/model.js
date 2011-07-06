@@ -131,6 +131,15 @@ describe("Model", function(){
     var assets = Asset.fromJSON('[{"name":"Un-Johnson me!"}]')
     expect(assets[0] && assets[0].name).toEqual("Un-Johnson me!");
   });
+
+  it("can filter JSON before deserializing", function() {
+    Asset.filterJSON = function(objects) {
+      objects.name = "Un-Johnson him!"
+    };
+
+    var asset = Asset.fromJSON('{"name": "Un-Johnson me!"}');
+    expect(asset.name).toEqual("Un-Johnson him!");
+  });
   
   it("can validate", function(){
     Asset.include({

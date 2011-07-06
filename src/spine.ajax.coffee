@@ -35,6 +35,8 @@ Ajax = Spine.Ajax =
       params.success = (data, status, xhr) ->
         return unless data
 
+        record.constructor.filterJSON?(data)
+        
         # Simple deep object comparison
         return if JSON.stringify(record) is JSON.stringify(data)
 
