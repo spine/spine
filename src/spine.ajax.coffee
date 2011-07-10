@@ -2,112 +2,152 @@ Spine or= require("spine")
 $     = Spine.$
 Model = Spine.Model
 
-Ajax = Spine.Ajax =
-  getUrl: (object) ->
-    return null unless object and object.url
-    object.url?() or object.url
-
-  methodMap: 
-    "create":  "POST"
-    "update":  "PUT"
-    "destroy": "DELETE"
-    "read":    "GET"
-
-  send: (record, method, params) ->
-    defaults =
-      type:          @methodMap[method]
-      contentType:  "application/json"
-      dataType:     "json"
-      data:         {}
-    
-    params = $.extend({}, defaults, params)
-    
-    if method is "create" and record.model
-      params.url = @getUrl(record.constructor)
-    else
-      params.url = @getUrl(record)
-
-    throw("Invalid URL") unless params.url
-    
-    if method is "create" or method is "update"
-      params.data = JSON.stringify(record)
-      params.processData = false
-      params.success = (data, status, xhr) ->
-        return unless data
-
-        # Simple deep object comparison
-        return if JSON.stringify(record) is JSON.stringify(data)
-
-        # ID change, need to do some shifting
-        if data.id and record.id != data.id
-          records = record.constructor.records
-          records[data.id] = records[record.id]
-          delete records[record.id]
-          record.id = data.id
-
-        # Update with latest data
-        Ajax.disable ->
-          record.updateAttributes(data); 
-
-        record.trigger("ajaxSuccess", record, status, xhr)
+getURL = (object) ->
+  object and object.url?() or object.url
   
-    if method is "read" and not params.success
-      params.success = (data) ->
-       (record.refresh or record.load).call(record, data)
-  
-    success = params.success
-    params.success = ->
-      success.apply(Ajax, arguments) if success
-      Ajax.sendNext()
-  
-    params.error = (xhr, s, e) ->
-      if record.trigger("ajaxError", record, xhr, s, e)
-        Ajax.sendNext()
-  
-    $.ajax(params)
-  
+Ajax =
   enabled:  true
   pending:  false
   requests: []
-  
+
   disable: (callback) ->
     @enabled = false
     callback()
     @enabled = true
 
-  sendNext: ->
+  requestNext: ->
     next = @requests.shift()
     if next
-      @send.apply(@, next)
+      @request.apply(@, next)
     else
       @pending = false
 
-  request: ->
+  request: (params) ->
+    $.ajax(params)
+
+  send: ->
     return unless @enabled
     if @pending
       @requests.push(arguments)
     else
-      @pending = true;
-      @send(arguments...)
+      @pending = true
+      @request(arguments...)
+    
+class Base
+  defaults:
+    contentType: "application/json"
+    processData: false
+  
+  send: (params, defaults) ->
+    Ajax.send($.extend({}, @defaults, defaults, params))
+
+class Collection extends Base
+  constructor: (@model) -> 
+    super
+    @url = getURL(@model)
+    
+  findAll: (params) ->
+    @send params,
+          type: "GET",
+          url: @url,
+          success: @recordsResponse(params)
+    
+  fetch: ->
+    @findAll success: (records) =>
+      @model.refresh(records)
+    
+  recordsResponse: (params) =>
+    success = params.success
+    
+    (data, status, xhr) =>
+      model.trigger("ajaxSuccess", null, status, xhr)
+      success?(@model.fromJSON(data))
+    
+class Singleton extends Base
+  constructor: (@record) ->
+    super
+    @model = @record.constructor
+    @url   = getURL(@record)
+  
+  find: (params) ->
+    @send params
+          type: "GET"
+          url:  @url
+  
+  create: (params) ->
+    @send params
+          type:    "POST"
+          data:    JSON.stringify(@record)
+          url:     @base.url
+          success: @recordResponse(params)
+
+  update: (params) ->
+    @send params
+          type:    "PUT"
+          data:    JSON.stringify(@record)
+          url:     @url
+          success: @recordResponse(params)
+  
+  destroy: (params) ->
+    @send params
+          type:    "DELETE"
+          url:     @url
+          success: @blankResponse(params)
+  
+  # Private
+  
+  recordResponse: (params) =>
+    success = params.success
+  
+    (data, status, xhr) =>
+      @record.trigger("ajaxSuccess", @record, status, xhr)
+
+      return if not data or params.data is data
+      data = @model.fromJSON(data)
+
+      # ID change, need to do some shifting
+      if data.id and @record.id isnt data.id
+        @record.updateID(data.id)
+
+      # Update with latest data
+      @disable ->
+        @record.updateAttributes(data)
+      
+      success?(@record)
+      
+  blankResponse: (params) =>
+    success = params.success
+  
+    (data, status, xhr) =>
+      @record.trigger("ajaxSuccess", @record, status, xhr)
+
+      success?(@record)
+
+# Ajax endpoint
+Model.host = ""
 
 Include =
+  ajax: -> new Singleton(this)
+
   url: ->
     base = Ajax.getUrl(@constructor)
     base += "/" unless base.charAt(base.length - 1) is "/"
     base += encodeURIComponent(@id)
-    return base;
+    base
 
 Model.Ajax =
+  ajax: -> new Collection(this)
+
   extended: ->
-    @change ->
-      Ajax.request(arguments...)
-    @fetch (params) =>
-      Ajax.request(@, "read", params)
+    @change (record, type) ->
+      record.ajax[type]()
+      
+    @fetch ->
+      @ajax.fetch(arguments...)
+      
     @include Include
 
-  ajaxPrefix: false
-
   url: ->
-    "/#{@className.toLowerCase()}s"
+    "#{Model.host}/#{@className.toLowerCase()}s"
     
 module?.exports = Model.Ajax

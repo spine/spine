@@ -248,6 +248,12 @@ class Model extends Module
   updateAttributes: (atts) ->
     @load(atts)
     @save()
+    
+  updateID: (id) ->
+    records = @constructor.records
+    records[id] = records[@id]
+    delete records[@id]
+    @id = id
   
   destroy: ->
     @trigger("beforeDestroy", @)
