@@ -149,4 +149,6 @@ Model.Ajax =
   url: ->
     "#{Model.host}/#{@className.toLowerCase()}s"
     
+# Globals
+Spine.Ajax      = Ajax
 module?.exports = Ajax
