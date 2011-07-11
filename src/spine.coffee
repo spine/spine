@@ -396,8 +396,9 @@ guid = ->
 
 # Globals
 
-Spine = @Spine = {}
-  
+Spine = @Spine   = {}
+module?.exports  = Spine
+
 Spine.version    = "2.0.0"
 Spine.isArray    = isArray
 Spine.$          = $
@@ -406,8 +407,6 @@ Spine.Log        = Log
 Spine.Module     = Module
 Spine.Controller = Controller
 Spine.Model      = Model
-
-module.exports   = Spine if module?
   
 # Backwards compatability
 

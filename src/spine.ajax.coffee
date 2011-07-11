@@ -149,4 +149,4 @@ Model.Ajax =
   url: ->
     "#{Model.host}/#{@className.toLowerCase()}s"
     
-module?.exports = Model.Ajax
+module?.exports = Ajax
