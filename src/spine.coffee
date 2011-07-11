@@ -1,5 +1,3 @@
-$ = @jQuery or @Zepto or -> arguments[0]
-
 Events = 
   bind: (ev, callback) ->
     evs   = ev.split(" ")
@@ -78,6 +76,8 @@ class Module
     => func.apply(@, arguments)
 
 class Model extends Module
+  @extend Events
+  
   @records: {}
   @attributes: []
   
@@ -316,9 +316,10 @@ class Model extends Module
   trigger: ->
     @constructor.trigger(arguments...)
 
-Model.extend(Events)
-
 class Controller extends Module
+  @include Events
+  @include Log
+  
   eventSplitter: /^(\w+)\s*(.*)$/
   tag: "div"
   
@@ -370,10 +371,9 @@ class Controller extends Module
   appendTo: (element) -> 
     @el.appendTo(element.el or element)
 
-Controller.include(Events)
-Controller.include(Log)
-
 # Utilities & Shims
+
+$ = @jQuery or @Zepto or -> arguments[0]
 
 unless typeof Object.create is "function"
   Object.create = (o) ->
