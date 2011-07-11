@@ -239,7 +239,7 @@ class Model extends Module
     @trigger("beforeSave", @)
     if @newRecord then @create() else @update()
     @trigger("save", @)
-    return @
+    @
 
   updateAttribute: (name, value) ->
     @[name] = value
@@ -277,7 +277,7 @@ class Model extends Module
     return @ if @newRecord
     original = @constructor.find(@id)
     @load(original.attributes())
-    return original
+    original
 
   toJSON: ->
     @attributes()

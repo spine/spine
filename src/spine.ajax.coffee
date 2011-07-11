@@ -22,6 +22,10 @@ Ajax =
       @pending = false
 
   request: (params) ->
+    success = params.success
+    params.success = =>
+      success?(arguments...)
+      @requestNext()
     $.ajax(params)
 
   send: ->
