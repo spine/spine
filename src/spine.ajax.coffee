@@ -2,13 +2,12 @@ Spine or= require("spine")
 $     = Spine.$
 Model = Spine.Model
 
-getURL = (object) ->
-  object and object.url?() or object.url
-  
 Ajax =
   enabled:  true
   pending:  false
   requests: []
+  getURL: (object) ->
+    object and object.url?() or object.url
 
   disable: (callback) ->
     @enabled = false
@@ -44,7 +43,7 @@ class Base
 class Collection extends Base
   constructor: (@model) -> 
     super
-    @url = getURL(@model)
+    @url = Ajax.getURL(@model)
     
   findAll: (params) ->
     @send params,
@@ -67,7 +66,7 @@ class Singleton extends Base
   constructor: (@record) ->
     super
     @model = @record.constructor
-    @url   = getURL(@record)
+    @url   = Ajax.getURL(@record)
   
   find: (params) ->
     @send params
@@ -130,7 +129,7 @@ Include =
   ajax: -> new Singleton(this)
 
   url: ->
-    base = Ajax.getUrl(@constructor)
+    base = Ajax.getURL(@constructor)
     base += "/" unless base.charAt(base.length - 1) is "/"
     base += encodeURIComponent(@id)
     base
