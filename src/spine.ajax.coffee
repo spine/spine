@@ -111,7 +111,7 @@ class Singleton extends Base
 
       # Update with latest data
       @disable ->
-        @record.updateAttributes(data)
+        @record.updateAttributes(data.attributes())
       
       success?(@record)
       
