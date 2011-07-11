@@ -7,6 +7,8 @@ splatParam   = /\*([\w\d]+)/g
 escapeRegExp = /[-[\]{}()+?.,\\^$|#\s]/g
 
 class Spine.Route extends Spine.Module
+  @extend Spine.Events
+  
   @historySupport: "history" of window
   
   @routes: []
@@ -89,11 +91,12 @@ class Spine.Route extends Spine.Module
   
   @matchRoute: (path, options) ->
     for route in @routes
-      return route if route.match(path, options)
+      if route.match(path, options)
+        @trigger("change", route)
+        return route
 
-  constructor: (path, callback) ->
+  constructor: (@path, @callback) ->
     @names = []
-    @callback = callback
 
     if typeof path is "string"
       while (match = namedParam.exec(path)) != null
