@@ -23,9 +23,11 @@ Spine or= require("spine")
 $     = Spine.$
 
 class Spine.Manager extends Spine.Module
+  @include Spine.Events
+  
   constructor: ->
     @controllers = []
-    @add.apply(@, arguments)
+    @add(arguments...)
     @bind "change", @change
     
   add: (controllers...) ->
@@ -38,7 +40,7 @@ class Spine.Manager extends Spine.Module
     @controllers.push(controller)
       
   deactivate: ->
-    @trigger("change", false, arguments...)
+    @trigger("change", false, arguments)
     
   # Private
     
@@ -48,8 +50,6 @@ class Spine.Manager extends Spine.Module
         cont.activate(args...)
       else
         cont.deactivate(args...)
-        
-Spine.Manager.include(Spine.Events)
 
 Spine.Controller.include
   active: (args...) ->
@@ -57,7 +57,7 @@ Spine.Controller.include
       @bind("active", args[0])
     else
       args.unshift("active")
-      @trigger.apply(@, args)
+      @trigger(args...)
     @
   
   isActive: ->
