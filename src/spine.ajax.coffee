@@ -146,7 +146,7 @@ Model.Ajax =
       record.ajax[type]()
       
     @fetch ->
-      @ajax.fetch(arguments...)
+      @ajax().fetch(arguments...)
       
     @include Include
 
