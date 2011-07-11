@@ -109,7 +109,7 @@ class Singleton extends Base
         @record.updateID(data.id)
 
       # Update with latest data
-      @disable ->
+      Ajax.disable ->
         @record.updateAttributes(data.attributes())
       
       success?(@record)
