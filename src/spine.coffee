@@ -337,6 +337,9 @@ class Controller extends Module
 
     @delegateEvents() if @events
     @refreshElements() if @elements
+     
+  destroy: ->
+    @trigger "destroy"
       
   $: (selector) -> $(selector, @el)
       
@@ -351,8 +354,12 @@ class Controller extends Module
 
       if selector is ''
         @el.bind(eventName, method)
+        @bind "destroy", ->
+          @el.unbind(eventName, method)
       else
         @el.delegate(selector, eventName, method)
+        @bind "destroy", ->
+          @el.undelegate(selector, eventName, method)
   
   refreshElements: ->
     for key, value of @elements
