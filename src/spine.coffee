@@ -1,42 +1,61 @@
-Events = 
-  bind: (ev, callback) ->
-    evs   = ev.split(" ")
+Events =
+  _add_callback: (target, ev, callback) ->
     calls = @hasOwnProperty("_callbacks") and @_callbacks or= {}
   
-    for name in evs
+    for name in ev.split(" ")
       calls[name] or= []
-      calls[name].push(callback)
+      calls[name].push { target: target, fn: callback }
     @
 
-  trigger: (args...) ->
-    ev = args.shift()
-      
+  bind: (ev, callback) ->
+    @_add_callback(null, ev, callback)
+
+  bind_for: (target, ev, callback) ->
+    @_add_callback(target, ev, callback)
+
+  _run_callbacks: (target, ev, args...) ->
     list = @hasOwnProperty("_callbacks") and @_callbacks?[ev]
     return false unless list
   
-    for callback in list
-      if callback.apply(this, args) is false
-        break      
+    for cb in list when !cb.target? or cb.target.eql?(target)
+      if cb.fn.apply(cb.target || @, args) is false
+        break
     true
 
-  unbind: (ev, callback) ->
+  trigger: (ev, args...) ->
+    @_run_callbacks(null, ev, args...)
+
+  trigger_for: (target, ev, args...) ->
+    @_run_callbacks(target, ev, args...)
+
+  _remove_callbacks: (target, ev, callback) ->
     unless ev
       @_callbacks = {}
       return @
-  
-    list = @_callbacks?[ev]
-    return @ unless list
-  
-    unless callback
-      delete @_callbacks[ev]
-      return @
 
-    for cb, i in list when cb is callback
-      list = list.slice()
-      list.splice(i, 1)
-      @_callbacks[ev] = list
-      break
+    for name in ev.split(' ')
+      list = @_callbacks?[name]
+      continue unless list
+    
+      unless callback
+        for cb, i in list when !cb.target? or cb.target.eql?(target)
+          list = list.slice()
+          list.splice(i, 1)
+          @_callbacks[name] = list
+        continue
+
+      for cb, i in list when (!cb.target? or cb.target.eql?(target)) and cb.fn is callback
+        list = list.slice()
+        list.splice(i, 1)
+        @_callbacks[name] = list
+        break
     @
+
+  unbind: (ev, callback) ->
+    @_remove_callbacks(null, ev, callback)
+
+  unbind_for: (target, ev, callback) ->
+    @_remove_callbacks(target, ev, callback)
 
 Log =
   trace: true
@@ -261,6 +280,7 @@ class Model extends Module
     @destroyed = true
     @trigger("destroy", @)
     @trigger("change", @, "destroy")
+    @unbind()
 
   dup: (newRecord) ->
     result = new @constructor(@attributes())
@@ -308,13 +328,14 @@ class Model extends Module
     @trigger("create", clone)
     @trigger("change", clone, "create")
   
-  bind: (events, callback) ->
-    @constructor.bind events, (record) =>
-      if record && @eql(record)
-        callback.apply(@, arguments)
+  bind: ->
+    @constructor.bind_for @, arguments...
   
   trigger: ->
-    @constructor.trigger(arguments...)
+    @constructor.trigger_for @, arguments...
+  
+  unbind: ->
+    @constructor.unbind_for @, arguments...
 
 class Controller extends Module
   @include Events

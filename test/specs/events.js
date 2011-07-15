@@ -1,11 +1,12 @@
 describe("Events", function(){
   var EventTest;
+  var EventTestInstance;
   var spy;
 
   beforeEach(function(){
     EventTest = Spine.Class.create();
     EventTest.extend(Spine.Events);
-    
+        
     var noop = {spy: function(){}};
     spyOn(noop, "spy");
     spy = noop.spy;
@@ -16,7 +17,7 @@ describe("Events", function(){
     EventTest.trigger("daddyo");
     expect(spy).toHaveBeenCalled();
   });
-  
+
   it("should trigger correct events", function(){    
     EventTest.bind("daddyo", spy);
     EventTest.trigger("motherio");
@@ -42,7 +43,7 @@ describe("Events", function(){
     expect(spy).not.toHaveBeenCalled();
   });
   
-  it("should allow a callback unbind itself", function(){
+  it("should allow a callback to unbind itself", function(){
     var a = jasmine.createSpy("a");
     var b = jasmine.createSpy("b");
     var c = jasmine.createSpy("c");
@@ -80,5 +81,43 @@ describe("Events", function(){
     var Sub = EventTest.sub();
     Sub.trigger("yoyo");
     expect(spy).not.toHaveBeenCalled();
+  });
+
+  describe("for an instance", function(){
+    beforeEach(function(){
+      EventTest.include({
+        eql: function(other) {
+          return this === other;
+        }
+      });
+
+      EventTestInstance = new EventTest();
+    });
+
+    it("can bind/trigger instance specific events", function(){
+      EventTest.bind_for(EventTestInstance, "daddyo", spy); 
+      EventTest.trigger_for(EventTestInstance, "daddyo");
+      expect(spy).toHaveBeenCalled();
+    });
+
+    it("can unbind instance specific event classes", function() {
+      EventTest.bind_for(EventTestInstance, "daddyo", spy);
+      EventTest.unbind_for(EventTestInstance, "daddyo");
+      EventTest.trigger_for(EventTestInstance, "daddyo");
+      expect(spy).not.toHaveBeenCalled();
+    });
+
+    it("can unbind instance specific event callbacks", function() {
+      EventTest.bind_for(EventTestInstance, "daddyo", spy);
+      EventTest.unbind_for(EventTestInstance, "daddyo", spy);
+      EventTest.trigger_for(EventTestInstance, "daddyo");
+      expect(spy).not.toHaveBeenCalled();
+    });
+
+    it("should still run class events for instance specific triggers", function(){
+      EventTest.bind("daddyo", spy);
+      EventTest.trigger_for(EventTestInstance, "daddyo");
+      expect(spy).toHaveBeenCalled();
+    });
   });
 });
