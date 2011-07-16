@@ -51,8 +51,8 @@ class Collection extends Base
     
   findAll: (params) ->
     @send params,
-          type: "GET",
-          url: @url,
+          type:    "GET",
+          url:     @url,
           success: @recordsResponse(params)
     
   fetch: ->

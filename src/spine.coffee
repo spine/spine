@@ -261,6 +261,7 @@ class Model extends Module
     @destroyed = true
     @trigger("destroy", @)
     @trigger("change", @, "destroy")
+    @unbind()
 
   dup: (newRecord) ->
     result = new @constructor(@attributes())
@@ -309,12 +310,20 @@ class Model extends Module
     @trigger("change", clone, "create")
   
   bind: (events, callback) ->
-    @constructor.bind events, (record) =>
+    @constructor.bind events, binder = (record) =>
       if record && @eql(record)
         callback.apply(@, arguments)
+    @constructor.bind "unbind", unbinder = (record) =>
+      if record && @eql(record)
+        @constructor.unbind(events, binder)
+        @constructor.unbind("unbind", unbinder)
+    binder
   
   trigger: ->
     @constructor.trigger(arguments...)
+    
+  unbind: ->
+    @trigger("unbind", @)
 
 class Controller extends Module
   @include Events

@@ -307,5 +307,25 @@ describe("Model", function(){
       var asset = Asset.create({name: "cartoon world.png"});
       asset.updateAttributes({name: "lonely heart.png"});
     });
+    
+    it("should be able to unbind instance events", function(){      
+      var asset = Asset.create({name: "cartoon world.png"});
+      
+      asset.bind("save", spy);      
+      asset.unbind();
+      asset.save();
+      
+      expect(spy).not.toHaveBeenCalled();
+    });
+    
+    it("should unbind events on instance destroy", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+      
+      asset.bind("save", spy);
+      asset.destroy();
+      
+      asset.trigger("save", asset);
+      expect(spy).not.toHaveBeenCalled();
+    });
   });
 });
