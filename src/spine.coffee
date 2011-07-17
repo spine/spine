@@ -249,7 +249,7 @@ class Model extends Module
     @load(atts)
     @save()
     
-  updateID: (id) ->
+  changeID: (id) ->
     records = @constructor.records
     records[id] = records[@id]
     delete records[@id]
@@ -379,6 +379,8 @@ class Controller extends Module
     
   html: (element) -> 
     @el.html(element.el or element)
+    @refreshElements()
+    @el
 
   append: (elements...) -> 
     elements = (e.el or e for e in elements)
@@ -386,10 +388,17 @@ class Controller extends Module
     
   appendTo: (element) -> 
     @el.appendTo(element.el or element)
+    
+  replace: (element) ->
+    [previous, @el] = [@el, element.el or element]
+    previous.replaceWith(@el)
+    @delegateEvents()
+    @refreshElements()
+    @el
 
 # Utilities & Shims
 
-$ = @jQuery or @Zepto or -> arguments[0]
+$ = @jQuery or @Zepto or (element) -> element
 
 unless typeof Object.create is "function"
   Object.create = (o) ->

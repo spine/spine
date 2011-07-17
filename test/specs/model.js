@@ -209,6 +209,23 @@ describe("Model", function(){
     expect(asset.dup(false).newRecord).toBeFalsy();
   });
   
+  it("should be able to change ID", function(){
+    var asset = Asset.create({name: "hotel california"});    
+    expect(asset.id).toBeTruthy();
+    asset.changeID("foo");
+    expect(asset.id).toBe("foo");
+    
+    expect(Asset.exists("foo")).toBeTruthy();
+  });
+  
+  it("eql should respect ID changes", function(){
+    var asset1 = Asset.create({name: "hotel california", id: "bar"});
+    var asset2 = asset1.dup(false);
+    
+    asset1.changeID("foo");
+    expect(asset1.eql(asset2)).toBeTruthy();
+  });
+  
   describe("with spy", function(){
     var spy;
     
@@ -326,6 +343,6 @@ describe("Model", function(){
       
       asset.trigger("save", asset);
       expect(spy).not.toHaveBeenCalled();
-    });
+    });    
   });
 });
