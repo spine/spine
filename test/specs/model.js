@@ -343,6 +343,16 @@ describe("Model", function(){
       
       asset.trigger("save", asset);
       expect(spy).not.toHaveBeenCalled();
-    });    
+    });
+    
+    it("callbacks should still work on ID changes", function(){
+      var asset = Asset.create({name: "hotel california", id: "bar"});
+      asset.bind("test", spy);
+      asset.changeID("foo");
+      
+      asset = Asset.find("foo");
+      asset.trigger("test", asset);
+      expect(spy).toHaveBeenCalled();
+    })
   });
 });

@@ -207,6 +207,7 @@ class Model extends Module
 
   constructor: (atts) ->
     super
+    @ids = []
     @load atts if atts
 
   isNew: () ->
@@ -228,7 +229,8 @@ class Model extends Module
     result
 
   eql: (rec) ->
-    rec and rec.id is @id and rec.constructor is @constructor
+    rec and rec.constructor is @constructor and 
+      (rec.id is @id or @id in rec.ids or rec.id in @ids)
 
   save: ->
     error = @validate()
@@ -250,10 +252,12 @@ class Model extends Module
     @save()
     
   changeID: (id) ->
+    @ids.push(@id)
     records = @constructor.records
     records[id] = records[@id]
     delete records[@id]
     @id = id
+    @save()
   
   destroy: ->
     @trigger("beforeDestroy", @)
