@@ -54,6 +54,7 @@ moduleKeywords = ["included", "extended"]
 
 class Module
   @include: (obj) ->
+    throw("include(obj) requires obj") unless obj
     for key, value of obj when key not in moduleKeywords
       @::[key] = value
 
@@ -62,6 +63,7 @@ class Module
     @
 
   @extend: (obj) ->
+    throw("extend(obj) requires obj") unless obj
     for key, value of obj when key not in moduleKeywords
       @[key] = value
     
@@ -202,7 +204,6 @@ class Model extends Module
 
   # Instance
  
-  model: true
   newRecord: true
 
   constructor: (atts) ->

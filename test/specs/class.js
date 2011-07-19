@@ -55,5 +55,10 @@ describe("Class", function(){
     spyOn(module, "extended");
     User.extend(module);
     expect(module.extended).toHaveBeenCalled();    
-  });  
+  });
+  
+  it("include/extend should raise without arguments", function(){
+    expect(function(){ User.include(); }).toThrow();
+    expect(function(){ User.extend(); }).toThrow();
+  })
 });
