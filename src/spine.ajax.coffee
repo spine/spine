@@ -143,7 +143,7 @@ Model.Ajax =
 
   extended: ->
     @change (record, type) ->
-      record.ajax[type]()
+      record.ajax()[type]()
       
     @fetch ->
       @ajax().fetch(arguments...)
