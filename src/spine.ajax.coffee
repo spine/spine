@@ -100,8 +100,8 @@ class Singleton extends Base
   
   # Private
   
-  recordResponse: (params) =>
-    success = params?.success
+  recordResponse: (params = {}) =>
+    success = params.success
   
     (data, status, xhr) =>
       @record.trigger("ajaxSuccess", @record, status, xhr)
@@ -119,8 +119,8 @@ class Singleton extends Base
       
       success?(@record)
       
-  blankResponse: (params) =>
-    success = params?.success
+  blankResponse: (params = {}) =>
+    success = params.success
   
     (data, status, xhr) =>
       @record.trigger("ajaxSuccess", @record, status, xhr)
