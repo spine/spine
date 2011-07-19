@@ -71,28 +71,29 @@ class Singleton extends Base
     super
     @model = @record.constructor
     @url   = Ajax.getURL(@record)
+    @base  = Ajax.getURL(@model)
   
   find: (params) ->
-    @send params
+    @send params,
           type: "GET"
           url:  @url
   
   create: (params) ->
-    @send params
+    @send params,
           type:    "POST"
           data:    JSON.stringify(@record)
-          url:     @base.url
+          url:     @base
           success: @recordResponse(params)
 
   update: (params) ->
-    @send params
+    @send params,
           type:    "PUT"
           data:    JSON.stringify(@record)
           url:     @url
           success: @recordResponse(params)
   
   destroy: (params) ->
-    @send params
+    @send params,
           type:    "DELETE"
           url:     @url
           success: @blankResponse(params)
