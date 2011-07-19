@@ -109,12 +109,12 @@ class Singleton extends Base
       return if not data or params.data is data
       data = @model.fromJSON(data)
 
-      # ID change, need to do some shifting
-      if data.id and @record.id isnt data.id
-        @record.changeID(data.id)
+      Ajax.disable =>
+        # ID change, need to do some shifting
+        if data.id and @record.id isnt data.id
+          @record.changeID(data.id)
 
-      # Update with latest data
-      Ajax.disable ->
+        # Update with latest data
         @record.updateAttributes(data.attributes())
       
       success?(@record)
