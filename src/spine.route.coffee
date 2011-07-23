@@ -22,7 +22,7 @@ class Spine.Route extends Spine.Module
     if (typeof path is "object")
       @add(key, value) for key, value of path
     else
-      @routes.push(new @(path, callback))
+      @routes.unshift(new @(path, callback))
     
   @setup: (options = {}) ->
     @options = $.extend({}, @options, options)
@@ -92,7 +92,7 @@ class Spine.Route extends Spine.Module
   @matchRoute: (path, options) ->
     for route in @routes
       if route.match(path, options)
-        @trigger("change", route)
+        @trigger("change", route, path)
         return route
 
   constructor: (@path, @callback) ->
@@ -119,9 +119,8 @@ class Spine.Route extends Spine.Module
     if @names.length
       for param, i in params
         options[@names[i]] = param
-
-    @callback.call(null, options)
-    true
+        
+    @callback.call(null, options) isnt false
 
 # Coffee-script bug
 Spine.Route.change = Spine.Route.proxy(Spine.Route.change)

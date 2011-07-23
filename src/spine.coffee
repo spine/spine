@@ -122,7 +122,7 @@ class Model extends Module
 
   @findByAttribute: (name, value) ->
     for id, record of @records
-      if record[name] == value
+      if record[name] is value
         return record.clone()
     null
 
