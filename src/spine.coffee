@@ -346,6 +346,8 @@ class Controller extends Module
     @el = document.createElement(@tag) unless @el
     @el = $(@el)
 
+    @el.addClass(@className) if @className
+
     @events = @constructor.events unless @events
     @elements = @constructor.elements unless @elements
 
@@ -393,6 +395,10 @@ class Controller extends Module
     
   appendTo: (element) -> 
     @el.appendTo(element.el or element)
+
+  prepend: (elements...) -> 
+    elements = (e.el or e for e in elements)
+    @el.prepend(elements...)
     
   replace: (element) ->
     [previous, @el] = [@el, element.el or element]
