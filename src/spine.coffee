@@ -132,7 +132,7 @@ class Model extends Module
 
   @each: (callback) ->
     for key, value of @records
-      callback(value)
+      callback(value.clone())
 
   @all: ->
     @cloneArray(@recordsValues())

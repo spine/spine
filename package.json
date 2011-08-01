@@ -13,7 +13,7 @@
     "url": "http://github.com/maccman/spine.git"
   }, 
   "engine" : [ "node >=0.1.102" ], 
-  "main" : "./spine.js",
+  "main" : "./lib/spine.js",
   "devDependencies" : {
     "spine.app": "0.0.2"
   }
