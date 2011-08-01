@@ -495,6 +495,7 @@
         this[key] = this.options[key];
 
       if (!this.el) this.el = document.createElement(this.tag);
+      this.el.className = this.class;
       this.el = $(this.el);
 
       if ( !this.events ) this.events = this.parent.events;
