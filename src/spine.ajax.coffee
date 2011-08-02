@@ -39,6 +39,7 @@ Ajax =
 class Base
   defaults:
     contentType: "application/json"
+    dataType: "json"
     processData: false
   
   send: (params, defaults) ->
