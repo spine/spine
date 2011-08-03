@@ -433,8 +433,13 @@ The convention inside Spine is to give the controller a plural camel cased name 
 
     var tasks = Tasks.init();
     
-Every controller has an element associated with it, which you can access under the instance property `el`. You can also set this element manually by passing it through on instantiation. 
+Every controller has an element associated with it, which you can access under the instance property `el`. This element is set automatically when creating a controller instance. The type of element created is specified by the `tag` property, which by default is `"div"`.
 
+    var TaskItem = Spine.Controller.create({tag: "li"});
+    var taskItem = TaskItem.init(); // taskItem.el is a <li></li> element
+
+The `el` property can also be set manually by passing it through on instantiation.
+    
     var tasks = Tasks.init({el: $("#tasks")});
 
 In fact, anything you pass to `init()` will be set as properties on the newly created instance. For example, you could pass a record that a controller would be associated with.
