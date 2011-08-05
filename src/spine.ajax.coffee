@@ -23,6 +23,10 @@ Ajax =
 
   request: (params) ->
     success = params.success
+    error = params.error
+    params.error= =>
+      error?(arguments...)
+      @requestNext()
     params.success = =>
       success?(arguments...)
       @requestNext()
@@ -55,6 +59,7 @@ class Collection extends Base
           type:    "GET",
           url:     @url,
           success: @recordsResponse(params)
+          error: @errorResponse(params)
     
   fetch: ->
     @findAll success: (records) =>
@@ -66,7 +71,15 @@ class Collection extends Base
     (data, status, xhr) =>
       model.trigger("ajaxSuccess", null, status, xhr)
       success?(@model.fromJSON(data))
-    
+
+  errorResponse: (params = {}) =>
+    error = params.error
+
+    (jqXHR, statusText, error) =>
+      @record.trigger("ajaxError", @record, jqXHR, statusText, error)
+      error?(@model)
+
+
 class Singleton extends Base
   constructor: (@record) ->
     super
@@ -85,6 +98,8 @@ class Singleton extends Base
           data:    JSON.stringify(@record)
           url:     @base
           success: @recordResponse(params)
+          error: @errorResponse(params)
+
 
   update: (params) ->
     @send params,
@@ -92,15 +107,18 @@ class Singleton extends Base
           data:    JSON.stringify(@record)
           url:     @url
           success: @recordResponse(params)
+          error: @errorResponse(params)
+
   
   destroy: (params) ->
     @send params,
           type:    "DELETE"
           url:     @url
           success: @blankResponse(params)
+          error: @errorResponse(params)
   
   # Private
-  
+
   recordResponse: (params = {}) =>
     success = params.success
   
@@ -127,6 +145,14 @@ class Singleton extends Base
       @record.trigger("ajaxSuccess", @record, status, xhr)
 
       success?(@record)
+
+  errorResponse: (params = {}) =>
+    error = params.error
+
+    (jqXHR, statusText, error) =>
+      @record.trigger("ajaxError", @record, jqXHR, statusText, error)
+
+      error?(@record)
 
 # Ajax endpoint
 Model.host = ""
