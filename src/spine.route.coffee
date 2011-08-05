@@ -1,5 +1,5 @@
-Spine or= require("spine")
-$     = Spine.$
+Spine ?= require("spine")
+$      = Spine.$
 
 hashStrip    = /^#*/
 namedParam   = /:([\w\d]+)/g

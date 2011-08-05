@@ -1,3 +1,5 @@
+Spine ?= require("spine")
+
 class Collection
   constructor: (options = {}) ->
     for key, value of options

@@ -19,8 +19,8 @@
 #  assert( groups.el.hasClass("active") );
 #  assert( ! users.el.hasClass("active") );
 
-Spine or= require("spine")
-$     = Spine.$
+Spine ?= require("spine")
+$      = Spine.$
 
 class Spine.Manager extends Spine.Module
   @include Spine.Events

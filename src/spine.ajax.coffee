@@ -1,6 +1,6 @@
-Spine or= require("spine")
-$     = Spine.$
-Model = Spine.Model
+Spine ?= require("spine")
+$      = Spine.$
+Model  = Spine.Model
 
 Ajax =
   enabled:  true

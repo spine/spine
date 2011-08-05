@@ -150,27 +150,24 @@ Or pass multiple function names to `proxyAll()` in order to re-write them perman
 
 `Spine.Events` is the module Spine uses for adding event support to classes. To use it, just include/extend a class with the module. 
 
-    var Tasks = Spine.Class.create();
-    Tasks.extend(Spine.Events);
+    class Tasks extends Spine.Module
+      @extend(Spine.Events)
     
 `Spine.Events` gives you three functions, `bind()`, `trigger()`, and `unbind()`. All three have a very similar API to jQuery's event handling one, if you're familiar with that. `bind(name, callback)` takes a event name and callback. `trigger(name, [*data])` takes an event name and optional data to be passed to handlers. `unbind(name, [callback])` takes a event name and optional callback.
     
-    Tasks.bind("create", function(foo, bar){ /* ... */ });
-    Tasks.trigger("create", "some", "data");
+    Tasks.bind "create", (foo, bar) -> 
+    Tasks.trigger "create", "some", "data"
 
 You can bind to multiple events by separating them with spaces. Callbacks are invoked in the context the event is associated with. 
 
-    Tasks.bind("create update destroy", function(){ this.trigger("change") });
+    Tasks.bind("create update destroy", -> @trigger("change"))
     
 You can pass optional data arguments to `trigger()` that will be passed onto event callbacks. Unlike jQuery, an event object will not be passed to callbacks.
 
-    Tasks.bind("create", function(name){
-      alert(name);
-    });
+    Tasks.bind "create", (name) -> alert(name)
+    Tasks.trigger "create", "Take out the rubbish"
     
-    Tasks.trigger("create", "Take out the rubbish");
-    
-Although you may never use `Spine.Events` in your own classes, you will use it with Spine's models and controllers. We're going to cover those next.
+Although you might never use `Spine.Events` in your own classes, you will use it with Spine's models and controllers. We're going to cover those next.
     
 #Models
 
@@ -178,93 +175,86 @@ Models are the core to Spine, and absolutely critical to your applications. Mode
 
 Creating models is slightly different from creating classes, since the `create()` function is already reserved by models. Models are created with the `setup()` function, passing in the model name and an array of attributes.
 
-    var Contact = Spine.Model.setup("Contact", ["first_name", "last_name"]);
-    
+    class Contact extends Spine.Model
+      @configure "Contact", "first_name", "last_name"
+
 Models are Spine classes, so you can treat them as such, extending and including properties.
-    
-    Contact.include({
-      fullName: function(){
-        return(this.first_name + " " + this.last_name);
-      }
-    });
+
+    class Contact extends Spine.Model
+      @configure "Contact", "first_name", "last_name"
+      
+      fullName: -> @first_name + " " + @last_name
     
 Model instances are created with `init()`, passing in an optional set of attributes.
-    
-    var contact = Contact.init({first_name: "Alex", last_name: "MacCaw"});
-    assertEqual( contact.fullName(), "Alex MacCaw" );
+
+    contact = new Contact(first_name: "Alex", last_name: "MacCaw")
+    assertEqual( contact.fullName(), "Alex MacCaw" )
     
 Models can be also be easily subclassed:
 
-    var Contact = Spine.Model.setup("Contact", ["first_name", "last_name"]);
-    var User = Contact.setup("User");
+    class User extends Contact
+      @configure "User"
     
 ##Saving/Retrieving Records
 
 Once an instance is created it can be saved in memory by calling `save()`.
 
-    var Contact = Spine.Model.setup("Contact", ["first_name", "last_name"]);
-    
-    var contact = Contact.init({first_name: "Joe"});
-    contact.save();
+    class Contact extends Spine.Model
+      @configure "Contact", "first_name", "last_name"
+      
+    contact = new Contact(first_name: "Joe")
+    contact.save()
     
 When a record is saved, Spine automatically creates an ID if it doesn't already exist.
 
-    assertEqual( contact.id, "AD9408B3-1229-4150-A6CC-B507DFDF8E90" );
+    assertEqual( contact.id, "AD9408B3-1229-4150-A6CC-B507DFDF8E90" )
     
 You can use this ID to retrieve the saved record using `find()`.
 
-    var identicalContact = Contact.find( contact.id );
-    assert( contact.eql( identicalContact ) );
+    identicalContact = Contact.find( contact.id )
+    assert( contact.eql( identicalContact ) )
     
 If `find()` fails to retrieve a record, an exception will be thrown. You can check for the existence of records without fear of an exception by calling `exists()`.
 
-    assert( Contact.exists( contact.id ) );
+    assert( Contact.exists( contact.id ) )
     
 Once you've changed any of a record's attributes, you can update it in-memory by re-calling `save()`.
 
-    var contact = Contact.create({first_name: "Polo"});
-    contact.save();
-    contact.first_name = "Marko";
-    contact.save();
+    contact = Contact.create({first_name: "Polo"})
+    contact.save()
+    contact.first_name = "Marko"
+    contact.save()
     
 You can also use `first()` or `last()` on the model to retrieve the first and last records respectively.
 
-    var firstContact = Contact.first();
+    firstContact = Contact.first()
     
 To retrieve every contact, use `all()`.
 
-    var contacts = Contact.all();
-    for (var i=0; i < contacts.length; i++)
-      console.log( contacts[i].first_name );
+    contacts = Contact.all()
+    console.log(contact.name) for contact in contacts
 
 You can pass a function that'll be iterated over every record using `each()`.
 
-    Contact.each(function(con){
-      console.log( con.first_name );
-    });
+    Contact.each (contact) -> console.log(console.first_name)
     
 Or select a subset of records with `select()`.
 
-    Contact.select(function(con){
-      if (con.first_name) return true;
-    });
+    Contact.select (contact) -> contact.first_name
     
 ##Validation
 
 Validating models is dirt simple, simply override the `validate()` function with your own custom one.
 
-    Contact.include({
-      validate: function(){
-        if (!this.first_name)
-          return "First name is required";
-      }
-    });
-    
+    class Contact extends Spine.Model
+      validate: ->
+        unless @first_name
+          "First name is required"
+
 If `validate()` returns anything, the validation will fail and an *error* event will be fired on the model. You can catch this by listening for it on the model, notifying the user.
     
-    Contact.bind("error", function(rec, msg){
-      alert("Contact failed to save - " + msg);
-    });
+    Contact.bind "error", (rec, msg) ->
+      alert("Contact failed to save - " + msg)
     
 In addition, `save()`, `create()` and `updateAttributes()` will all return false if validation fails. For more information about validation, see the [form tutorial](http://maccman.github.com/spine.tutorials/form.html).
 
@@ -272,19 +262,17 @@ In addition, `save()`, `create()` and `updateAttributes()` will all return false
 
 Spine's models include special support for JSON serialization. To serialize a record, call `JSON.stringify()` passing the record, or to serialize every record, pass the model.
 
-    JSON.stringify(Contact);
-    JSON.stringify(Contact.first());
+    JSON.stringify(Contact)
+    JSON.stringify(Contact.first())
     
 Alternatively, you can retrieve an instance's attributes and implement your own serialization by calling `attributes()`.
 
-    var contact = Contact.init({first_name: "Leo"});
-    assertEqual( contact.attributes(), {first_name: "Leo"} );
+    contact = new Contact(first_name: "Leo")
+    assertEqual( contact.attributes(), {first_name: "Leo"} )
     
-    Contact.include({
-      toXML: function(){
-        return serializeToXML(this.attributes());
-      }
-    });
+    Contact.include
+      toXML: ->
+        serializeToXML(@attributes())
     
 If you're using an older browser which doesn't have native JSON support (i.e. IE 7), you'll need to include [json2.js](https://github.com/douglascrockford/JSON-js/blob/master/json2.js) which adds legacy support. 
 
@@ -296,11 +284,12 @@ Spine's persistence is implemented via modules, so for HTML5 Local Storage persi
 
 To persist a model using HTML5 Local Storage, simply extend it with `Spine.Model.Local`.
 
-    Contact.extend(Spine.Model.Local);
+    class Contact extends Spine.Model
+      @extend Spine.Model.Local
 
 When a record is changed, the Local Storage database will be updated to reflect that. In order to fetch the records from Local Storage in the first place, you need to use `fetch()`. 
 
-    Contact.fetch();
+    Contact.fetch()
     
 Typically this is called once, when your application is first initialized. 
 
@@ -308,13 +297,15 @@ Typically this is called once, when your application is first initialized.
 
 Using Ajax as a persistence mechanism is very similar, extend models with `Spine.Model.Ajax`.
 
-    Contact.extend(Spine.Model.Ajax);
+    class Contact extends Spine.Model
+      @extend Spine.Model.Ajax
     
 By convention, this uses a basic pluralization mechanism to generate an endpoint, in this case `/contacts`. You can choose a custom URL by setting the `url` property on your model, like so:
 
-    Contact.extend({
+    class Contact extends Spine.Model
+      @extend Spine.Model.Ajax
+  
       url: "/users"
-    });
     
 Spine will use this endpoint URL as a basis for all of its Ajax requests. Once a model has been persisted with Ajax, whenever its records are changed, Spine will send an Ajax request notifying the server. Spine encodes all of its request's parameters with JSON, and expects JSON encoded responses. Spine uses REST to determine the method and endpoint of HTTP requests, and will work seamlessly with REST friendly frameworks like Rails.
 
@@ -367,9 +358,7 @@ Obviously there are caveats for those advantages, but I think those are easily a
 
 When the server does return an unsuccessful response, an *ajaxError* event will be fired on the model, including the record, XMLHttpRequest object, Ajax settings and the thrown error. 
 
-    Contact.bind("ajaxError", function(record, xhr, settings, error){ 
-      /* Invalid response... */ 
-    });
+    Contact.bind "ajaxError", (record, xhr, settings, error) -> /* Invalid response... */ 
 
 ##Events
 
@@ -385,16 +374,14 @@ You've already seen that models have some events associated with them, such as *
 
 For example, you can bind to a model's *create* event like so:
 
-    Contact.bind("create", function(newRecord){
+    Contact.bind "create", (newRecord) ->
       // New record was created
-    });
     
 For model level callbacks, any associated record is always passed to the callback. The other option is to bind to the event directly on the record.
 
-    var contact = Contact.first();
-    contact.bind("save", function(){
+    contact = Contact.first()
+    contact.bind "save", ->
       // Contact was updated
-    });
     
 The callback's context will be the record that the event listener was placed on. You'll find model events crucial when it comes to binding records to the view, making sure the view is kept in sync with your application's data. 
 
@@ -404,16 +391,16 @@ One rather neat addition to Spine's models is dynamic records, which use prototy
 
 Let's give you a code example; we're going to create an asset, and a clone of that asset. You'll notice that when the asset is updated, the clone has also automatically changed. 
 
-    var asset = Asset.create({name: "whatshisname"});
+    asset = Asset.create(name: "whatshisname")
     
     // Completely new asset instance
-    var clone = Asset.find(asset.id);
+    clone = Asset.find(asset.id)
 
     // Change saved asset
-    asset.updateAttributes({name: "bob"});
+    asset.updateAttributes(name: "bob")
     
     // Clone reflects changes
-    assertEqual(clone.name, "bob");
+    assertEqual(clone.name, "bob")
     
 This means that you never have to bother calling some sort of `reload()` functions on instances. You can be sure that all instances are constantly in sync with their saved versions. 
 
@@ -423,28 +410,30 @@ Controllers are the last part to the trinity of Spine and are very simple, being
 
 Controllers, like models, extend `Spine.Class` and so inherit all of its properties. This means you can use `extend()` and `include()` to add properties onto controllers, and can take advantage of all of Spine's context management. To create a controller, inherit a class from `Spine.Controller`.
 
-    var Tasks = Spine.Controller.create({
-      init: function(){
+    class Tasks extends Spine.Controller
+      constructor: ->
+        super
         // Called on instantiation
-      }
-    });
     
 The convention inside Spine is to give the controller a plural camel cased name of the model it is most associated with, in this case `Tasks`. Usually, you'll only be adding instance properties onto controllers, so you can just pass them as the first argument to `create()`. Instantiating controllers is the same as creating an instance of any other class, by calling `init()`.
 
-    var tasks = Tasks.init();
+    tasks = new Tasks
     
 Every controller has an element associated with it, which you can access under the instance property `el`. This element is set automatically when creating a controller instance. The type of element created is specified by the `tag` property, which by default is `"div"`.
 
-    var TaskItem = Spine.Controller.create({tag: "li"});
-    var taskItem = TaskItem.init(); // taskItem.el is a <li></li> element
+    class TaskItem extends Spine.Controller
+      tag: "li"
+      
+    # taskItem.el is a <li></li> element
+    taskItem = new TaskItem 
 
 The `el` property can also be set manually by passing it through on instantiation.
     
-    var tasks = Tasks.init({el: $("#tasks")});
+    tasks = new Tasks(el: $("#tasks"));
 
 In fact, anything you pass to `init()` will be set as properties on the newly created instance. For example, you could pass a record that a controller would be associated with.
 
-    var taskItem = TaskItem.init({item: Task.first()});
+    taskItem = new TaskItem(item: Task.first())
 
 Inside your controller's `init()` function, you'll generally add event listeners to models and views, referencing a function inside the controller. 
 
@@ -452,98 +441,65 @@ Inside your controller's `init()` function, you'll generally add event listeners
 
 Spine gives you a shortcut for adding event listeners onto DOM elements, with the `events` property. 
 
-    var Tasks = Spine.Controller.create({
-      events: {"click .item": "click"},
+    class Tasks extends Spine.Controller
+      events: 
+        "click .item": "click"
       
-      click: function(e){
+      click: (event) ->
         // Invoked when .item is clicked
-      }
-    });
     
 `events` is an object in the following format `{"eventType selector", "functionName"}`. All the selectors are scoped to the controller's associated element, `el`. If a selector isn't provided, the event will be added directly on `el`, otherwise it'll be delegated to any children matching the selector. 
 
 Spine will take care of callback context for you, making sure it keeps to the current controller. Callbacks will be passed an event object, and you can access the original element the event was targeted on using `event.target`.
 
-    var Tasks = Spine.Controller.create({
-      events: {"click .item": "click"},
-      
-      click: function(event){
-        var item = jQuery(event.target);
-      }
-    });
+    class Tasks extends Spine.Controller
+      events: 
+        "click .item": "click"
+  
+      click: (event) ->
+        item = jQuery(event.target);
 
 Since Spine uses [delegation](http://api.jquery.com/delegate) for events, it doesn't matter if the contents of `el` change. The appropriate events will still be fired when necessary. 
 
 As well as DOM events, `Spine.Controller` has been extended with `Spine.Events`, meaning that you can bind and trigger custom events. 
 
-    var ToggleView = Spine.Controller.create({
-      init: function(){
-        this.items = this.$(".items");
-        this.items.click(this.proxy(function(){ 
-          this.trigger("toggle");
-        }));
-        this.bind("toggle", this.toggle);
-      },
-      
-      toggle: function(){ /* ... */ }
-    });
+    class ToggleView extends Spine.Controller
+      constructor: ->
+        super
+        @items = @$(".items")
+        @items.click => @trigger("toggle")
+        @bind "toggle", @toggle
+        
+      toggle: ->
+        # ...
 
 Spine also has a global object `Spine.App`, that you can bind and trigger global events. This is one way that you can get controllers communicating with one other, without resorting to deep-coupling. `Spine.App` is aliased inside controllers to `this.App`.
 
-    var GlobalController = Spine.Controller.create({
-      init: function(){
-        this.el.click(this.proxy(this.click));
-      },
-      
-      click: function(){
-        this.App.trigger("globalEvent", this.el);
-      }
-    });
+    class GlobalController extends Spine.Controller
+      constructor: ->
+        super
+        @el.click @click
+        
+      click: =>        
 
 ##Elements
 
 When you first instantiate a controller, it's common to set a bunch of instance variables referencing various elements. For example, setting the `items` variable on the `Tasks` controller:
 
-    var Tasks = Spine.Controller.create({
-      init: function(){
-        this.items = this.$(".items");
-      }
-    });
+    class Tasks extends Spine.Controller
+      constructor: ->
+        super
+        @items = @$(".items")
     
 Since this is such a common scenario, Spine provides a helper, the `elements` property. The is in the format of `{"selector": "variableName"}`. When the controller is instantiated, Spine will go through `elements`, setting the appropriate elements as properties on the instance. Like with `events`, all the selectors are scoped by the controller's current element, `el`.
 
-    var Tasks = Spine.Controller.create({
-      elements: {".items": "items"},
-
-      init: function(){
-        this.items.each(function(){
-          // ...
-        });
-      }
-    });
-
-##Proxying
-
-Setting up a bunch of proxies in your controller's `init()` function is also a common scenario. For example:
-
-    var Tasks = Spine.Controller.create({
-      init: function(){
-        this.proxyAll("render");
-        Task.change(this.render);
-      },
+    class Tasks extends Spine.Controller
+      elements:
+        ".items": "items"
       
-      render: function(){ /* ... */ }
-    });
-    
-As you've probably guessed, Spine provides a shortcut for adding proxies too, using the `proxied` property. Simply set `proxied` to an array of function names, and Spine will make sure those functions are always executed in the controller's context.
-
-    var Tasks = Spine.Controller.create({
-      proxied: ["render"],
-
-      init: function(){
-        Task.change(this.render);
-      }
-    });
+      constructor: ->
+        super
+        @items.each -> #...
     
 #Routing
 
@@ -555,35 +511,25 @@ Internally Spine uses the *hashchange* event to detect changes in the URLs hash.
 
 So, how to use the API? It's very simple, first you need to include [spine.route.js](lib/spine.route.js), which contains the module `Spine.Route`. Then you can start adding routes inside your controller. `Spine.Route` gives you a `routes()` function inside controllers, which you can call passing a hash of routes and callbacks.
 
-    var App = Spine.Controller.create({
-      init: function(){
-        this.routes({
-          "/users/:id": function(id){
-            // Activate controller or something
-            console.log("/users/", id)
-          },
-          "/users": function(any){
-            console.log("/users")
-          }
-        });
-      }
-    }).init();
-        
+    class App extends Spine.Controller
+      constructor: ->
+        @routes
+          "/users/:id": (params) ->
+            console.log("/users/", params.id)
+          "/users": ->
+            console.log("users")
+
 Route parameters, are in the form of `:name`, and are passed as arguments to the associated callback. You can also use globs to match anything via an asterisk, like so: 
 
-    App.routes({
-      "/pages/*glob": function(name){
-        console.log("/pages/", name);
-      }
-    });
+    @routes
+      "/pages/*glob": (params) ->
+        console.log("/pages/", params.glob)
 
 Routes are added in reverse order of specificity, so the most specific routes should be added first, and generic 'catch alls' should be added later. It's worth noting, especially if you're putting routes in the `init()` function of controllers, that routes shouldn't be added more than once. The examples above are fine, since the `App` controller is only ever going to be instantiated a single time. 
 
 One alternative is to skip out controllers, and add routes directly using `Spine.Route.add()`, passing in either a hash or a single route. 
     
-    Spine.Route.add(/\/groups(\/)?/, function(){
-      console.log('groups')
-    });
+    Spine.Route.add /\/groups(\/)?/, -> console.log("groups")
     
 Like you can see in the example above, routes can also be raw regexes, giving you full control over matching.
 
@@ -591,7 +537,7 @@ Like you can see in the example above, routes can also be raw regexes, giving yo
 
 When the page loads initially, even if the URL has a hash fragment, the `hashchange` event won't be called. It'll only be called for subsequent changes. This means, after our application has been setup, we need to manually tell Spine that we want to run the routes & check the URL's hash. This can be done by invoking `Spine.Route.setup()`.
     
-    Spine.Route.setup();
+    Spine.Route.setup()
     
 ##Navigate
     

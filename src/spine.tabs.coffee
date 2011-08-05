@@ -18,8 +18,8 @@
 ## Select first tab.
 # tabs.render();
 
-Spine or= require("spine")
-$     = Spine.$
+Spine ?= require("spine")
+$      = Spine.$
 
 class Spine.Tabs extends Spine.Controller
   events: 

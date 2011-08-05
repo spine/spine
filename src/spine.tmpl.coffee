@@ -1,6 +1,6 @@
 # jQuery.tmpl.js utilities
 
-$ = jQuery
+$ = jQuery ? require("jqueryify")
 
 $.fn.item = ->
   item = $(@).tmplItem().data
