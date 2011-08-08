@@ -448,10 +448,10 @@ Spine.Model      = Model
 
 Module.create = Module.sub =
 Controller.create = Controller.sub =
-Model.sub = (instance, static) ->
+Model.sub = (instances, statics) ->
   class result extends this
-  result.include(instance) if instance
-  result.extend(static) if static
+  result.include(instances) if instances
+  result.extend(statics) if statics
   result.unbind?()
   result
   
