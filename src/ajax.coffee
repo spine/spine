@@ -69,7 +69,7 @@ class Collection extends Base
     success = params.success
     
     (data, status, xhr) =>
-      model.trigger("ajaxSuccess", null, status, xhr)
+      @model.trigger("ajaxSuccess", null, status, xhr)
       success?(@model.fromJSON(data))
 
   errorResponse: (params = {}) =>
