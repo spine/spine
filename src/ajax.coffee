@@ -76,7 +76,7 @@ class Collection extends Base
     error = params.error
 
     (jqXHR, statusText, error) =>
-      @record.trigger("ajaxError", @record, jqXHR, statusText, error)
+      @model.trigger("ajaxError", null ,jqXHR, statusText, error)
       error?(@model)
 
 
