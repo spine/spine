@@ -464,4 +464,8 @@ Module.init = Controller.init = Model.init = (a1, a2, a3, a4, a5) ->
   new this(a1, a2, a3, a4, a5)
   
 Spine.App = new Controller
-Spine.Class = Module
+class Spine.Class extends Module
+  init: ->
+  
+  constructor: ->
+    @init(arguments...)
