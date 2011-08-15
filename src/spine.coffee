@@ -53,6 +53,9 @@ Log =
 moduleKeywords = ["included", "extended"]
 
 class Module
+  constructor: ->
+    @init(arguments...) if @init
+
   @include: (obj) ->
     throw("include(obj) requires obj") unless obj
     for key, value of obj when key not in moduleKeywords
@@ -353,6 +356,7 @@ class Controller extends Module
 
     @delegateEvents() if @events
     @refreshElements() if @elements
+    super
      
   destroy: ->
     @trigger "destroy"
@@ -464,8 +468,4 @@ Module.init = Controller.init = Model.init = (a1, a2, a3, a4, a5) ->
   new this(a1, a2, a3, a4, a5)
   
 Spine.App = new Controller
-class Spine.Class extends Module
-  init: ->
-  
-  constructor: ->
-    @init(arguments...)
+Spine.Class = Module
