@@ -270,6 +270,7 @@ class Model extends Module
     @trigger("destroy", @)
     @trigger("change", @, "destroy")
     @unbind()
+    @
 
   dup: (newRecord) ->
     result = new @constructor(@attributes())
