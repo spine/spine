@@ -365,10 +365,10 @@ class Controller extends Module
   $: (selector) -> $(selector, @el)
       
   delegateEvents: ->
-    for key of @events
-      methodName = @events[key]
-      method     = @proxy(@[methodName])
-      
+    for key, method of @events
+      unless typeof(method) is "function"
+        method = @proxy(@[method])
+
       match      = key.match(@eventSplitter)
       eventName  = match[1]
       selector   = match[2]
