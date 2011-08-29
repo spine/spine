@@ -2,7 +2,7 @@ describe("Model", function(){
   var Asset;
   
   beforeEach(function(){
-    Asset = Spine.Model.setup("Asset", "name");
+    Asset = Spine.Model.setup("Asset", ["name"]);
   });
   
   it("can create records", function(){
@@ -197,6 +197,7 @@ describe("Model", function(){
     
     expect(File.aProperty).toBeTruthy();
     expect(File.className).toBe("File");
+    
     expect(File.attributes).toEqual(Asset.attributes);
   });
   
