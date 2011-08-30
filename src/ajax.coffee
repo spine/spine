@@ -133,11 +133,14 @@ class Singleton extends Base
         if data.id and @record.id isnt data.id
           @record.changeID(data.id)
 
-        # Update with latest data
-        @record.updateAttributes(data.attributes())
-      
+        # do not blindly update the local copy
+        # in case server sends different json object
+        # for example list of errors which domain logic
+        # only exists in server
+        @record.updateAttribute key, data[key] for key, value of @record.attributes() when data[key]?
+
       success?(@record)
-      
+
   blankResponse: (params = {}) =>
     success = params.success
   
