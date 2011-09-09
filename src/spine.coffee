@@ -53,9 +53,6 @@ Log =
 moduleKeywords = ["included", "extended"]
 
 class Module
-  constructor: ->
-    @init(arguments...) if @init
-
   @include: (obj) ->
     throw("include(obj) requires obj") unless obj
     for key, value of obj when key not in moduleKeywords
@@ -79,6 +76,9 @@ class Module
 
   proxy: (func) ->
     => func.apply(@, arguments)
+
+  constructor: ->
+    @init?(arguments...)
 
 class Model extends Module
   @extend Events
@@ -373,7 +373,7 @@ class Controller extends Module
       eventName  = match[1]
       selector   = match[2]
 
-      if selector is ''
+      if selector is ""
         @el.bind(eventName, method)
         @bind "destroy", ->
           @el.unbind(eventName, method)
@@ -448,8 +448,12 @@ Spine.Log        = Log
 Spine.Module     = Module
 Spine.Controller = Controller
 Spine.Model      = Model
+
+# Global events
+
+Module.extend.apply(Spine, Events)
   
-# Backwards compatability
+# JavaScript compatability
 
 Module.create = Module.sub =
 Controller.create = Controller.sub =
@@ -468,5 +472,4 @@ Model.setup = (name, attributes = []) ->
 Module.init = Controller.init = Model.init = (a1, a2, a3, a4, a5) ->
   new this(a1, a2, a3, a4, a5)
   
-Spine.App = new Controller
 Spine.Class = Module
