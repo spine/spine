@@ -15,6 +15,6 @@
   "engine" : [ "node >=0.1.102" ], 
   "main" : "./lib/spine.js",
   "devDependencies" : {
-    "spine.app": "~= 0.0.2"
+    "spine.app": "~0.0.2"
   }
 }

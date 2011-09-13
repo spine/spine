@@ -3,8 +3,9 @@
 $ = jQuery ? require("jqueryify")
 
 $.fn.item = ->
-  item = $(@).tmplItem().data
-  item.reload?()
+  item = $(@)
+  item = item.data("item") or item.tmplItem?().data
+  item?.reload?()
 
 $.fn.forItem = ->
   @filter ->
