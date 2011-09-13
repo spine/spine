@@ -1,7 +1,7 @@
 Events = 
   bind: (ev, callback) ->
-    evs   = ev.split(" ")
-    calls = @hasOwnProperty("_callbacks") and @_callbacks or= {}
+    evs   = ev.split(' ')
+    calls = @hasOwnProperty('_callbacks') and @_callbacks or= {}
   
     for name in evs
       calls[name] or= []
@@ -11,7 +11,7 @@ Events =
   trigger: (args...) ->
     ev = args.shift()
       
-    list = @hasOwnProperty("_callbacks") and @_callbacks?[ev]
+    list = @hasOwnProperty('_callbacks') and @_callbacks?[ev]
     return false unless list
   
     for callback in list
@@ -41,20 +41,20 @@ Events =
 Log =
   trace: true
 
-  logPrefix: "(App)"
+  logPrefix: '(App)'
 
   log: (args...) ->
     return unless @trace
-    return if typeof console is "undefined"
+    return if typeof console is 'undefined'
     if @logPrefix then args.unshift(@logPrefix)
     console.log(args...)
     @
 
-moduleKeywords = ["included", "extended"]
+moduleKeywords = ['included', 'extended']
 
 class Module
   @include: (obj) ->
-    throw("include(obj) requires obj") unless obj
+    throw('include(obj) requires obj') unless obj
     for key, value of obj when key not in moduleKeywords
       @::[key] = value
 
@@ -63,7 +63,7 @@ class Module
     @
 
   @extend: (obj) ->
-    throw("extend(obj) requires obj") unless obj
+    throw('extend(obj) requires obj') unless obj
     for key, value of obj when key not in moduleKeywords
       @[key] = value
     
@@ -99,7 +99,7 @@ class Model extends Module
 
   @find: (id) ->
     record = @records[id]
-    throw("Unknown record") unless record
+    throw('Unknown record') unless record
     record.clone()
 
   @exists: (id) ->
@@ -116,7 +116,7 @@ class Model extends Module
       record.id           or= guid()
       @records[record.id] = record
 
-    @trigger("refresh")
+    @trigger('refresh')
     @
 
   @select: (callback) ->
@@ -171,23 +171,23 @@ class Model extends Module
     @find(id).destroy()
 
   @change: (callbackOrParams) ->
-    if typeof callbackOrParams is "function"
-      @bind("change", callbackOrParams)
+    if typeof callbackOrParams is 'function'
+      @bind('change', callbackOrParams)
     else
-      @trigger("change", callbackOrParams)
+      @trigger('change', callbackOrParams)
 
   @fetch: (callbackOrParams) ->
-    if typeof callbackOrParams is "function"
-      @bind("fetch", callbackOrParams)
+    if typeof callbackOrParams is 'function'
+      @bind('fetch', callbackOrParams)
     else
-      @trigger("fetch", callbackOrParams)
+      @trigger('fetch', callbackOrParams)
 
   @toJSON: ->
     @recordsValues()
   
   @fromJSON: (objects) ->
     return unless objects
-    if typeof objects is "string"
+    if typeof objects is 'string'
       objects = JSON.parse(objects)
     if isArray(objects)
       (new @(value) for value in objects)
@@ -239,12 +239,12 @@ class Model extends Module
   save: ->
     error = @validate()
     if error
-      @trigger("error", @, error)
+      @trigger('error', @, error)
       return false
     
-    @trigger("beforeSave", @)
+    @trigger('beforeSave', @)
     if @newRecord then @create() else @update()
-    @trigger("save", @)
+    @trigger('save', @)
     @
 
   updateAttribute: (name, value) ->
@@ -264,11 +264,11 @@ class Model extends Module
     @save()
   
   destroy: ->
-    @trigger("beforeDestroy", @)
+    @trigger('beforeDestroy', @)
     delete @constructor.records[@id]
     @destroyed = true
-    @trigger("destroy", @)
-    @trigger("change", @, "destroy")
+    @trigger('destroy', @)
+    @trigger('change', @, 'destroy')
     @unbind()
     @
 
@@ -301,45 +301,45 @@ class Model extends Module
   # Private
 
   update: ->
-    @trigger("beforeUpdate", @)
+    @trigger('beforeUpdate', @)
     records = @constructor.records
     records[@id].load @attributes()
     clone = records[@id].clone()
-    @trigger("update", clone)
-    @trigger("change", clone, "update")
+    @trigger('update', clone)
+    @trigger('change', clone, 'update')
 
   create: ->
-    @trigger("beforeCreate", @)
+    @trigger('beforeCreate', @)
     @id          = guid() unless @id
     @newRecord   = false    
     records      = @constructor.records
     records[@id] = @dup(false)
     clone        = records[@id].clone()
-    @trigger("create", clone)
-    @trigger("change", clone, "create")
+    @trigger('create', clone)
+    @trigger('change', clone, 'create')
   
   bind: (events, callback) ->
     @constructor.bind events, binder = (record) =>
       if record && @eql(record)
         callback.apply(@, arguments)
-    @constructor.bind "unbind", unbinder = (record) =>
+    @constructor.bind 'unbind', unbinder = (record) =>
       if record && @eql(record)
         @constructor.unbind(events, binder)
-        @constructor.unbind("unbind", unbinder)
+        @constructor.unbind('unbind', unbinder)
     binder
   
   trigger: ->
     @constructor.trigger(arguments...)
     
   unbind: ->
-    @trigger("unbind", @)
+    @trigger('unbind', @)
 
 class Controller extends Module
   @include Events
   @include Log
   
   eventSplitter: /^(\w+)\s*(.*)$/
-  tag: "div"
+  tag: 'div'
   
   constructor: (options) ->
     @options = options
@@ -351,36 +351,38 @@ class Controller extends Module
     @el = $(@el)
 
     @el.addClass(@className) if @className
+      
+    @destroy -> @el.remove()
 
     @events = @constructor.events unless @events
     @elements = @constructor.elements unless @elements
-
+    
     @delegateEvents() if @events
     @refreshElements() if @elements
+
     super
      
-  destroy: ->
-    @trigger "destroy"
+  destroy: (callback) ->
+    if typeof callback is 'function'
+      @bind 'destroy', callback
+    else
+      @trigger 'destroy'
       
   $: (selector) -> $(selector, @el)
       
   delegateEvents: ->
     for key, method of @events
-      unless typeof(method) is "function"
+      unless typeof(method) is 'function'
         method = @proxy(@[method])
 
       match      = key.match(@eventSplitter)
       eventName  = match[1]
       selector   = match[2]
 
-      if selector is ""
+      if selector is ''
         @el.bind(eventName, method)
-        @bind "destroy", ->
-          @el.unbind(eventName, method)
       else
         @el.delegate(selector, eventName, method)
-        @bind "destroy", ->
-          @el.undelegate(selector, eventName, method)
   
   refreshElements: ->
     for key, value of @elements
@@ -416,14 +418,14 @@ class Controller extends Module
 
 $ = @jQuery or @Zepto or (element) -> element
 
-unless typeof Object.create is "function"
+unless typeof Object.create is 'function'
   Object.create = (o) ->
     Func = ->
     Func.prototype = o
     new Func()
 
 isArray = (value) ->
-  Object::toString.call(value) is "[object Array]"
+  Object::toString.call(value) is '[object Array]'
   
 makeArray = (args) ->
   Array.prototype.slice.call(args, 0)
@@ -440,7 +442,7 @@ guid = ->
 Spine = @Spine   = {}
 module?.exports  = Spine
 
-Spine.version    = "2.0.0"
+Spine.version    = '2.0.1'
 Spine.isArray    = isArray
 Spine.$          = $
 Spine.Events     = Events
@@ -451,7 +453,7 @@ Spine.Model      = Model
 
 # Global events
 
-Module.extend.apply(Spine, Events)
+Module.extend.call(Spine, Events)
   
 # JavaScript compatability
 
