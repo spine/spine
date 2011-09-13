@@ -34,6 +34,7 @@ class Spine.Manager extends Spine.Module
     @addOne(cont) for cont in controllers
     
   addOne: (controller) ->    
+    return if not controller?
     controller.active (args...) =>
       @trigger("change", controller, args)
 
