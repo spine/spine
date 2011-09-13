@@ -12,14 +12,14 @@
 #  
 #  users.active();
 #  assert( users.isActive() );
-#  assert( users.el.hasClass("active") );
-#  assert( ! groups.el.hasClass("active") );
+#  assert( users.el.hasClass('active') );
+#  assert( ! groups.el.hasClass('active') );
 #  
 #  groups.active();
-#  assert( groups.el.hasClass("active") );
-#  assert( ! users.el.hasClass("active") );
+#  assert( groups.el.hasClass('active') );
+#  assert( ! users.el.hasClass('active') );
 
-Spine ?= require("spine")
+Spine ?= require('spine')
 $      = Spine.$
 
 class Spine.Manager extends Spine.Module
@@ -28,19 +28,21 @@ class Spine.Manager extends Spine.Module
   constructor: ->
     @controllers = []
     @add(arguments...)
-    @bind "change", @change
+    @bind 'change', @change
     
   add: (controllers...) ->
     @addOne(cont) for cont in controllers
     
   addOne: (controller) ->    
-    controller.active (args...) =>
-      @trigger("change", controller, args)
+    controller.bind 'active', (args...) =>
+      @trigger('change', controller, args)
+    controller.bind 'destroy', =>
+      @controllers.splice(@controllers.indexOf(controller), 1)
 
     @controllers.push(controller)
       
   deactivate: ->
-    @trigger("change", false, arguments)
+    @trigger('change', false, arguments)
     
   # Private
     
@@ -53,22 +55,22 @@ class Spine.Manager extends Spine.Module
 
 Spine.Controller.include
   active: (args...) ->
-    if typeof args[0] is "function"
-      @bind("active", args[0])
+    if typeof args[0] is 'function'
+      @bind('active', args[0])
     else
-      args.unshift("active")
+      args.unshift('active')
       @trigger(args...)
     @
   
   isActive: ->
-    @el.hasClass("active")
+    @el.hasClass('active')
   
   activate: ->
-    @el.addClass("active")
+    @el.addClass('active')
     @
   
   deactivate: ->
-    @el.removeClass("active");
+    @el.removeClass('active');
     @
     
 module?.exports = Spine.Manager
