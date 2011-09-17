@@ -1,7 +1,7 @@
 { 
   "name": "spine", 
   "description": "MVC Framework.", 
-  "version": "0.0.8", 
+  "version": "0.0.9", 
   "author": "maccman", 
   "licenses":
     [{ 
@@ -12,7 +12,7 @@
     "type" : "git", 
     "url": "http://github.com/maccman/spine.git"
   }, 
-  "main" : "./lib/spine.js",
+  "main" : "./index.js",
   "devDependencies" : {
     "spine.app": "~0.0.2"
   }
