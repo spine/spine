@@ -125,13 +125,15 @@ class Model extends Module
 
   @findByAttribute: (name, value) ->
     for id, record of @records
-      if record[name] is value
+      attr = record[name]
+      if typeof attr is "function" && attr() is value or attr is value
         return record.clone()
     null
 
   @findAllByAttribute: (name, value) ->
     @select (item) ->
-      item[name] is value
+      attr = item[name]
+      typeof attr is "function" && attr() is value or attr is value
 
   @each: (callback) ->
     for key, value of @records
