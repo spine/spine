@@ -153,7 +153,7 @@ Or pass multiple function names to `proxyAll()` in order to re-write them perman
     class Tasks extends Spine.Module
       @extend(Spine.Events)
     
-`Spine.Events` gives you three functions, `bind()`, `trigger()`, and `unbind()`. All three have a very similar API to jQuery's event handling one, if you're familiar with that. `bind(name, callback)` takes a event name and callback. `trigger(name, [*data])` takes an event name and optional data to be passed to handlers. `unbind(name, [callback])` takes a event name and optional callback.
+`Spine.Events` gives you three functions, `bind()`, `trigger()`, and `unbind()`. All three have a very similar API to jQuery's event handling one, if you're familiar with that. `bind(name, callback)` takes an event name and callback. `trigger(name, [*data])` takes an event name and optional data to be passed to handlers. `unbind(name, [callback])` takes an event name and optional callback.
     
     Tasks.bind "create", (foo, bar) -> 
     Tasks.trigger "create", "some", "data"
