@@ -24,7 +24,7 @@ class Spine.List extends Spine.Controller
     @html @template(@items)
     @change @current
     if @selectFirst
-      unless @children(".active").length or @current
+      unless @children(".active").length
         @children(":first").click()
         
   children: (sel) ->
