@@ -399,13 +399,19 @@ class Controller extends Module
   append: (elements...) -> 
     elements = (e.el or e for e in elements)
     @el.append(elements...)
+    @refreshElements()
+    @el
     
   appendTo: (element) -> 
     @el.appendTo(element.el or element)
+    @refreshElements()
+    @el
 
   prepend: (elements...) -> 
     elements = (e.el or e for e in elements)
     @el.prepend(elements...)
+    @refreshElements()
+    @el
     
   replace: (element) ->
     [previous, @el] = [@el, element.el or element]
