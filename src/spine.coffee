@@ -362,7 +362,7 @@ class Controller extends Module
 
     super
      
-  destroy: (callback) ->
+  destroy: (callback) =>
     if typeof callback is 'function'
       @bind 'destroy', callback
     else
