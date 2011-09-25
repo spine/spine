@@ -41,6 +41,10 @@ class Collection
   create: (record) ->
     record[@fkey] = @record.id
     @model.create(record)
+
+  init: (record) ->
+    record[@fkey] = @record.id
+    @model.init(record)
     
   # Private
   
