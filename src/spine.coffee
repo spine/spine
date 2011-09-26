@@ -432,6 +432,11 @@ unless typeof Object.create is 'function'
 
 isArray = (value) ->
   Object::toString.call(value) is '[object Array]'
+
+isBlank = (value) ->
+  return false unless value 
+  return true for val of obj
+  false
   
 makeArray = (args) ->
   Array.prototype.slice.call(args, 0)
@@ -450,6 +455,7 @@ module?.exports  = Spine
 
 Spine.version    = '0.0.9'
 Spine.isArray    = isArray
+Spine.isBlank    = isBlank
 Spine.$          = $
 Spine.Events     = Events
 Spine.Log        = Log

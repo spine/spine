@@ -125,7 +125,7 @@ class Singleton extends Base
     (data, status, xhr) =>
       @record.trigger("ajaxSuccess", @record, status, xhr)
 
-      return if not data or params.data is data
+      return Spine.isBlank(data) or params.data is data
       data = @model.fromJSON(data)
 
       Ajax.disable =>
