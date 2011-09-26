@@ -435,7 +435,7 @@ isArray = (value) ->
 
 isBlank = (value) ->
   return false unless value 
-  return true for val of obj
+  return true for key of value
   false
   
 makeArray = (args) ->
