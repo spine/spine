@@ -352,7 +352,7 @@ class Controller extends Module
 
     @el.addClass(@className) if @className
       
-    @bind 'destroy', -> @el.remove()
+    @release -> @el.remove()
 
     @events = @constructor.events unless @events
     @elements = @constructor.elements unless @elements
@@ -361,6 +361,12 @@ class Controller extends Module
     @refreshElements() if @elements
 
     super
+     
+  release: (callback) =>
+    if typeof callback is 'function'
+      @bind 'release', callback
+    else
+      @trigger 'release'
       
   $: (selector) -> $(selector, @el)
       
