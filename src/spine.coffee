@@ -352,7 +352,7 @@ class Controller extends Module
 
     @el.addClass(@className) if @className
       
-    @destroy -> @el.remove()
+    @bind 'destroy', -> @el.remove()
 
     @events = @constructor.events unless @events
     @elements = @constructor.elements unless @elements
@@ -361,12 +361,6 @@ class Controller extends Module
     @refreshElements() if @elements
 
     super
-     
-  destroy: (callback) =>
-    if typeof callback is 'function'
-      @bind 'destroy', callback
-    else
-      @trigger 'destroy'
       
   $: (selector) -> $(selector, @el)
       
@@ -448,7 +442,7 @@ guid = ->
 Spine = @Spine   = {}
 module?.exports  = Spine
 
-Spine.version    = '2.0.1'
+Spine.version    = '0.0.9'
 Spine.isArray    = isArray
 Spine.$          = $
 Spine.Events     = Events
