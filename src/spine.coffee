@@ -434,9 +434,9 @@ isArray = (value) ->
   Object::toString.call(value) is '[object Array]'
 
 isBlank = (value) ->
-  return false unless value 
-  return true for key of value
-  false
+  return true unless value 
+  return false for key of value
+  true
   
 makeArray = (args) ->
   Array.prototype.slice.call(args, 0)
