@@ -10,7 +10,8 @@ class Spine.Route extends Spine.Module
   @extend Spine.Events
   
   @historySupport: "history" of window
-  
+  @changeCallback: null
+
   @routes: []
         
   @options:
@@ -26,23 +27,25 @@ class Spine.Route extends Spine.Module
     
   @setup: (options = {}) ->
     @options = $.extend({}, @options, options)
-      
+
+    @changeCallback = @proxy(@change)
+
     if (@options.history)
       @history = @historySupport && @options.history
       
     return if @options.shim
         
     if @history 
-      $(window).bind("popstate", @change)
+      $(window).bind("popstate", @changeCallback)
     else
-      $(window).bind("hashchange", @change)
+      $(window).bind("hashchange", @changeCallback)
     @change() 
     
   @unbind: ->
     if @history
-      $(window).unbind("popstate", @change)
+      $(window).unbind("popstate", @changeCallback)
     else
-      $(window).unbind("hashchange", @change)
+      $(window).unbind("hashchange", @changeCallback)
     
   @navigate: (args...) ->
     options = {}
