@@ -140,21 +140,28 @@ Include =
     base += "/" unless base.charAt(base.length - 1) is "/"
     base += encodeURIComponent(@id)
     base
-
-Model.Ajax =
+    
+Extend = 
   ajax: -> new Collection(this)
 
+  url: ->
+    "#{Model.host}/#{@className.toLowerCase()}s"
+      
+Model.Ajax =
   extended: ->
     @change (record, type) ->
       record.ajax()[type]()
       
     @fetch ->
       @ajax().fetch(arguments...)
-      
+    
+    @extend Extend
     @include Include
-
-  url: ->
-    "#{Model.host}/#{@className.toLowerCase()}s"
+    
+Model.Ajax.Methods = 
+  extended: ->
+    @extend Extend
+    @include Include
     
 # Globals
 Spine.Ajax      = Ajax
