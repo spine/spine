@@ -228,7 +228,8 @@ class Model extends Module
 
   attributes: ->
     result = {}
-    result[key] = @[key] for key in @constructor.attributes
+    for key in @constructor.attributes when key of @
+      result[key] = @[key]
     result.id   = @id
     result
 

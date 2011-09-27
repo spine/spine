@@ -119,7 +119,7 @@ describe("Model", function(){
   });
   
   it("can be serialized into JSON", function(){
-    var asset = Asset.init({name: "Johnson me!"});
+    var asset = new Asset({name: "Johnson me!"});
     
     expect(JSON.stringify(asset)).toEqual('{"name":"Johnson me!"}');
   });
@@ -141,15 +141,20 @@ describe("Model", function(){
     });
     
     expect(Asset.create({name: ""})).toBeFalsy();
-    expect(Asset.init({name: ""}).isValid()).toBeFalsy();
+    expect(new Asset({name: ""}).isValid()).toBeFalsy();
     
     expect(Asset.create({name: "Yo big dog"})).toBeTruthy();
-    expect(Asset.init({name: "Yo big dog"}).isValid()).toBeTruthy();
+    expect(new Asset({name: "Yo big dog"}).isValid()).toBeTruthy();
   });
   
   it("has attribute hash", function(){
-    var asset = Asset.init({name: "wazzzup!"});
+    var asset = new Asset({name: "wazzzup!"});
     expect(asset.attributes()).toEqual({name: "wazzzup!"});
+  });
+  
+  it("attributes() should not return undefined atts", function(){
+    var asset = new Asset()
+    expect(asset.attributes()).toEqual({});
   });
   
   it("can generate GUID", function(){
@@ -307,7 +312,7 @@ describe("Model", function(){
         }
       });
       
-      var asset = Asset.init({name: ""});
+      var asset = new Asset({name: ""});
       expect(asset.save()).toBeFalsy();
       expect(spy).toHaveBeenCalledWith(asset, "Name required");
     });
