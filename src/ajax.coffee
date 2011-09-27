@@ -32,6 +32,7 @@ Ajax =
     else
       @pending = true
       @request(callback)    
+    callback
     
 class Base
   defaults:
