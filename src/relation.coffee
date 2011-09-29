@@ -1,6 +1,6 @@
 Spine ?= require("spine")
 
-class Collection
+class Collection extends Spine.Module
   constructor: (options = {}) ->
     for key, value of options
       @[key] = value
@@ -47,16 +47,28 @@ class Collection
   associated: (record) ->
     record[@fkey] is @record.id
     
-class Instance
+class Instance extends Spine.Module
   constructor: (options = {}) ->
     for key, value of options
       @[key] = value
     
-  find: ->
-    @record[@fkey] && @model.find(@record[@fkey])
+  exists: ->
+    @record[@fkey] and @model.exists(@record[@fkey])
     
   update: (value) ->
-    @record[@fkey] = value && value.id 
+    @record[@fkey] = value and value.id
+
+class Singleton extends Spine.Module
+  constructor: (options = {}) ->
+    for key, value of options
+      @[key] = value
+
+  find: ->
+    @record.id and @model.findByAttribute(@fkey, @record.id)
+
+  update: (value) ->
+    value?[@fkey] = @id
+    value
 
 singularize = (str) ->
   str.replace(/s$/, '')
@@ -69,8 +81,8 @@ underscore = (str) ->
      .toLowerCase()
 
 Spine.Model.extend 
-  many: (name, model, fkey) -> 
-    fkey ?= "#{underscore(@className)}_id"
+  hasMany: (name, model, fkey) -> 
+    fkey ?= "#{underscore(name)}_id"
     
     association = (record) -> 
       model = require(model) if typeof model is "string"
@@ -81,12 +93,12 @@ Spine.Model.extend
       )
     
     @::__defineGetter__ name, ->
-      return association(@)
+      association(@)
       
     @::__defineSetter__ name, (value) ->
-      return association(@).refresh(value)
+      association(@).refresh(value)
   
-  belongs: (name, model, fkey) ->
+  belongsTo: (name, model, fkey) ->
     fkey ?= "#{singularize(name)}_id"
     
     association = (record) ->
@@ -98,9 +110,26 @@ Spine.Model.extend
       )
       
     @::__defineGetter__ name, ->
-      return association(@).find()
+      association(@).exists()
     
     @::__defineSetter__ name, (value) ->
-      return association(@).update(value)
+      association(@).update(value)
       
     @attributes.push(fkey)
+    
+  hasOne: (name, model, fkey) -> 
+    fkey ?= "#{underscore(@className)}_id"
+    
+    association = (record) ->
+      model = require(model) if typeof model is "string"
+      
+      new Singleton(
+        name: name, model: model, 
+        record: record, fkey: fkey
+      )
+    
+    @::__defineGetter__ name, ->
+      association(@).find()
+    
+    @::__defineSetter__ name, (value) ->
+      association(@).update(value)
