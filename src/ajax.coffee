@@ -1,4 +1,4 @@
-Spine  = require("spine") unless Spine?
+Spine ?= require('spine')
 $      = Spine.$
 Model  = Spine.Model
 
@@ -36,8 +36,8 @@ Ajax =
     
 class Base
   defaults:
-    contentType: "application/json"
-    dataType: "json"
+    contentType: 'application/json'
+    dataType: 'json'
     processData: false
   
   ajax: (params, defaults) ->
@@ -52,7 +52,7 @@ class Collection extends Base
   findAll: (params) ->
     @ajax(
       params,
-      type: "GET",
+      type: 'GET',
       url:  Ajax.getURL(@model)
     ).success(@recordsResponse)
      .error(@errorResponse)
@@ -62,10 +62,10 @@ class Collection extends Base
       @model.refresh(records)
     
   recordsResponse: (data, status, xhr) =>
-    @model.trigger("ajaxSuccess", null, status, xhr)
+    @model.trigger('ajaxSuccess', null, status, xhr)
 
   errorResponse: (xhr, statusText, error) =>
-    @model.trigger("ajaxError", null, xhr, statusText, error)
+    @model.trigger('ajaxError', null, xhr, statusText, error)
 
 class Singleton extends Base
   constructor: (@record) ->
@@ -74,7 +74,7 @@ class Singleton extends Base
   find: (params) ->
     @ajax(
       params,
-      type: "GET"
+      type: 'GET'
       url:  @url
     )
   
@@ -82,7 +82,7 @@ class Singleton extends Base
     @queue =>
       @ajax(
         params,
-        type: "POST"
+        type: 'POST'
         data: JSON.stringify(@record)
         url:  Ajax.getURL(@model)
       ).success(@recordResponse)
@@ -92,7 +92,7 @@ class Singleton extends Base
     @queue =>
       @ajax(
         params,
-        type: "PUT"
+        type: 'PUT'
         data: JSON.stringify(@record)
         url:  Ajax.getURL(@record)
       ).success(@recordResponse)
@@ -102,7 +102,7 @@ class Singleton extends Base
     @queue =>
       @ajax(
         params,
-        type: "DELETE"
+        type: 'DELETE'
         url:  Ajax.getURL(@record)
       ).success(@recordResponse)
        .error(@errorResponse)  
@@ -110,7 +110,7 @@ class Singleton extends Base
   # Private
 
   recordResponse: (data, status, xhr) =>
-    @record.trigger("ajaxSuccess", @record, status, xhr)
+    @record.trigger('ajaxSuccess', @record, status, xhr)
     
     return if Spine.isBlank(data)
     data = @model.fromJSON(data)
@@ -124,20 +124,20 @@ class Singleton extends Base
       @record.updateAttributes(data.attributes())      
       
   blankResponse: (data, status, xhr) =>
-    @record.trigger("ajaxSuccess", @record, status, xhr)
+    @record.trigger('ajaxSuccess', @record, status, xhr)
 
   errorResponse: (xhr, statusText, error) =>
-    @record.trigger("ajaxError", @record, xhr, statusText, error)
+    @record.trigger('ajaxError', @record, xhr, statusText, error)
 
 # Ajax endpoint
-Model.host = ""
+Model.host = ''
 
 Include =
   ajax: -> new Singleton(this)
 
   url: ->
     base = Ajax.getURL(@constructor)
-    base += "/" unless base.charAt(base.length - 1) is "/"
+    base += '/' unless base.charAt(base.length - 1) is '/'
     base += encodeURIComponent(@id)
     base
     

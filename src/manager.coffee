@@ -1,4 +1,4 @@
-Spine  = require('spine') unless Spine
+Spine ?= require('spine')
 $      = Spine.$
 
 class Spine.Manager extends Spine.Module

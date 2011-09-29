@@ -5,7 +5,7 @@ describe("Ajax", function(){
     Spine.Ajax.requests = [];
     Spine.Ajax.pending  = false;
     
-    User = Spine.Model.setup("User", "first", "last");
+    User = Spine.Model.setup("User", ["first", "last"]);
     User.extend(Spine.Model.Ajax);
   });
   
