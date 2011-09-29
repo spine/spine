@@ -224,7 +224,10 @@ class Model extends Module
 
   load: (atts) ->
     for key, value of atts
-      @[key] = value
+      if typeof @[key] is "function"
+        @[key](value)
+      else
+        @[key] = value
 
   attributes: ->
     result = {}

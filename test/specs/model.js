@@ -153,8 +153,29 @@ describe("Model", function(){
   });
   
   it("attributes() should not return undefined atts", function(){
-    var asset = new Asset()
+    var asset = new Asset();
     expect(asset.attributes()).toEqual({});
+  });
+  
+  it("can load attributes()", function(){
+    var asset = new Asset();
+    asset.load({name: "In da' house"});
+    expect(asset.name).toEqual("In da' house");
+  });
+  
+  it("can load attributes() respecting getters/setters", function(){
+    Asset.include({
+      name: function(value){
+        var ref = value.split(' ', 2);
+        this.first_name = ref[0];
+        this.last_name  = ref[1];
+      }
+    })
+    
+    var asset = new Asset();
+    asset.load({name: "Alex MacCaw"});
+    expect(asset.first_name).toEqual("Alex");
+    expect(asset.last_name).toEqual("MacCaw");
   });
   
   it("can generate GUID", function(){
