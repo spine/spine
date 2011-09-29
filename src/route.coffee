@@ -1,4 +1,4 @@
-Spine ?= require("spine")
+Spine  = require("spine") unless Spine?
 $      = Spine.$
 
 hashStrip    = /^#*/

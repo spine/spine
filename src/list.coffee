@@ -1,5 +1,5 @@
-Spine ?= require("spine")
-$      = Spine.$
+Spine = require("spine") unless Spine?
+$     = Spine.$
 
 class Spine.List extends Spine.Controller
   events:

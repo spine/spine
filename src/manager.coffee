@@ -1,25 +1,4 @@
-# A Manager is basically a state machine that controls a set of controller's 'active' state.
-# In other words, you feed a manager controllers, and it'll make sure that only controller has an 'active' state at any one time. 
-# This is useful whenever you're implementing tabs or separate views inside an application. 
-#
-# By default, whenever a controller is activated, it's element receives a 'active' class. 
-# You can use this class to show/hide views and tabs via CSS.
-# For example:
-#
-#  var users = Users.init();
-#  var groups = Groups.init();
-#  Manager.init(users, groups);
-#  
-#  users.active();
-#  assert( users.isActive() );
-#  assert( users.el.hasClass('active') );
-#  assert( ! groups.el.hasClass('active') );
-#  
-#  groups.active();
-#  assert( groups.el.hasClass('active') );
-#  assert( ! users.el.hasClass('active') );
-
-Spine ?= require('spine')
+Spine  = require('spine') unless Spine
 $      = Spine.$
 
 class Spine.Manager extends Spine.Module

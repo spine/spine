@@ -1,4 +1,4 @@
-Spine ?= require("spine")
+Spine  = require("spine") unless Spine?
 $      = Spine.$
 Model  = Spine.Model
 
