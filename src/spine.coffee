@@ -232,8 +232,11 @@ class Model extends Module
   attributes: ->
     result = {}
     for key in @constructor.attributes when key of @
-      result[key] = @[key]
-    result.id   = @id
+      if typeof @[key] is 'function'
+        result[key] = @[key]()
+      else
+        result[key] = @[key]
+    result.id = @id if @id
     result
 
   eql: (rec) ->

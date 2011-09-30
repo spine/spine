@@ -163,7 +163,7 @@ describe("Model", function(){
     expect(asset.name).toEqual("In da' house");
   });
   
-  it("can load attributes() respecting getters/setters", function(){
+  it("can load() attributes respecting getters/setters", function(){
     Asset.include({
       name: function(value){
         var ref = value.split(' ', 2);
@@ -176,6 +176,17 @@ describe("Model", function(){
     asset.load({name: "Alex MacCaw"});
     expect(asset.first_name).toEqual("Alex");
     expect(asset.last_name).toEqual("MacCaw");
+  });
+  
+  it("attributes() respecting getters/setters", function(){
+    Asset.include({
+      name: function(){
+        return "Bob";
+      }
+    })
+    
+    var asset = new Asset();
+    expect(asset.attributes()).toEqual({name: "Bob"});
   });
   
   it("can generate GUID", function(){
