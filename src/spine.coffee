@@ -226,12 +226,19 @@ class Model extends Module
 
   load: (atts) ->
     for key, value of atts
-      @[key] = value
+      if typeof @[key] is 'function'
+        @[key](value)
+      else
+        @[key] = value
 
   attributes: ->
     result = {}
-    result[key] = @[key] for key in @constructor.attributes
-    result.id   = @id
+    for key in @constructor.attributes when key of @
+      if typeof @[key] is 'function'
+        result[key] = @[key]()
+      else
+        result[key] = @[key]
+    result.id = @id if @id
     result
 
   eql: (rec) ->
@@ -354,7 +361,7 @@ class Controller extends Module
 
     @el.addClass(@className) if @className
       
-    @destroy -> @el.remove()
+    @release -> @el.remove()
 
     @events = @constructor.events unless @events
     @elements = @constructor.elements unless @elements
@@ -364,11 +371,11 @@ class Controller extends Module
 
     super
      
-  destroy: (callback) ->
+  release: (callback) =>
     if typeof callback is 'function'
-      @bind 'destroy', callback
+      @bind 'release', callback
     else
-      @trigger 'destroy'
+      @trigger 'release'
       
   $: (selector) -> $(selector, @el)
       
@@ -401,13 +408,19 @@ class Controller extends Module
   append: (elements...) -> 
     elements = (e.el or e for e in elements)
     @el.append(elements...)
+    @refreshElements()
+    @el
     
   appendTo: (element) -> 
     @el.appendTo(element.el or element)
+    @refreshElements()
+    @el
 
   prepend: (elements...) -> 
     elements = (e.el or e for e in elements)
     @el.prepend(elements...)
+    @refreshElements()
+    @el
     
   replace: (element) ->
     [previous, @el] = [@el, element.el or element]
@@ -428,6 +441,11 @@ unless typeof Object.create is 'function'
 
 isArray = (value) ->
   Object::toString.call(value) is '[object Array]'
+
+isBlank = (value) ->
+  return true unless value 
+  return false for key of value
+  true
   
 makeArray = (args) ->
   Array.prototype.slice.call(args, 0)
@@ -444,8 +462,9 @@ guid = ->
 Spine = @Spine   = {}
 module?.exports  = Spine
 
-Spine.version    = '2.0.1'
+Spine.version    = '1.0.0'
 Spine.isArray    = isArray
+Spine.isBlank    = isBlank
 Spine.$          = $
 Spine.Events     = Events
 Spine.Log        = Log
@@ -477,3 +496,4 @@ Module.init = Controller.init = Model.init = (a1, a2, a3, a4, a5) ->
   new this(a1, a2, a3, a4, a5)
   
 Spine.Class = Module
+Spine.App   = new Controller

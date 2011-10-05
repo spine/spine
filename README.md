@@ -1,7 +1,11 @@
 # Spine
 
-__Spine is a lightwork framework for building JavaScript web applications.__ Spine gives you a MVC structure and then gets out of your way,  allowing you to concentrate on the fun stuff, building awesome web applications. 
+Spine is a lightweight framework for building JavaScript web applications. Spine gives you an MVC structure and then gets out of your way, allowing you to concentrate on the fun stuff, building awesome web applications.
 
-Spine is tiny, the library comes in at around 500 lines of JavaScript, that's about 2K minified & compressed. However, it's not about size, it's how you use it, and Spine certainly packs a punch! 
+Spine is opinionated in its approach to web application architecture and design. Spine's architecture complements patterns such as de-coupled components and CommonJS modules, markedly helping with code quality and maintainability.
 
-For documentation, usage, and examples, see: [http://maccman.github.com/spine](http://maccman.github.com/spine)
+The library is written in [CoffeeScript](http://jashkenas.github.com/coffee-script), but doesn't necessarily require CoffeeScript to develop applications - you can use whichever language you're most familiar with.
+
+Spine is tiny, the library comes in at around 500 lines of CoffeeScript, that's about 2K minified & compressed. Being lightweight and simple is fundamental to Spine.
+
+For documentation, usage, and examples, see: [spinejs.com](http://spinejs.com)
