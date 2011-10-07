@@ -49,7 +49,16 @@ class Base
 class Collection extends Base
   constructor: (@model) -> 
     
-  findAll: (params) ->
+  find: (id, params) ->
+    record = new @model(id: id)
+    @ajax(
+      params,
+      type: 'GET',
+      url:  Ajax.getURL(record)
+    ).success(@recordsResponse)
+     .error(@errorResponse)
+    
+  all: (params) ->
     @ajax(
       params,
       type: 'GET',
@@ -57,9 +66,14 @@ class Collection extends Base
     ).success(@recordsResponse)
      .error(@errorResponse)
     
-  fetch: (params) ->
-    @findAll(params).success (records) =>
-      @model.refresh(records)
+  fetch: (params = {}) ->
+    if id = params.id
+      delete params.id
+      @find(id, params).success (record) =>
+        @model.refresh(record)
+    else
+      @all(params).success (records) =>
+        @model.refresh(records)
     
   recordsResponse: (data, status, xhr) =>
     @model.trigger('ajaxSuccess', null, status, xhr)
@@ -71,12 +85,14 @@ class Singleton extends Base
   constructor: (@record) ->
     @model = @record.constructor
   
-  find: (params) ->
-    @ajax(
-      params,
-      type: 'GET'
-      url:  @url
-    )
+  reload: (params) ->
+    @queue =>
+      @ajax(
+        params,
+        type: 'GET'
+        url:  Ajax.getURL(@record)
+      ).success(@recordResponse)
+       .error(@errorResponse)
   
   create: (params) ->
     @queue =>
