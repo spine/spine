@@ -94,6 +94,15 @@ class Singleton extends Base
       ).success(@recordResponse)
        .error(@errorResponse)
   
+  show: (params) ->
+    @queue =>
+      @ajax(
+        params,
+        type: 'GET'
+        url: @url
+      ).success(@recordResponse)
+       .error(@errorResponse)
+  
   create: (params) ->
     @queue =>
       @ajax(
@@ -156,6 +165,9 @@ Include =
     base += '/' unless base.charAt(base.length - 1) is '/'
     base += encodeURIComponent(@id)
     base
+    
+  show: ->
+    @ajax().show(arguments...)
     
 Extend = 
   ajax: -> new Collection(this)
