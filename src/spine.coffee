@@ -345,7 +345,7 @@ class Controller extends Module
   @include Events
   @include Log
   
-  eventSplitter: /^(\w+)\s*(.*)$/
+  eventSplitter: /^(\S+)\s*(.*)$/
   tag: 'div'
   
   constructor: (options) ->
