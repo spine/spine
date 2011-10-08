@@ -7,6 +7,11 @@ Events =
       calls[name] or= []
       calls[name].push(callback)
     @
+    
+  one: (ev, callback) ->
+    @bind ev, ->
+      @unbind(ev, arguments.callee)
+      callback.apply(@, arguments)
 
   trigger: (args...) ->
     ev = args.shift()
@@ -15,8 +20,8 @@ Events =
     return false unless list
   
     for callback in list
-      if callback.apply(this, args) is false
-        break      
+      if callback.apply(@, args) is false
+        break
     true
 
   unbind: (ev, callback) ->

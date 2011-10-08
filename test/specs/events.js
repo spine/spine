@@ -42,6 +42,16 @@ describe("Events", function(){
     expect(spy).not.toHaveBeenCalled();
   });
   
+  it("can bind to a single event", function(){
+    EventTest.one("indahouse", spy);
+    EventTest.trigger("indahouse");
+    expect(spy).toHaveBeenCalled();
+    
+    spy.reset();
+    EventTest.trigger("indahouse");
+    expect(spy).not.toHaveBeenCalled();
+  });
+  
   it("should allow a callback unbind itself", function(){
     var a = jasmine.createSpy("a");
     var b = jasmine.createSpy("b");
