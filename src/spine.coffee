@@ -115,8 +115,11 @@ class Model extends Module
 
   @refresh: (values, options = {}) ->
     @records = {} if options.clear
-
-    for record in @fromJSON(values) 
+    records = @fromJSON(values)
+    
+    records = [records] unless isArray(records)
+    
+    for record in records
       record.newRecord    = false
       record.id           or= guid()
       @records[record.id] = record
