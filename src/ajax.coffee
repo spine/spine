@@ -70,11 +70,7 @@ class Collection extends Base
     if id = params.id
       delete params.id
       @find(id, params).success (record) =>
-        if @model.exists(id)
-          data = @model.fromJSON(record)
-          @model.find(id).updateAttributes(data.attributes())
-        else
-          @model.create(record)
+        @model.refresh(record)
     else
       @all(params).success (records) =>
         @model.refresh(records)
