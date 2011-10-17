@@ -6,26 +6,26 @@ class Spine.Manager extends Spine.Module
   
   constructor: ->
     @controllers = []
-    @add(arguments...)
     @bind 'change', @change
+    @add(arguments...)
     
   add: (controllers...) ->
     @addOne(cont) for cont in controllers
     
   addOne: (controller) ->    
     controller.bind 'active', (args...) =>
-      @trigger('change', controller, args)
-    controller.bind 'destroy', =>
+      @trigger('change', controller, args...)
+    controller.bind 'release', =>
       @controllers.splice(@controllers.indexOf(controller), 1)
 
     @controllers.push(controller)
       
   deactivate: ->
-    @trigger('change', false, arguments)
+    @trigger('change', false, arguments...)
     
   # Private
     
-  change: (current, args) ->
+  change: (current, args...) ->
     for cont in @controllers
       if cont is current
         cont.activate(args...)

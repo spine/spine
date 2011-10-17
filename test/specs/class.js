@@ -20,7 +20,7 @@ describe("Class", function(){
   it("can create instance", function(){
     User.include({instanceProperty: true})
     
-    var Bob = User.init();
+    var Bob = new User();
     expect(Bob).toBeTruthy();
     expect(Bob.instanceProperty).toBeTruthy();
   });
@@ -39,7 +39,7 @@ describe("Class", function(){
     });
     
     expect(User.prototype.instanceProperty).toBeTruthy();
-    expect(User.init().instanceProperty).toBeTruthy();
+    expect((new User).instanceProperty).toBeTruthy();
   });
   
   it("should trigger module callbacks", function(){

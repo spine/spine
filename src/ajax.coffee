@@ -126,7 +126,7 @@ class Singleton extends Base
   # Private
 
   recordResponse: (data, status, xhr) =>
-    @record.trigger('ajaxSuccess', @record, status, xhr)
+    @record.trigger('ajaxSuccess', status, xhr)
     
     return if Spine.isBlank(data)
     data = @model.fromJSON(data)
@@ -140,10 +140,10 @@ class Singleton extends Base
       @record.updateAttributes(data.attributes())      
       
   blankResponse: (data, status, xhr) =>
-    @record.trigger('ajaxSuccess', @record, status, xhr)
+    @record.trigger('ajaxSuccess', status, xhr)
 
   errorResponse: (xhr, statusText, error) =>
-    @record.trigger('ajaxError', @record, xhr, statusText, error)
+    @record.trigger('ajaxError', xhr, statusText, error)
 
 # Ajax endpoint
 Model.host = ''

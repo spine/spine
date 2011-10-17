@@ -254,12 +254,12 @@ class Model extends Module
   save: ->
     error = @validate()
     if error
-      @trigger('error', @, error)
+      @trigger('error', error)
       return false
     
-    @trigger('beforeSave', @)
+    @trigger('beforeSave')
     if @newRecord then @create() else @update()
-    @trigger('save', @)
+    @trigger('save')
     @
 
   updateAttribute: (name, value) ->
@@ -279,11 +279,11 @@ class Model extends Module
     @save()
   
   destroy: ->
-    @trigger('beforeDestroy', @)
+    @trigger('beforeDestroy')
     delete @constructor.records[@id]
     @destroyed = true
-    @trigger('destroy', @)
-    @trigger('change', @, 'destroy')
+    @trigger('destroy')
+    @trigger('change', 'destroy')
     @unbind()
     @
 
@@ -316,22 +316,22 @@ class Model extends Module
   # Private
 
   update: ->
-    @trigger('beforeUpdate', @)
+    @trigger('beforeUpdate')
     records = @constructor.records
     records[@id].load @attributes()
     clone = records[@id].clone()
-    @trigger('update', clone)
-    @trigger('change', clone, 'update')
+    clone.trigger('update')
+    clone.trigger('change', 'update')
 
   create: ->
-    @trigger('beforeCreate', @)
+    @trigger('beforeCreate')
     @id          = guid() unless @id
     @newRecord   = false    
     records      = @constructor.records
     records[@id] = @dup(false)
     clone        = records[@id].clone()
-    @trigger('create', clone)
-    @trigger('change', clone, 'create')
+    clone.trigger('create')
+    clone.trigger('change', 'create')
   
   bind: (events, callback) ->
     @constructor.bind events, binder = (record) =>
@@ -343,11 +343,12 @@ class Model extends Module
         @constructor.unbind('unbind', unbinder)
     binder
   
-  trigger: ->
-    @constructor.trigger(arguments...)
+  trigger: (args...) ->
+    args.splice(1, 0, @)
+    @constructor.trigger(args...)
     
   unbind: ->
-    @trigger('unbind', @)
+    @trigger('unbind')
 
 class Controller extends Module
   @include Events
