@@ -124,7 +124,7 @@ class Model extends Module
       record.id           or= guid()
       @records[record.id] = record
 
-    @trigger('refresh')
+    @trigger('refresh', not options.clear and records)
     @
 
   @select: (callback) ->
