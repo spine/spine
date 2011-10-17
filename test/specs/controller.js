@@ -9,15 +9,15 @@ describe("Controller", function(){
     
   it("should be configurable", function(){
     element.addClass("testy");
-    var users = Users.init({el: element});
+    var users = new Users({el: element});
     expect(users.el.hasClass("testy")).toBeTruthy();
     
-    var users = Users.init({item: "foo"});
+    var users = new Users({item: "foo"});
     expect(users.item).toEqual("foo");
   });
   
   it("should generate element", function(){
-    var users = Users.init();
+    var users = new Users();
     expect(users.el).toBeTruthy();
   });
   
@@ -27,10 +27,21 @@ describe("Controller", function(){
     });
     
     element.append($("<div />").addClass("foo"));
-    var users = Users.init({el: element});
+    var users = new Users({el: element});
     
     expect(users.foo).toBeTruthy();
     expect(users.foo.hasClass("foo")).toBeTruthy();
+  });
+  
+  it("can remove element upon release event", function(){
+    var parent = $('<div />');
+    parent.append(element);
+    
+    var users = new Users({el: element});
+    expect(parent.children().length).toBe(1);
+    
+    users.release();
+    expect(parent.children().length).toBe(0);
   });
     
   describe("with spy", function(){
@@ -50,7 +61,7 @@ describe("Controller", function(){
         wasClicked: $.proxy(spy, jasmine)
       });
         
-      var users = Users.init({el: element});
+      var users = new Users({el: element});
       element.click();
       expect(spy).toHaveBeenCalled();
     });
@@ -65,7 +76,7 @@ describe("Controller", function(){
       var child = $("<div />").addClass("foo");
       element.append(child);
     
-      var users = Users.init({el: element});
+      var users = new Users({el: element});
       child.click();    
       expect(spy).toHaveBeenCalled();
     });
