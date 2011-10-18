@@ -165,14 +165,17 @@ Extend =
       
 Model.Ajax =
   extended: ->
-    @change (record, type) ->
-      record.ajax()[type]()
-      
-    @fetch ->
-      @ajax().fetch(arguments...)
+    @fetch @ajaxFetch
+    @change @ajaxChange
     
     @extend Extend
     @include Include
+    
+  ajaxFetch: ->
+    @ajax().fetch(arguments...)
+    
+  ajaxChange: (record, type) ->
+    record.ajax()[type]()
     
 Model.Ajax.Methods = 
   extended: ->
