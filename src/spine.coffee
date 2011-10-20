@@ -258,9 +258,9 @@ class Model extends Module
       return false
     
     @trigger('beforeSave')
-    if @newRecord then @create() else @update()
+    record = if @newRecord then @create() else @update()
     @trigger('save')
-    @
+    record
 
   updateAttribute: (name, value) ->
     @[name] = value
@@ -322,6 +322,7 @@ class Model extends Module
     clone = records[@id].clone()
     clone.trigger('update')
     clone.trigger('change', 'update')
+    clone
 
   create: ->
     @trigger('beforeCreate')
@@ -332,6 +333,7 @@ class Model extends Module
     clone        = records[@id].clone()
     clone.trigger('create')
     clone.trigger('change', 'create')
+    clone
   
   bind: (events, callback) ->
     @constructor.bind events, binder = (record) =>

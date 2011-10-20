@@ -52,7 +52,7 @@ describe("Model", function(){
   });
   
   it("can reload", function(){
-    var asset = Asset.create({name: "test.pdf"});
+    var asset = Asset.create({name: "test.pdf"}).dup(false);
     
     Asset.find(asset.id).updateAttributes({name: "foo.pdf"});
     
@@ -204,7 +204,7 @@ describe("Model", function(){
   });
   
   it("can be cloned", function(){
-    var asset = Asset.create({name: "what's cooler than cool?"});    
+    var asset = Asset.create({name: "what's cooler than cool?"}).dup(false);    
     expect(asset.clone().__proto__).not.toBe(Asset.prototype);
     expect(asset.clone().__proto__.__proto__).toBe(Asset.prototype);
     
@@ -223,6 +223,12 @@ describe("Model", function(){
     asset.save();
     
     expect(clone.name).toEqual("checkout anytime");
+  });
+  
+  it("create or save should return a close", function(){
+    var asset = Asset.create({name: "what's cooler than cool?"});
+    expect(asset.__proto__).not.toBe(Asset.prototype);
+    expect(asset.__proto__.__proto__).toBe(Asset.prototype);
   });
   
   it("should be able to be subclassed", function(){
