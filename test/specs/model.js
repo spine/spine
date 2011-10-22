@@ -132,6 +132,13 @@ describe("Model", function(){
     expect(assets[0] && assets[0].name).toEqual("Un-Johnson me!");
   });
   
+  it("can be instantiated from a form", function(){
+    var form = $('<form />');
+    form.append('<input name="name" value="bar" />');
+    var asset = Asset.fromForm(form);
+    expect(asset.name).toEqual("bar");
+  });
+  
   it("can validate", function(){
     Asset.include({
       validate: function(){

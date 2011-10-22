@@ -201,6 +201,12 @@ class Model extends Module
       (new @(value) for value in objects)
     else
       new @(objects)
+      
+  @fromForm: (form) ->
+    result = {}
+    for key in $(form).serializeArray()
+      result[key.name] = key.value
+    new this(result)
 
   # Private
 
