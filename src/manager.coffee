@@ -69,7 +69,9 @@ class Spine.Stack extends Spine.Controller
 
     for key, value of @routes
       do (key, value) =>
-        @route(key, => @[value].active(arguments...))
+        callback = value if typeof value is 'function'
+        callback or= => @[value].active(arguments...)
+        @route(key, callback)
 
   add: (controller) ->
     @manager.add(controller)

@@ -9,7 +9,7 @@ class Spine.List extends Spine.Controller
     
   constructor: ->
     super
-    @bind('change', @change)
+    @bind 'change', @change
     
   template: -> arguments[0]
   
