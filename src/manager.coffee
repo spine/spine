@@ -52,4 +52,27 @@ Spine.Controller.include
     @el.removeClass('active');
     @
     
+class Spine.Stack extends Spine.Controller
+  controllers: {}
+  routes: {}
+
+  className: 'stack'
+
+  constructor: ->
+    super
+
+    @manager = new Spine.Manager
+
+    for key, value of @controllers
+      @[key] = new value(stack: @)
+      @add(@[key])
+
+    for key, value of @routes
+      do (key, value) =>
+        @route(key, => @[value].active(arguments...))
+
+  add: (controller) ->
+    @manager.add(controller)
+    @append(controller)
+    
 module?.exports = Spine.Manager
