@@ -202,11 +202,8 @@ class Model extends Module
     else
       new @(objects)
       
-  @fromForm: (form) ->
-    result = {}
-    for key in $(form).serializeArray()
-      result[key.name] = key.value
-    new this(result)
+  @fromForm: ->
+    (new this).fromForm(arguments...)
 
   # Private
 
@@ -242,6 +239,7 @@ class Model extends Module
         @[key](value)
       else
         @[key] = value
+    @
 
   attributes: ->
     result = {}
@@ -315,6 +313,12 @@ class Model extends Module
     
   toString: ->
     "<#{@constructor.className} (#{JSON.stringify(@)})>"
+      
+  fromForm: (form) ->
+    result = {}
+    for key in $(form).serializeArray()
+      result[key.name] = key.value
+    @load(result)
   
   exists: ->
     @id && @id of @constructor.records

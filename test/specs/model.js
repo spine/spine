@@ -166,7 +166,8 @@ describe("Model", function(){
   
   it("can load attributes()", function(){
     var asset = new Asset();
-    asset.load({name: "In da' house"});
+    var result = asset.load({name: "In da' house"});
+    expect(result).toBe(asset);
     expect(asset.name).toEqual("In da' house");
   });
   
