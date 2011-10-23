@@ -7,13 +7,13 @@ class Spine.Tabs extends Spine.Controller
     
   constructor: ->
     super
-    @bind('change', @change)
+    @bind 'change', @change
 
   change: (name) => 
     return unless name
     @current = name
     @children().removeClass('active')
-    @children('[data-name='' + @current + '']').addClass('active')
+    @children("[data-name=#{@current}").addClass('active')
   
   render: ->
     @change @current

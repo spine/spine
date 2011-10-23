@@ -22,7 +22,7 @@ class Spine.Route extends Spine.Module
     if (typeof path is "object")
       @add(key, value) for key, value of path
     else
-      @routes.unshift(new @(path, callback))
+      @routes.append(new @(path, callback))
     
   @setup: (options = {}) ->
     @options = $.extend({}, @options, options)
