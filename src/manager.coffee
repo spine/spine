@@ -56,7 +56,7 @@ class Spine.Stack extends Spine.Controller
   controllers: {}
   routes: {}
 
-  className: 'stack'
+  className: 'spine stack'
 
   constructor: ->
     super
@@ -72,6 +72,8 @@ class Spine.Stack extends Spine.Controller
         callback = value if typeof value is 'function'
         callback or= => @[value].active(arguments...)
         @route(key, callback)
+        
+    @[@default].active() if @default
 
   add: (controller) ->
     @manager.add(controller)
