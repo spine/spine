@@ -19,7 +19,7 @@ class Spine.Route extends Spine.Module
     shim: false
         
   @add: (path, callback) ->
-    if (typeof path is "object")
+    if (typeof path is "object" and path not instanceof RegExp)
       @add(key, value) for key, value of path
     else
       @routes.push(new @(path, callback))
