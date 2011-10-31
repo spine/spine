@@ -31,7 +31,8 @@ class Spine.List extends Spine.Controller
     @el.children(sel)
     
   click: (e) ->
-    item = $(e.target).item()
+    item = $(e.currentTarget).item()
     @trigger('change', item)
+    false
     
 module?.exports = Spine.List

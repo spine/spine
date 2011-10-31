@@ -24,7 +24,7 @@ class Spine.Tabs extends Spine.Controller
     @el.children(sel)
 
   click: (e) ->
-    name = $(e.target).attr('data-name')
+    name = $(e.currentTarget).attr('data-name')
     @trigger('change', name)
 
   connect: (tabName, controller) ->
