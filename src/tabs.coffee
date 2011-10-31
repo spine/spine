@@ -30,5 +30,7 @@ class Spine.Tabs extends Spine.Controller
   connect: (tabName, controller) ->
     @bind 'change', (name) ->
       controller.active() if name == tabName
+	controller.bind "active", () =>
+	      @change tabName
       
 module?.exports = Spine.Tabs
