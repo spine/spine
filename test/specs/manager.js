@@ -8,8 +8,8 @@ describe("Ajax", function(){
     Users = Spine.Controller.sub();
     Groups = Spine.Controller.sub();
     
-    users = new Users;
-    groups = new Groups;
+    users = new Users();
+    groups = new Groups();
   });
   
   it("should toggle active class", function(){

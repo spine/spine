@@ -5,8 +5,7 @@ describe("Routing", function(){
   var navigate = function(str, callback){
     window.location.hash = str;
     waits(50);
-    if (callback)
-      runs(callback);
+    if (callback) { runs(callback); }
   };
   
   beforeEach(function(){
@@ -36,7 +35,7 @@ describe("Routing", function(){
   it("can add regex route", function(){
     Route.add(/\/users\/(\d+)/);
     expect(Route.routes).toBeTruthy();
-  })
+  });
   
   it("can trigger routes", function(){
      Route.add({

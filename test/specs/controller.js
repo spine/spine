@@ -12,7 +12,7 @@ describe("Controller", function(){
     var users = new Users({el: element});
     expect(users.el.hasClass("testy")).toBeTruthy();
     
-    var users = new Users({item: "foo"});
+    users = new Users({item: "foo"});
     expect(users.item).toEqual("foo");
   });
   
@@ -23,7 +23,7 @@ describe("Controller", function(){
   
   it("can populate elements", function(){
     Users.include({
-      elements: {".foo": "foo"},
+      elements: {".foo": "foo"}
     });
     
     element.append($("<div />").addClass("foo"));
