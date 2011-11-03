@@ -62,18 +62,14 @@ class Module
     throw('include(obj) requires obj') unless obj
     for key, value of obj when key not in moduleKeywords
       @::[key] = value
-
-    included = obj.included
-    included.apply(this) if included
+    obj.included?.apply(@)
     @
 
   @extend: (obj) ->
     throw('extend(obj) requires obj') unless obj
     for key, value of obj when key not in moduleKeywords
-      @[key] = value
-    
-    extended = obj.extended
-    extended.apply(this) if extended
+      @[key] = value    
+    obj.extended?.apply(@)
     @
     
   @proxy: (func) ->
