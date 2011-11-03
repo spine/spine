@@ -78,7 +78,7 @@ describe("Events", function(){
   });
   
   it("can cancel propogation", function(){
-    EventTest.bind("motherio", function(){ return false });
+    EventTest.bind("motherio", function(){ return false; });
     EventTest.bind("motherio", spy);
 
     EventTest.trigger("motherio");
