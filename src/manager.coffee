@@ -62,7 +62,10 @@ class Spine.Stack extends Spine.Controller
     super
 
     @manager = new Spine.Manager
-
+    
+    @manager.bind 'change', (controller, args...) =>
+      @active(args...) if controller
+    
     for key, value of @controllers
       @[key] = new value(stack: @)
       @add(@[key])
