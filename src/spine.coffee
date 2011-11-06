@@ -315,8 +315,11 @@ class Model extends Module
     result = {}
     for key in form.serializeArray()
       result[key.name] = key.value
-      check = form.find("input[type='checkbox'][name='#{key.name}']")
-      result[key.name] = check.prop('checked') if check.length
+    # Override the result with the boolean values of checkboxes, if any
+    checkboxes = form.find("input:checkbox")
+    for check in checkboxes
+      result[$(check).prop 'name'] = $(check).prop 'checked'
+
     @load(result)
   
   exists: ->

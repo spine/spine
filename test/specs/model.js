@@ -149,9 +149,10 @@ describe("Model", function(){
       // TODO: configure 'available' attribute
       expect(Asset.fromForm(form).available).toEqual(true);
     });
+
     it("can convert checkbox to boolean false", function(){
       var form = formWith('<input name="available" value="1" type="checkbox" />');
-      expect(Asset.fromForm(form).available).toEqual(true);
+      expect(Asset.fromForm(form).available).toEqual(false);
     });
   });
   
