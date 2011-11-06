@@ -154,6 +154,11 @@ describe("Model", function(){
       var form = formWith('<input name="available" value="1" type="checkbox" />');
       expect(Asset.fromForm(form).available).toEqual(false);
     });
+
+    it("should ignore disabled checkboxes", function(){
+      var form = formWith('<input name="available" value="1" disabled="disabled" />');
+      expect(Asset.fromForm(form).available).toBeUndefined()
+    });
   });
   
 
