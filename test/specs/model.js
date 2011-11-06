@@ -131,14 +131,37 @@ describe("Model", function(){
     var assets = Asset.fromJSON('[{"name":"Un-Johnson me!"}]')
     expect(assets[0] && assets[0].name).toEqual("Un-Johnson me!");
   });
-  
-  it("can be instantiated from a form", function(){
-    var form = $('<form />');
-    form.append('<input name="name" value="bar" />');
-    var asset = Asset.fromForm(form);
-    expect(asset.name).toEqual("bar");
+
+
+  describe("fromForm", function(){
+    var formWith = function(html) {
+      return $("<form />").append(html);
+    };
+
+    it("can be instantiated", function(){
+      var form = formWith('<input name="name" value="bar" />');
+      var asset = Asset.fromForm(form);
+      expect(asset.name).toEqual("bar");
+    });
+
+    it("can convert checkbox to boolean true", function(){
+      var form = formWith('<input name="available" value="1" checked="checked" type="checkbox" />');
+      // TODO: configure 'available' attribute
+      expect(Asset.fromForm(form).available).toEqual(true);
+    });
+
+    it("can convert checkbox to boolean false", function(){
+      var form = formWith('<input name="available" value="1" type="checkbox" />');
+      expect(Asset.fromForm(form).available).toEqual(false);
+    });
+
+    it("should ignore disabled checkboxes", function(){
+      var form = formWith('<input name="available" value="1" disabled="disabled" />');
+      expect(Asset.fromForm(form).available).toBeUndefined()
+    });
   });
   
+
   it("can validate", function(){
     Asset.include({
       validate: function(){
