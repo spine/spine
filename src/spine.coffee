@@ -311,9 +311,12 @@ class Model extends Module
     "<#{@constructor.className} (#{JSON.stringify(@)})>"
       
   fromForm: (form) ->
+    form = $(form)
     result = {}
-    for key in $(form).serializeArray()
+    for key in form.serializeArray()
       result[key.name] = key.value
+      check = form.find("input[type='checkbox'][name='#{key.name}']")
+      result[key.name] = check.prop('checked') if check.length
     @load(result)
   
   exists: ->
