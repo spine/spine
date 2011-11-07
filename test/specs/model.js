@@ -154,6 +154,19 @@ describe("Model", function(){
     expect(new Asset({name: "Yo big dog"}).isValid()).toBeTruthy();
   });
   
+  it("validation can be disabled", function(){
+    Asset.include({
+      validate: function(){
+        if ( !this.name )
+          return "Name required";
+      }
+    });
+    
+    var asset = new Asset;
+    expect(asset.save()).toBeFalsy();
+    expect(asset.save({validate: false})).toBeTruthy();
+  });
+  
   it("has attribute hash", function(){
     var asset = new Asset({name: "wazzzup!"});
     expect(asset.attributes()).toEqual({name: "wazzzup!"});
@@ -299,13 +312,13 @@ describe("Model", function(){
     it("can fire create events", function(){
       Asset.bind("create", spy);
       var asset = Asset.create({name: "cartoon world.png"});
-      expect(spy).toHaveBeenCalledWith(asset);
+      expect(spy).toHaveBeenCalledWith(asset, {});
     });
 
     it("can fire save events", function(){
       Asset.bind("save", spy);
       var asset = Asset.create({name: "cartoon world.png"});
-      expect(spy).toHaveBeenCalledWith(asset);
+      expect(spy).toHaveBeenCalledWith(asset, {});
       
       asset.save();
       expect(spy).toHaveBeenCalled();
@@ -318,34 +331,34 @@ describe("Model", function(){
       expect(spy).not.toHaveBeenCalledWith(asset);
       
       asset.save();
-      expect(spy).toHaveBeenCalledWith(asset);
+      expect(spy).toHaveBeenCalledWith(asset, {});
     });
 
     it("can fire destroy events", function(){
       Asset.bind("destroy", spy);
       var asset = Asset.create({name: "cartoon world.png"});
       asset.destroy();
-      expect(spy).toHaveBeenCalledWith(asset);
+      expect(spy).toHaveBeenCalledWith(asset, {});
     });
 
     it("can fire events on record", function(){
       var asset = Asset.create({name: "cartoon world.png"});
       asset.bind("save", spy);
       asset.save();
-      expect(spy).toHaveBeenCalledWith(asset);
+      expect(spy).toHaveBeenCalledWith(asset, {});
     });
     
     it("can fire change events on record", function(){
       Asset.bind("change", spy);
       
       var asset = Asset.create({name: "cartoon world.png"});
-      expect(spy).toHaveBeenCalledWith(asset, "create");
+      expect(spy).toHaveBeenCalledWith(asset, "create", {});
 
       asset.save();
-      expect(spy).toHaveBeenCalledWith(asset, "update");
+      expect(spy).toHaveBeenCalledWith(asset, "update", {});
       
       asset.destroy();
-      expect(spy).toHaveBeenCalledWith(asset, "destroy");
+      expect(spy).toHaveBeenCalledWith(asset, "destroy", {});
     });
     
     it("can fire error events", function(){
@@ -361,6 +374,19 @@ describe("Model", function(){
       var asset = new Asset({name: ""});
       expect(asset.save()).toBeFalsy();
       expect(spy).toHaveBeenCalledWith(asset, "Name required");
+    });
+    
+    it("should be able to bind once", function(){
+      Asset.one("save", spy);
+      
+      var asset = new Asset({name: "cartoon world.png"});
+      asset.save();
+      
+      expect(spy).toHaveBeenCalled();
+      spy.reset();
+      
+      asset.save();
+      expect(spy).not.toHaveBeenCalled();
     });
     
     it("it should pass clones with events", function(){

@@ -31,6 +31,7 @@ describe("Ajax", function(){
     
     expect(jQuery.ajax).toHaveBeenCalledWith({
       type:         'POST', 
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
       contentType:  'application/json', 
       dataType:     'json', 
       data:         '{"first":"Hans","last":"Zimmer","id":"IDD"}', 
@@ -48,6 +49,7 @@ describe("Ajax", function(){
       
       expect(jQuery.ajax).toHaveBeenCalledWith({
         type:         'PUT', 
+        headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
         contentType:  'application/json', 
         dataType:     'json', 
         data:         '{"first":"John2","last":"Williams2","id":"IDD"}', 
@@ -65,10 +67,11 @@ describe("Ajax", function(){
       
       expect(jQuery.ajax).toHaveBeenCalledWith({
         contentType: 'application/json', 
-        dataType: 'json', 
+        headers:     { 'X-Requested-With' : 'XMLHttpRequest' },
+        dataType:   'json', 
         processData: false, 
-        type: 'DELETE', 
-        url: '/users/IDD' 
+        type:        'DELETE', 
+        url:         '/users/IDD' 
       })
     });
     
@@ -109,5 +112,29 @@ describe("Ajax", function(){
       expect(jQuery.ajax).not.toHaveBeenCalled();
       jqXHR.resolve();
       expect(jQuery.ajax).toHaveBeenCalled();
+    });
+    
+    it("should have success callbacks", function(){
+      spyOn(jQuery, "ajax").andReturn(jqXHR);
+      
+      var noop = {spy: function(){}};
+      spyOn(noop, "spy");
+      var spy = noop.spy;
+      
+      User.create({first: "Second"}, {success: spy});
+      jqXHR.resolve();
+      expect(spy).toHaveBeenCalled();
+    });
+    
+    it("should have error callbacks", function(){
+      spyOn(jQuery, "ajax").andReturn(jqXHR);
+      
+      var noop = {spy: function(){}};
+      spyOn(noop, "spy");
+      var spy = noop.spy;
+      
+      User.create({first: "Second"}, {error: spy});
+      jqXHR.reject();
+      expect(spy).toHaveBeenCalled();
     });
 });

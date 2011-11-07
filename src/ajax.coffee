@@ -86,65 +86,69 @@ class Singleton extends Base
   constructor: (@record) ->
     @model = @record.constructor
   
-  reload: (params) ->
+  reload: (params, options) ->
     @queue =>
       @ajax(
         params,
         type: 'GET'
         url:  Ajax.getURL(@record)
-      ).success(@recordResponse)
-       .error(@errorResponse)
+      ).success(@recordResponse(options))
+       .error(@errorResponse(options))
   
-  create: (params) ->
+  create: (params, options) ->
     @queue =>
       @ajax(
         params,
         type: 'POST'
         data: JSON.stringify(@record)
         url:  Ajax.getURL(@model)
-      ).success(@recordResponse)
-       .error(@errorResponse)
+      ).success(@recordResponse(options))
+       .error(@errorResponse(options))
 
-  update: (params) ->
+  update: (params, options) ->
     @queue =>
       @ajax(
         params,
         type: 'PUT'
         data: JSON.stringify(@record)
         url:  Ajax.getURL(@record)
-      ).success(@recordResponse)
-       .error(@errorResponse)
+      ).success(@recordResponse(options))
+       .error(@errorResponse(options))
   
-  destroy: (params) ->
+  destroy: (params, options) ->
     @queue =>
       @ajax(
         params,
         type: 'DELETE'
         url:  Ajax.getURL(@record)
-      ).success(@recordResponse)
-       .error(@errorResponse)  
+      ).success(@recordResponse(options))
+       .error(@errorResponse(options))
 
   # Private
 
-  recordResponse: (data, status, xhr) =>
-    @record.trigger('ajaxSuccess', status, xhr)
+  recordResponse: (options = {}) =>
+    (data, status, xhr) =>
+      if Spine.isBlank(data)
+        data = false
+      else
+        data = @model.fromJSON(data)
     
-    return if Spine.isBlank(data)
-    data = @model.fromJSON(data)
-    
-    Ajax.disable =>        
-      # ID change, need to do some shifting
-      if data.id and @record.id isnt data.id
-        @record.changeID(data.id)
+      Ajax.disable =>
+        if data
+          # ID change, need to do some shifting
+          if data.id and @record.id isnt data.id
+            @record.changeID(data.id)
 
-      # Update with latest data
-      @record.updateAttributes(data.attributes())      
+          # Update with latest data
+          @record.updateAttributes(data.attributes())
+        
+        @record.trigger('ajaxSuccess', data, status, xhr)
+        options.success?.apply(@record)
       
-  blankResponse: (data, status, xhr) =>
-    @record.trigger('ajaxSuccess', status, xhr)
-
-  errorResponse: (xhr, statusText, error) =>
-    @record.trigger('ajaxError', xhr, statusText, error)
+  errorResponse: (options = {}) =>
+    (xhr, statusText, error) =>
+      @record.trigger('ajaxError', xhr, statusText, error)
+      options.error?.apply(@record)
 
 # Ajax endpoint
 Model.host = ''
@@ -175,8 +179,8 @@ Model.Ajax =
   ajaxFetch: ->
     @ajax().fetch(arguments...)
     
-  ajaxChange: (record, type) ->
-    record.ajax()[type]()
+  ajaxChange: (record, type, options = {}) ->
+    record.ajax()[type](options.ajax, options)
     
 Model.Ajax.Methods = 
   extended: ->
@@ -184,5 +188,6 @@ Model.Ajax.Methods =
     @include Include
     
 # Globals
+Ajax.defaults   = Base.defaults
 Spine.Ajax      = Ajax
 module?.exports = Ajax

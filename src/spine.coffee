@@ -164,12 +164,12 @@ class Model extends Module
     for key, value of @records
       @records[key].destroy()
 
-  @update: (id, atts) ->
-    @find(id).updateAttributes(atts)
+  @update: (id, atts, options) ->
+    @find(id).updateAttributes(atts, options)
 
-  @create: (atts) ->
+  @create: (atts, options) ->
     record = new @(atts)
-    record.save()
+    record.save(options)
 
   @destroy: (id) ->
     @find(id).destroy()
@@ -251,24 +251,25 @@ class Model extends Module
     rec and rec.constructor is @constructor and 
       (rec.id is @id or @id in rec.ids or rec.id in @ids)
 
-  save: ->
-    error = @validate()
-    if error
-      @trigger('error', error)
-      return false
+  save: (options = {}) ->
+    unless options.validate is false
+      error = @validate()
+      if error
+        @trigger('error', error)
+        return false
     
-    @trigger('beforeSave')
-    record = if @newRecord then @create() else @update()
-    @trigger('save')
+    @trigger('beforeSave', options)
+    record = if @newRecord then @create(options) else @update(options)
+    @trigger('save', options)
     record
 
   updateAttribute: (name, value) ->
     @[name] = value
     @save()
 
-  updateAttributes: (atts) ->
+  updateAttributes: (atts, options) ->
     @load(atts)
-    @save()
+    @save(options)
     
   changeID: (id) ->
     @ids.push(@id)
@@ -278,12 +279,12 @@ class Model extends Module
     @id = id
     @save()
   
-  destroy: ->
-    @trigger('beforeDestroy')
+  destroy: (options = {}) ->
+    @trigger('beforeDestroy', options)
     delete @constructor.records[@id]
     @destroyed = true
-    @trigger('destroy')
-    @trigger('change', 'destroy')
+    @trigger('destroy', options)
+    @trigger('change', 'destroy', options)
     @unbind()
     @
 
@@ -321,24 +322,24 @@ class Model extends Module
 
   # Private
 
-  update: ->
-    @trigger('beforeUpdate')
+  update: (options) ->
+    @trigger('beforeUpdate', options)
     records = @constructor.records
     records[@id].load @attributes()
     clone = records[@id].clone()
-    clone.trigger('update')
-    clone.trigger('change', 'update')
+    clone.trigger('update', options)
+    clone.trigger('change', 'update', options)
     clone
 
-  create: ->
-    @trigger('beforeCreate')
+  create: (options) ->
+    @trigger('beforeCreate', options)
     @id          = guid() unless @id
     @newRecord   = false    
     records      = @constructor.records
     records[@id] = @dup(false)
     clone        = records[@id].clone()
-    clone.trigger('create')
-    clone.trigger('change', 'create')
+    clone.trigger('create', options)
+    clone.trigger('change', 'create', options)
     clone
   
   bind: (events, callback) ->
@@ -350,6 +351,11 @@ class Model extends Module
         @constructor.unbind(events, binder)
         @constructor.unbind('unbind', unbinder)
     binder
+    
+  one: (events, callback) ->
+    binder = @bind events, =>
+      @constructor.unbind(events, binder)
+      callback.apply(@)
   
   trigger: (args...) ->
     args.splice(1, 0, @)
