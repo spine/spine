@@ -12,8 +12,5 @@
     "type" : "git", 
     "url": "http://github.com/maccman/spine.git"
   }, 
-  "main" : "./index.js",
-  "dependencies" : {
-    "spine.app": "~0.2.8"
-  }
+  "main" : "./index.js"
 }
