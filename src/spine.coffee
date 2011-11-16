@@ -334,9 +334,9 @@ class Model extends Module
   create: (options) ->
     @trigger('beforeCreate', options)
     @id          = guid() unless @id
-    @newRecord   = false    
+    @newRecord   = false
     records      = @constructor.records
-    records[@id] = @dup(false)
+    records[@id] = @
     clone        = records[@id].clone()
     clone.trigger('create', options)
     clone.trigger('change', 'create', options)
@@ -499,9 +499,7 @@ Module.extend.call(Spine, Events)
   
 # JavaScript compatability
 
-Module.create = Module.sub =
-Controller.create = Controller.sub =
-Model.sub = (instances, statics) ->
+Module.create = Module.sub = Controller.create = Controller.sub = Model.sub = (instances, statics) ->
   class result extends this
   result.include(instances) if instances
   result.extend(statics) if statics

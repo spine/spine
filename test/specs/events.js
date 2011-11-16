@@ -91,4 +91,42 @@ describe("Events", function(){
     Sub.trigger("yoyo");
     expect(spy).not.toHaveBeenCalled();
   });
+
+  describe("binding in constructors", function(){
+    var Foo, Bar, spy, details;
+
+    beforeEach(function(){
+      Bar = Spine.Model.setup("Bar", []);
+      spy = jasmine.createSpy("spy").andCallFake(function(){});
+      details = {
+        init: function(){
+          Bar.bind("create", this.proxy(this.barCreated))
+        },
+
+        barCreated: function(){
+          this.trigger("update");
+        }
+      }
+    });
+
+    it("doesn't duplicate bindings in Model's init", function(){
+      Foo = Spine.Model.setup("Foo", []).include(details);
+
+      Foo.create().bind('update', spy);
+      Bar.trigger('create'); // barCreated -> Foo#update -> spy
+
+      expect(Bar._callbacks.create.length).toEqual(1);
+      expect(spy.callCount).toEqual(1);
+    });
+
+    it("daesn't duplicate bindings in Controller's init", function(){
+      Foo = Spine.Controller.sub(details);
+
+      new Foo().bind('update', spy);
+      Bar.trigger('create'); // barCreated -> Foo#update -> spy
+
+      expect(Bar._callbacks.create.length).toEqual(1);
+      expect(spy.callCount).toEqual(1);
+    });
+  })
 });
