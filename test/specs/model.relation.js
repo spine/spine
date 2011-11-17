@@ -35,4 +35,24 @@ describe("Model.Relation", function(){
     expect( photo.album() ).toBeTruthy();
     expect( photo.album().name ).toBe("First Album");
   });
+  
+  it("should honour belongsTo with hasOne associations", function(){
+    Album.hasOne("photo", Photo);
+    Photo.belongsTo("album", Album);
+    
+    expect(Photo.attributes).toEqual(["name", "album_id"]);
+    
+    var album = Album.create();
+    var photo = Photo.create({name: "Sunset picture"});
+
+		album.photo(photo);
+
+    expect(photo.album_id).toBe(album.id);
+
+		// Sadly we need to currently save here :(
+		photo.save(); 
+    
+    expect( album.photo() ).toBeTruthy();
+    expect( album.photo().name ).toBe("Sunset picture");
+  });
 });

@@ -68,7 +68,7 @@ class Singleton extends Spine.Module
     @record.id and @model.findByAttribute(@fkey, @record.id)
 
   update: (value) ->
-    value?[@fkey] = @id
+    value?[@fkey] = @record.id
     value
 
 singularize = (str) ->
