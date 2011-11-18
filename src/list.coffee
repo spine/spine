@@ -14,8 +14,12 @@ class Spine.List extends Spine.Controller
   template: -> arguments[0]
   
   change: (item) =>
-    return unless item
     @current = item
+
+    unless @current
+      @children().removeClass('active')
+      return
+    
     @children().removeClass('active')
     @children().forItem(@current).addClass('active')
   
