@@ -500,13 +500,13 @@ Module.extend.call(Spine, Events)
 # JavaScript compatability
 
 Module.create = Module.sub =
-Controller.create = Controller.sub =
-Model.sub = (instances, statics) ->
-  class result extends this
-  result.include(instances) if instances
-  result.extend(statics) if statics
-  result.unbind?()
-  result
+  Controller.create = Controller.sub =
+    Model.sub = (instances, statics) ->
+      class result extends this
+      result.include(instances) if instances
+      result.extend(statics) if statics
+      result.unbind?()
+      result
   
 Model.setup = (name, attributes = []) ->
   class Instance extends this
