@@ -17,8 +17,8 @@ class Collection extends Spine.Module
     values[values.length - 1]
     
   find: (id) ->
-    records = @model.select (rec) =>
-      @associated(rec) and rec.id is id
+    records = @select (rec) =>
+      rec.id + '' is id + ''
     throw('Unknown record') unless records[0]
     records[0]
     
