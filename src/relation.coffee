@@ -68,8 +68,13 @@ class Singleton extends Spine.Module
     @record.id and @model.findByAttribute(@fkey, @record.id)
 
   update: (value) ->
-    value?[@fkey] = @id
-    value
+    delete @model.records[record.id] if @model.exists? value.id
+
+    value = @model.fromJSON(value)
+    value.newRecord = false
+    value[@fkey] = @record.id
+    @model.records[value.id] = value
+    @record[@fkey] = value and value.id
 
 singularize = (str) ->
   str.replace(/s$/, '')
