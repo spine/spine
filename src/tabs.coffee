@@ -13,7 +13,7 @@ class Spine.Tabs extends Spine.Controller
     return unless name
     @current = name
     @children().removeClass('active')
-    @children("[data-name=#{@current}").addClass('active')
+    @children("[data-name=#{@current}]").addClass('active')
   
   render: ->
     @change @current
