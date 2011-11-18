@@ -222,6 +222,8 @@ describe("Model", function(){
     expect(asset.name).toEqual("who's your daddy?");
     asset.name = "I am your father";
     expect(asset.reload().name).toBe("who's your daddy?");
+    
+    expect(asset).not.toBe(Asset.records[asset.id]);
   });
   
   it("can be cloned", function(){
@@ -246,7 +248,7 @@ describe("Model", function(){
     expect(clone.name).toEqual("checkout anytime");
   });
   
-  it("create or save should return a close", function(){
+  it("create or save should return a clone", function(){
     var asset = Asset.create({name: "what's cooler than cool?"});
     expect(asset.__proto__).not.toBe(Asset.prototype);
     expect(asset.__proto__.__proto__).toBe(Asset.prototype);
