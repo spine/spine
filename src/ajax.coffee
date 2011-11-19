@@ -188,6 +188,6 @@ Model.Ajax.Methods =
     @include Include
     
 # Globals
-Ajax.defaults   = Base.defaults
+Ajax.defaults   = Base::defaults
 Spine.Ajax      = Ajax
 module?.exports = Ajax
