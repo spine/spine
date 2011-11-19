@@ -35,4 +35,33 @@ describe("Model.Relation", function(){
     expect( photo.album() ).toBeTruthy();
     expect( photo.album().name ).toBe("First Album");
   });
+  
+  it("should load nested Singleton record", function(){
+    Album.hasOne("photo", Photo);
+    Photo.belongsTo("album", Album);
+
+    var album = new Album();
+    album.load({id: "1", name: "Beautiful album", 
+                photo: {id: "2", name: "Beautiful photo", album_id: "1"}});
+
+    expect( album.photo() ).toBeTruthy();
+    expect( album.photo().name ).toBe("Beautiful photo");
+  });
+
+  it("should load nested Collection records", function(){
+    Album.hasMany("photos", Photo);
+    Photo.belongsTo("album", Album);
+
+    var album = new Album();
+    album.load({
+                id: "1", name: "Beautiful album", 
+                photos: [{id: "1", name: "Beautiful photo 1", album_id: "1"},
+                         {id: "2", name: "Beautiful photo 2", album_id: "1"}]
+               });
+
+    expect( album.photos() ).toBeTruthy();
+    expect( album.photos().all().length ).toBe(2);
+    expect( album.photos().first().name ).toBe("Beautiful photo 1");
+    expect( album.photos().last().name ).toBe("Beautiful photo 2");
+  });
 });
