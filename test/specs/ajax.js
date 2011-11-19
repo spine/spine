@@ -137,4 +137,8 @@ describe("Ajax", function(){
       jqXHR.reject();
       expect(spy).toHaveBeenCalled();
     });
+
+    it("should expose the defaults object", function(){
+      expect(Spine.Ajax.defaults).toBeDefined();
+    });
 });
