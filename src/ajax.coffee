@@ -55,7 +55,8 @@ class Collection extends Base
     @ajax(
       params,
       type: 'GET',
-      url:  Ajax.getURL(record)
+      url:  Ajax.getURL(record),
+      data: $.param(params)
     ).success(@recordsResponse)
      .error(@errorResponse)
     
@@ -63,7 +64,8 @@ class Collection extends Base
     @ajax(
       params,
       type: 'GET',
-      url:  Ajax.getURL(@model)
+      url:  Ajax.getURL(@model),
+      data: $.param(params)
     ).success(@recordsResponse)
      .error(@errorResponse)
     
