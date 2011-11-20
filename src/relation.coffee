@@ -22,6 +22,13 @@ class Collection extends Spine.Module
     throw('Unknown record') unless records[0]
     records[0]
     
+  findAllByAttribute: (name, value) ->
+    @model.select (rec) =>
+      rec[name] is value
+    
+  findByAttribute: (name, value) ->
+    @findAllByAttribute(name, value)[0]
+      
   select: (cb) ->
     @model.select (rec) =>
       @associated(rec) and cb(rec)
