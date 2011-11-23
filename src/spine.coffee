@@ -452,11 +452,7 @@ class Controller extends Module
 
 # Utilities & Shims
 
-$ = @jQuery or
-    @Zepto or
-    (window and window.jQuery) or
-    (window and window.Zepto) or
-    (element) -> element
+$ = @jQuery or @Zepto or window?.jQuery or window?.Zepto or (element) -> element
 
 unless typeof Object.create is 'function'
   Object.create = (o) ->
