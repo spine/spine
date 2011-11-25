@@ -142,8 +142,8 @@ class Singleton extends Base
           # Update with latest data
           @record.updateAttributes(data.attributes())
         
-        @record.trigger('ajaxSuccess', data, status, xhr)
-        options.success?.apply(@record)
+      @record.trigger('ajaxSuccess', data, status, xhr)
+      options.success?.apply(@record)
       
   errorResponse: (options = {}) =>
     (xhr, statusText, error) =>
