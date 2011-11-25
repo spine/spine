@@ -166,7 +166,7 @@ Extend =
   ajax: -> new Collection(this)
 
   url: ->
-    "#{Model.host}/#{@className.toLowerCase()}s"
+    "#{Model.host}/#{@className.toLowerCase().pluralize()}"
       
 Model.Ajax =
   extended: ->

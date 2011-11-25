@@ -8,6 +8,9 @@ describe("Ajax", function(){
     
     User = Spine.Model.setup("User", ["first", "last"]);
     User.extend(Spine.Model.Ajax);
+    Story = Spine.Model.setup("Story", ["title", "description"]);
+    Story.extend(Spine.Model.Ajax);
+
     
     jqXHR = $.Deferred();
 
@@ -140,5 +143,21 @@ describe("Ajax", function(){
 
     it("should expose the defaults object", function(){
       expect(Spine.Ajax.defaults).toBeDefined();
+    });
+    
+    it("pluralizes correctly", function(){
+      spyOn(jQuery, "ajax").andReturn(jqXHR);
+
+      Story.create({title: "hello", description: "no", id: "IDD"});
+
+      expect(jQuery.ajax).toHaveBeenCalledWith({
+        type:         'POST', 
+        headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+        contentType:  'application/json', 
+        dataType:     'json', 
+        data:         '{"title":"hello","description":"no","id":"IDD"}', 
+        url:          '/stories', 
+        processData:  false
+      });
     });
 });

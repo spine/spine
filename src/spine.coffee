@@ -483,7 +483,7 @@ guid = ->
 Spine = @Spine   = {}
 module?.exports  = Spine
 
-Spine.version    = '1.0.5'
+Spine.version    = '1.0.6'
 Spine.isArray    = isArray
 Spine.isBlank    = isBlank
 Spine.$          = $
