@@ -289,7 +289,11 @@ class Model extends Module
     @
 
   dup: (newRecord) ->
-    result = new @constructor(@attributes())
+    result = @attributes()
+    result.__proto__ = @constructor.prototype
+    #TODO: not sure why this is required or if it's in the best place
+    result.ids = @ids if @ids
+
     if newRecord is false
       result.newRecord = @newRecord
     else
