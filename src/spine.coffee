@@ -115,13 +115,17 @@ class Model extends Module
     
     records = [records] unless isArray(records)
     
-    for record in records
-      record.newRecord    = false
-      record.id           or= guid()
-      @records[record.id] = record
+    @add(record) for record in records
 
     @trigger('refresh', not options.clear and records)
     @
+
+  @add: (record) ->
+    record.newRecord    = false
+    record.id           or= guid()
+    @records[record.id] = record
+    @trigger('add', record)
+    @    
 
   @select: (callback) ->
     result = (record for id, record of @records when callback(record))
