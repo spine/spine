@@ -131,7 +131,7 @@ optionize = (name, model, fkey) ->
 
 Spine.Model.extend 
   # options = { model, fkey, as, ftype, namespace }
-  hasMany: (name, options = {}, fkey) -> 
+  hasMany: (name, options = {}) -> 
     options = optionize arguments...
     options['fkey'] ?= "#{underscore(@className)}_id"
     
@@ -144,7 +144,7 @@ Spine.Model.extend
       association(@)
   
   # options = { model, fkey, polymorphic, ftype, namespace }
-  belongsTo: (name, options = {}, fkey) -> 
+  belongsTo: (name, options = {}) -> 
     options = optionize arguments...
     options['fkey'] ?= "#{singularize(name)}_id"
     options['ftype'] ?= "#{singularize(name)}_type" if options['polymorphic']
@@ -161,7 +161,7 @@ Spine.Model.extend
     @attributes.push(options['ftype']) if options['polymorphic']
   
   # options = { model, fkey } for consistency (until polymorph is implemented)
-  hasOne: (name, options = {}, fkey) -> 
+  hasOne: (name, options = {}) -> 
     options = optionize arguments...
     options['fkey'] ?= "#{underscore(@className)}_id"
     
