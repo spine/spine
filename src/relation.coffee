@@ -141,17 +141,17 @@ optionize = (name, model, fkey) ->
     options = if typeof model is 'string' then { model: model } else model or {}
   # polymorphic association
   if options['as']
-    options['fkey'] ?= "#{options['as']}_id" 
-    options['ftype'] ?= "#{options['as']}_type"
+    options['fkey'] or= "#{options['as']}_id" 
+    options['ftype'] or= "#{options['as']}_type"
   
-  options['name'] = name
   options
 
 Spine.Model.extend 
   # options = { model, fkey, as, ftype, namespace }
   hasMany: (name, options = {}) -> 
+    #optionize converts args for backwards-compatibility
     options = optionize arguments...
-    options['fkey'] ?= "#{underscore(@className)}_id"
+    options['fkey'] or= "#{underscore(@className)}_id"
     
     association = (record) -> 
       options['record'] = record
@@ -160,12 +160,17 @@ Spine.Model.extend
     @::[name] = (values) ->
       association(@).refresh(values) if values?
       association(@)
+    
+    #make association information available on model
+    @associations or= {}
+    @associations[name] = options
   
   # options = { model, fkey, polymorphic, ftype, namespace }
   belongsTo: (name, options = {}) -> 
+    #optionize converts args for backwards-compatibility
     options = optionize arguments...
-    options['fkey'] ?= "#{singularize(name)}_id"
-    options['ftype'] ?= "#{singularize(name)}_type" if options['polymorphic']
+    options['fkey'] or= "#{singularize(name)}_id"
+    options['ftype'] or= "#{singularize(name)}_type" if options['polymorphic']
     
     association = (record) -> 
       options['record'] = record
@@ -177,11 +182,16 @@ Spine.Model.extend
 
     @attributes.push(options['fkey'])
     @attributes.push(options['ftype']) if options['polymorphic']
+    
+    #make association information available on model
+    @associations or= {}
+    @associations[name] = options
   
   # options = { model, fkey } for consistency (until polymorph is implemented)
   hasOne: (name, options = {}) -> 
+    #optionize converts args for backwards-compatibility
     options = optionize arguments...
-    options['fkey'] ?= "#{underscore(@className)}_id"
+    options['fkey'] or= "#{underscore(@className)}_id"
     
     association = (record) -> 
       options['record'] = record
@@ -190,3 +200,8 @@ Spine.Model.extend
     @::[name] = (value) ->
       association(@).update(value) if value?
       association(@).find()
+    
+    #make association information available on model
+    @associations or= {}
+    @associations[name] = options
+    
