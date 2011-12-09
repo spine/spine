@@ -8,6 +8,9 @@ class Relation extends Spine.Module
       # make sure if it's the "model" property that it's converted from string to class
       @[key] = if key is 'model' and typeof value is 'string' then @stringToClass(value) else value
       @polymorphic = true if key is 'as' or key is 'polymorphic'
+    
+    #set the model class in case polymorphic
+    @updateModel()
   
   # Private
   
@@ -19,8 +22,9 @@ class Relation extends Spine.Module
     record[@ftype] = @polymorphic and foreign and @modelName(foreign)
     record
   
-  associatedModel: ->
-    if @record[@fkey] and @polymorphic then @stringToClass(@record[@ftype]) else @model
+  #updates @model if there's a polymorphic association
+  updateModel: ->
+    @model = if @record[@fkey] and @polymorphic then @stringToClass(@record[@ftype]) else @model
   
   stringToClass: (modelName) ->
     # namespace is optional for developers not using CommonJS
@@ -96,11 +100,12 @@ class Instance extends Relation
     super options
     
   exists: ->
-    model = @associatedModel()
-    model and @record[@fkey] and model.exists(@record[@fkey])
+    @model and @record[@fkey] and @model.exists(@record[@fkey])
   
   update: (value) ->
     @associate @record, value
+    @updateModel()
+    @record
   
 class Singleton extends Relation
   constructor: (options = {}) ->
