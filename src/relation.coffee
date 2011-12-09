@@ -14,7 +14,6 @@ class Relation extends Spine.Module
     (!@polymorphic or record[@ftype] is @modelName(@record)) and record[@fkey] is @record.id
     
   associate: (record, foreign) ->
-    console.log 'record', record, 'foreign', foreign
     record[@fkey] = foreign and foreign.id
     record[@ftype] = @polymorphic and foreign and @modelName(foreign)
     record
