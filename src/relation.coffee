@@ -5,7 +5,8 @@ class Relation extends Spine.Module
   constructor: (options = {}) ->
     # add all optional properties to model
     for key, value of options
-      @[key] = if key is 'model' and typeof value is 'string' then @modelClass(value) else value
+      # make sure if it's the "model" property that it's converted from string to class
+      @[key] = if key is 'model' and typeof value is 'string' then @stringToClass(value) else value
       @polymorphic = true if key is 'as' or key is 'polymorphic'
   
   # Private
@@ -18,10 +19,10 @@ class Relation extends Spine.Module
     record[@ftype] = @polymorphic and foreign and @modelName(foreign)
     record
   
-  associatedModel: (record) ->
-    if @record[@fkey] and @polymorphic then @modelClass(@record[@ftype]) else @model
+  associatedModel: ->
+    if @record[@fkey] and @polymorphic then @stringToClass(@record[@ftype]) else @model
   
-  modelClass: (modelName) ->
+  stringToClass: (modelName) ->
     # namespace is optional for developers not using CommonJS
     modelName = @modelName(modelName) if typeof modelName isnt 'string'
     modelName = "#{@namespace}.#{modelName}" if @namespace
@@ -77,7 +78,19 @@ class Collection extends Relation
   create: (record = {}) ->
     @associate record, @record
     @model.create(record)
+  
+  #bind only to events on associated records
+  bind: (ev, callback) ->
+    callback.proxy = (record) => 
+      callback.apply(@, arguments) if @associated record
     
+    @model.bind ev, callback.proxy
+    @
+    
+  unbind: (ev, callback) ->
+    @model.unbind ev, callback.proxy
+    @
+
 class Instance extends Relation
   constructor: (options = {}) ->
     super options
