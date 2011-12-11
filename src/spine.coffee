@@ -171,8 +171,8 @@ class Model extends Module
     record = new @(atts)
     record.save(options)
 
-  @destroy: (id) ->
-    @find(id).destroy()
+  @destroy: (id, options) ->
+    @find(id).destroy(options)
 
   @change: (callbackOrParams) ->
     if typeof callbackOrParams is 'function'
