@@ -76,7 +76,11 @@ class Spine.Route extends Spine.Module
     
   # Private
   
-  @getPath: -> if window.location.pathname.substr(0,1) is '/' then window.location.pathname else '/' + window.location.pathname
+  @getPath: -> 
+    path = window.location.pathname
+    if path.substr(0,1) isnt '/' 
+      path = '/' + path
+    path
   
   @getHash: -> window.location.hash
   
