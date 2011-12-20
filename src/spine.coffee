@@ -200,6 +200,9 @@ class Model extends Module
 
   @fromForm: ->
     (new this).fromForm(arguments...)
+    
+  @guid: ->
+    guid()
 
   # Private
 
@@ -333,7 +336,7 @@ class Model extends Module
 
   create: (options) ->
     @trigger('beforeCreate', options)
-    @id          = guid() unless @id
+    @id          = @constructor.guid() unless @id
     @newRecord   = false
     records      = @constructor.records
     records[@id] = @dup(false)
