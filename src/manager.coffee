@@ -49,7 +49,7 @@ Spine.Controller.include
     @
   
   deactivate: ->
-    @el.removeClass('active');
+    @el.removeClass('active')
     @
     
 class Spine.Stack extends Spine.Controller

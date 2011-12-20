@@ -141,4 +141,17 @@ describe("Ajax", function(){
     it("should expose the defaults object", function(){
       expect(Spine.Ajax.defaults).toBeDefined();
     });
+    
+    it("should have a url function", function(){
+      expect(User.url()).toBe('/users');
+      expect(User.url('search')).toBe('/users/search');
+      
+      var user = new User({id: 1});
+      expect(user.url()).toBe('/users/1');      
+      expect(user.url('custom')).toBe('/users/1/custom');
+      
+      Spine.Model.host = 'http://example.com';
+      expect(User.url()).toBe('http://example.com/users');
+      expect(user.url()).toBe('http://example.com/users/1');
+    });
 });

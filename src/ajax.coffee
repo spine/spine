@@ -156,17 +156,20 @@ Model.host = ''
 Include =
   ajax: -> new Singleton(this)
 
-  url: ->
-    base = Ajax.getURL(@constructor)
-    base += '/' unless base.charAt(base.length - 1) is '/'
-    base += encodeURIComponent(@id)
-    base
+  url: (args...) ->
+    url = Ajax.getURL(@constructor)
+    url += '/' unless url.charAt(url.length - 1) is '/'
+    url += encodeURIComponent(@id)
+    args.unshift(url)
+    args.join('/')
     
 Extend = 
   ajax: -> new Collection(this)
 
-  url: ->
-    "#{Model.host}/#{@className.toLowerCase()}s"
+  url: (args...) ->
+    args.unshift(@className.toLowerCase() + 's')
+    args.unshift(Model.host)
+    args.join('/')
       
 Model.Ajax =
   extended: ->
