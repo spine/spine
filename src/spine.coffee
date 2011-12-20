@@ -289,7 +289,16 @@ class Model extends Module
     @
 
   dup: (newRecord) ->
-    result = new @constructor(@attributes())
+    if Object.getOwnPropertyNames(@).length == 0 # must be a clone, dup the parent
+      return Object.getPrototypeOf(@).dup(newRecord)
+
+    result  = Object.create(Object.getPrototypeOf(@), Object.getOwnPropertyDescriptors(@))
+    if newRecord is false
+      result.newRecord = @newRecord
+    else
+      delete result.newRecord
+      delete result.id
+    result
     if newRecord is false
       result.newRecord = @newRecord
     else
@@ -477,6 +486,18 @@ guid = ->
     v = if c is 'x' then r else r & 3 | 8
     v.toString 16
   .toUpperCase()
+
+getOwnPropertyDescriptors = (object) ->
+  getPropertyDescriptor = (key) ->
+    pd = Object.getOwnPropertyDescriptor(object, key)
+    returnObj[key] = pd
+
+  keys = Object.getOwnPropertyNames(object)
+  returnObj = {}
+  keys.forEach getPropertyDescriptor
+  return returnObj
+
+Object.getOwnPropertyDescriptors = getOwnPropertyDescriptors unless Object.getOwnPropertyDescriptors
 
 # Globals
 

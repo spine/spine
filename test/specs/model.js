@@ -267,6 +267,39 @@ describe("Model", function(){
     expect(File.attributes).toEqual(Asset.attributes);
   });
   
+  describe("#dup", function(){
+    it("doesn't call model's constructor more than once", function(){
+      var spy = jasmine.createSpy("fakeConstructor", function() {});
+      Asset.include({init:spy});
+
+      expect(spy.callCount).toEqual(0); 
+      var a = new Asset();
+      expect(spy.callCount).toEqual(1); 
+      a.dup();
+      expect(spy.callCount).toEqual(1); 
+    });
+
+    it("works with grand children", function() {
+      var ChildAsset = Asset.sub();
+      var asset = ChildAsset.create({name: "who's your daddy?"});
+      expect(asset.dup().__proto__).toBe(ChildAsset.prototype);
+      
+      expect(asset.name).toEqual("who's your daddy?");
+      asset.name = "I am your father";
+      expect(asset.reload().name).toBe("who's your daddy?");
+      
+      expect(asset).not.toBe(Asset.records[asset.id]);
+    });
+
+    it("dups the parent if it's a clone", function(){
+      var asset = Asset.create({name: "hotel california"});
+      var clone = asset.clone();
+      expect(Object.getPrototypeOf(clone)).not.toBe(Asset.prototype)
+      expect(Object.getPrototypeOf(asset.dup())).toBe(Asset.prototype)
+      expect(Object.getPrototypeOf(clone.dup())).toBe(Asset.prototype)
+    });
+  });
+
   it("dup should take a newRecord argument, which controls if a new record is returned", function(){
     var asset = Asset.create({name: "hotel california"});    
     expect(asset.dup().id).toBeUndefined();
