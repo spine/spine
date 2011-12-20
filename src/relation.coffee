@@ -1,4 +1,5 @@
 Spine   ?= require('spine')
+isArray = Spine.isArray
 require ?= ((value) -> eval(value))
 
 class Collection extends Spine.Module
@@ -34,17 +35,17 @@ class Collection extends Spine.Module
       @associated(rec) and cb(rec)
     
   refresh: (values) ->
-    records = @all()
+    delete @model.records[record.id] for record in @all()
+    records = @model.fromJSON(values)
+
+    records = [records] unless isArray(records)
+
     for record in records
-      delete @model.records[record.id]
-    
-    values = @model.fromJSON(values)
-    for value in values
-      value.newRecord = false
-      value[@fkey] = @record.id
-      @model.records[value.id] = value
-      
-    @model.trigger('refresh')
+      record.newRecord = false
+      record[@fkey] = @record.id
+      @model.records[record.id] = record
+
+    @model.trigger('refresh', records)
     
   create: (record) ->
     record[@fkey] = @record.id
