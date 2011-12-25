@@ -9,7 +9,7 @@ escapeRegExp = /[-[\]{}()+?.,\\^$|#\s]/g
 class Spine.Route extends Spine.Module
   @extend Spine.Events
   
-  @historySupport: "history" of window
+  @historySupport: window.history?.pushState?
   
   @routes: []
         
@@ -59,6 +59,8 @@ class Spine.Route extends Spine.Module
     return if @path is path
     @path = path
 
+    @trigger("navigate", @path)
+
     @matchRoute(@path, options) if options.trigger
 
     return if options.shim
@@ -67,14 +69,18 @@ class Spine.Route extends Spine.Module
       history.pushState(
         {}, 
         document.title, 
-        @getHost() + @path
+        @path
       )
     else
       window.location.hash = @path
     
   # Private
   
-  @getPath: -> window.location.pathname
+  @getPath: -> 
+    path = window.location.pathname
+    if path.substr(0,1) isnt '/' 
+      path = '/' + path
+    path
   
   @getHash: -> window.location.hash
   
@@ -84,7 +90,7 @@ class Spine.Route extends Spine.Module
     (document.location + "").replace(@getPath() + @getHash(), "")
     
   @change: ->
-    path = if @history then @getPath() else @getFragment()
+    path = if @getFragment() isnt "" then @getFragment() else @getPath()
     return if path is @path
     @path = path
     @matchRoute(@path)
