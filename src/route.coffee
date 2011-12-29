@@ -105,6 +105,7 @@ class Spine.Route extends Spine.Module
     @names = []
 
     if typeof path is "string"
+      namedParam.lastIndex = 0
       while (match = namedParam.exec(path)) != null
         @names.push(match[1])
         
