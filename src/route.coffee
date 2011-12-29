@@ -19,7 +19,7 @@ class Spine.Route extends Spine.Module
     shim: false
         
   @add: (path, callback) ->
-    if (typeof path is "object" and path not instanceof RegExp)
+    if (typeof path is 'object' and path not instanceof RegExp)
       @add(key, value) for key, value of path
     else
       @routes.push(new @(path, callback))
@@ -33,33 +33,33 @@ class Spine.Route extends Spine.Module
     return if @options.shim
         
     if @history 
-      $(window).bind("popstate", @change)
+      $(window).bind('popstate', @change)
     else
-      $(window).bind("hashchange", @change)
+      $(window).bind('hashchange', @change)
     @change() 
     
   @unbind: ->
     if @history
-      $(window).unbind("popstate", @change)
+      $(window).unbind('popstate', @change)
     else
-      $(window).unbind("hashchange", @change)
+      $(window).unbind('hashchange', @change)
     
   @navigate: (args...) ->
     options = {}
     
     lastArg = args[args.length - 1]
-    if typeof lastArg is "object"
+    if typeof lastArg is 'object'
       options = args.pop()
-    else if typeof lastArg is "boolean"
+    else if typeof lastArg is 'boolean'
       options.trigger = args.pop()
     
     options = $.extend({}, @options, options)
     
-    path = args.join("/")
+    path = args.join('/')
     return if @path is path
     @path = path
 
-    @trigger("navigate", @path)
+    @trigger('navigate', @path)
 
     @matchRoute(@path, options) if options.trigger
 
@@ -84,13 +84,13 @@ class Spine.Route extends Spine.Module
   
   @getHash: -> window.location.hash
   
-  @getFragment: -> @getHash().replace(hashStrip, "")
+  @getFragment: -> @getHash().replace(hashStrip, '')
   
   @getHost: ->
-    (document.location + "").replace(@getPath() + @getHash(), "")
+    (document.location + '').replace(@getPath() + @getHash(), '')
     
   @change: ->
-    path = if @getFragment() isnt "" then @getFragment() else @getPath()
+    path = if @getFragment() isnt '' then @getFragment() else @getPath()
     return if path is @path
     @path = path
     @matchRoute(@path)
@@ -98,20 +98,20 @@ class Spine.Route extends Spine.Module
   @matchRoute: (path, options) ->
     for route in @routes
       if route.match(path, options)
-        @trigger("change", route, path)
+        @trigger('change', route, path)
         return route
 
   constructor: (@path, @callback) ->
     @names = []
 
-    if typeof path is "string"
+    if typeof path is 'string'
       namedParam.lastIndex = 0
       while (match = namedParam.exec(path)) != null
         @names.push(match[1])
         
-      path = path.replace(escapeRegExp, "\\$&")
-                 .replace(namedParam, "([^\/]*)")
-                 .replace(splatParam, "(.*?)")
+      path = path.replace(escapeRegExp, '\\$&')
+                 .replace(namedParam, '([^\/]*)')
+                 .replace(splatParam, '(.*?)')
                  
       @route = new RegExp('^' + path + '$')
     else
