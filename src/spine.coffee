@@ -233,6 +233,9 @@ class Model extends Module
   validate: ->
 
   load: (atts) ->
+    @.id = atts.id
+    delete atts.id
+
     for key, value of atts
       if typeof @[key] is 'function'
         @[key](value)
