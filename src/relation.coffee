@@ -65,8 +65,11 @@ class Instance extends Spine.Module
     @record[@fkey] and @model.exists(@record[@fkey])
     
   update: (value) ->
+    unless value instanceof @model
+      value = new @model(value)
+    value.save() if value.isNew()
     @record[@fkey] = value and value.id
-
+    
 class Singleton extends Spine.Module
   constructor: (options = {}) ->
     for key, value of options
@@ -118,7 +121,7 @@ Spine.Model.extend
         name: name, model: model, 
         record: record, fkey: fkey
       )
-      
+          
     @::[name] = (value) ->
       association(@).update(value) if value?
       association(@).exists()
