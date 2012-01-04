@@ -233,7 +233,7 @@ class Model extends Module
 
   constructor: (atts) ->
     super
-    @cid = 'c' + @constructor.uid()
+    @cid = 'c-' + @constructor.uid()
     @load atts if atts
 
   isNew: () ->
