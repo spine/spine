@@ -210,9 +210,9 @@ describe("Model", function(){
     expect(asset.attributes()).toEqual({name: "Bob"});
   });
   
-  it("can generate GUID", function(){
+  it("can generate ID", function(){
     var asset = Asset.create({name: "who's in the house?"});
-    expect(asset.id.length).toEqual(36);
+    expect(asset.id).toBeTruthy();
   });
   
   it("can be duplicated", function(){
