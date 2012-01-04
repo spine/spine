@@ -91,6 +91,7 @@ class Model extends Module
   @configure: (name, attributes...) ->
     @className  = name
     @records    = {}
+    @crecords   = {}
     @attributes = attributes if attributes.length
     @attributes and= makeArray(@attributes)
     @attributes or=  []
@@ -119,15 +120,18 @@ class Model extends Module
       return false
 
   @refresh: (values, options = {}) ->
-    @records = {} if options.clear
+    if options.clear
+      @records  = {}
+      @crecords = {}
+      
     records = @fromJSON(values)
 
     records = [records] unless isArray(records)
 
     for record in records
-      record.newRecord      = false
       record.id           or= record.cid
       @records[record.id]   = record
+      
       @crecords[record.cid] = record
 
     @trigger('refresh', not options.clear and records)
@@ -229,15 +233,13 @@ class Model extends Module
 
   # Instance
 
-  newRecord: true
-
   constructor: (atts) ->
     super
-    @cid = 'c-' + @constructor.uid()
     @load atts if atts
+    @cid or= 'c-' + @constructor.uid()
 
   isNew: () ->
-    @newRecord
+    !@exists()
 
   isValid: () ->
     not @validate()
@@ -274,7 +276,7 @@ class Model extends Module
         return false
 
     @trigger('beforeSave', options)
-    record = if @newRecord then @create(options) else @update(options)
+    record = if @isNew() then @create(options) else @update(options)
     @trigger('save', options)
     record
 
@@ -306,8 +308,7 @@ class Model extends Module
   dup: (newRecord) ->
     result = new @constructor(@attributes())
     if newRecord is false
-      result.newRecord = @newRecord
-      result.cid       = @cid
+      result.cid = @cid
     else
       delete result.id
     result
@@ -316,7 +317,7 @@ class Model extends Module
     Object.create(@)
 
   reload: ->
-    return @ if @newRecord
+    return @ if @isNew()
     original = @constructor.find(@id)
     @load(original.attributes())
     original
@@ -350,11 +351,10 @@ class Model extends Module
   create: (options) ->
     @trigger('beforeCreate', options)
     @id          = @constructor.uid() unless @id
-    @newRecord   = false
     
     record       = @dup(false)
-    @constructor.records[@id]  = record
-    @constructor.crecords[@id] = record
+    @constructor.records[@id]   = record
+    @constructor.crecords[@cid] = record
     
     clone        = record.clone()
     clone.trigger('create', options)
