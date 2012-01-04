@@ -85,6 +85,7 @@ class Model extends Module
   @extend Events
 
   @records: {}
+  @crecords: {}
   @attributes: []
 
   @configure: (name, attributes...) ->
@@ -99,10 +100,18 @@ class Model extends Module
   @toString: -> "#{@className}(#{@attributes.join(", ")})"
 
   @find: (id) ->
+    if ("#{id}").match(/c-\d+/)
+      return @findCID(id)
+    
     record = @records[id]
     throw('Unknown record') unless record
     record.clone()
-
+    
+  @findCID: (cid) ->
+    record = @crecords[cid]
+    throw('Unknown record') unless record
+    record.clone()
+    
   @exists: (id) ->
     try
       return @find(id)
@@ -116,9 +125,10 @@ class Model extends Module
     records = [records] unless isArray(records)
 
     for record in records
-      record.newRecord    = false
-      record.id           or= guid()
-      @records[record.id] = record
+      record.newRecord      = false
+      record.id           or= record.cid
+      @records[record.id]   = record
+      @crecords[record.cid] = record
 
     @trigger('refresh', not options.clear and records)
     @
@@ -201,9 +211,6 @@ class Model extends Module
   @fromForm: ->
     (new this).fromForm(arguments...)
     
-  @guid: ->
-    guid()
-
   # Private
 
   @recordsValues: ->
@@ -214,6 +221,11 @@ class Model extends Module
 
   @cloneArray: (array) ->
     (value.clone() for value in array)
+    
+  @idCounter: 0
+  
+  @uid: ->
+    @idCounter++
 
   # Instance
 
@@ -221,7 +233,7 @@ class Model extends Module
 
   constructor: (atts) ->
     super
-    @ids = []
+    @cid = 'c' + @constructor.uid()
     @load atts if atts
 
   isNew: () ->
@@ -251,8 +263,8 @@ class Model extends Module
     result
 
   eql: (rec) ->
-    rec and rec.constructor is @constructor and
-      (rec.id is @id or @id in rec.ids or rec.id in @ids)
+    rec and rec.constructor is @constructor and 
+      (rec.id is @id or rec.cid is @cid)
 
   save: (options = {}) ->
     unless options.validate is false
@@ -275,7 +287,6 @@ class Model extends Module
     @save(options)
 
   changeID: (id) ->
-    @ids.push(@id)
     records = @constructor.records
     records[id] = records[@id]
     delete records[@id]
@@ -285,6 +296,7 @@ class Model extends Module
   destroy: (options = {}) ->
     @trigger('beforeDestroy', options)
     delete @constructor.records[@id]
+    delete @constructor.crecords[@cid]
     @destroyed = true
     @trigger('destroy', options)
     @trigger('change', 'destroy', options)
@@ -295,6 +307,7 @@ class Model extends Module
     result = new @constructor(@attributes())
     if newRecord is false
       result.newRecord = @newRecord
+      result.cid       = @cid
     else
       delete result.id
     result
@@ -336,11 +349,14 @@ class Model extends Module
 
   create: (options) ->
     @trigger('beforeCreate', options)
-    @id          = @constructor.guid() unless @id
+    @id          = @constructor.uid() unless @id
     @newRecord   = false
-    records      = @constructor.records
-    records[@id] = @dup(false)
-    clone        = records[@id].clone()
+    
+    record       = @dup(false)
+    @constructor.records[@id]  = record
+    @constructor.crecords[@id] = record
+    
+    clone        = record.clone()
     clone.trigger('create', options)
     clone.trigger('change', 'create', options)
     clone
@@ -473,13 +489,6 @@ isBlank = (value) ->
 
 makeArray = (args) ->
   Array.prototype.slice.call(args, 0)
-
-guid = ->
-  'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace /[xy]/g, (c) ->
-    r = Math.random() * 16 | 0
-    v = if c is 'x' then r else r & 3 | 8
-    v.toString 16
-  .toUpperCase()
 
 # Globals
 
