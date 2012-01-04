@@ -6,7 +6,7 @@ Events =
     for name in evs
       calls[name] or= []
       calls[name].push(callback)
-    @
+    this
 
   one: (ev, callback) ->
     @bind ev, ->
@@ -27,21 +27,21 @@ Events =
   unbind: (ev, callback) ->
     unless ev
       @_callbacks = {}
-      return @
+      return this
 
     list = @_callbacks?[ev]
-    return @ unless list
+    return this unless list
 
     unless callback
       delete @_callbacks[ev]
-      return @
+      return this
 
     for cb, i in list when cb is callback
       list = list.slice()
       list.splice(i, 1)
       @_callbacks[ev] = list
       break
-    @
+    this
 
 Log =
   trace: true
@@ -53,7 +53,7 @@ Log =
     return if typeof console is 'undefined'
     if @logPrefix then args.unshift(@logPrefix)
     console.log(args...)
-    @
+    this
 
 moduleKeywords = ['included', 'extended']
 
@@ -63,14 +63,14 @@ class Module
     for key, value of obj when key not in moduleKeywords
       @::[key] = value
     obj.included?.apply(@)
-    @
+    this
 
   @extend: (obj) ->
     throw('extend(obj) requires obj') unless obj
     for key, value of obj when key not in moduleKeywords
       @[key] = value
     obj.extended?.apply(@)
-    @
+    this
 
   @proxy: (func) ->
     => func.apply(@, arguments)
@@ -96,7 +96,7 @@ class Model extends Module
     @attributes and= makeArray(@attributes)
     @attributes or=  []
     @unbind()
-    @
+    this
 
   @toString: -> "#{@className}(#{@attributes.join(", ")})"
 
@@ -135,7 +135,7 @@ class Model extends Module
       @crecords[record.cid] = record
 
     @trigger('refresh', not options.clear and records)
-    @
+    this
 
   @select: (callback) ->
     result = (record for id, record of @records when callback(record))
@@ -238,10 +238,10 @@ class Model extends Module
     @load atts if atts
     @cid or= 'c-' + @constructor.uid()
 
-  isNew: () ->
-    !@exists()
+  isNew: ->
+    not @exists()
 
-  isValid: () ->
+  isValid: ->
     not @validate()
 
   validate: ->
@@ -252,11 +252,11 @@ class Model extends Module
         @[key](value)
       else
         @[key] = value
-    @
+    this
 
   attributes: ->
     result = {}
-    for key in @constructor.attributes when key of @
+    for key in @constructor.attributes when key of this
       if typeof @[key] is 'function'
         result[key] = @[key]()
       else
@@ -303,7 +303,7 @@ class Model extends Module
     @trigger('destroy', options)
     @trigger('change', 'destroy', options)
     @unbind()
-    @
+    this
 
   dup: (newRecord) ->
     result = new @constructor(@attributes())
@@ -317,7 +317,7 @@ class Model extends Module
     Object.create(@)
 
   reload: ->
-    return @ if @isNew()
+    return this if @isNew()
     original = @constructor.find(@id)
     @load(original.attributes())
     original
