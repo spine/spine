@@ -37,6 +37,6 @@ class Spine.List extends Spine.Controller
   click: (e) ->
     item = $(e.currentTarget).item()
     @trigger('change', item)
-    false
+    true
     
 module?.exports = Spine.List
