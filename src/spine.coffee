@@ -50,9 +50,8 @@ Log =
 
   log: (args...) ->
     return unless @trace
-    return if typeof console is 'undefined'
     if @logPrefix then args.unshift(@logPrefix)
-    console.log(args...)
+    console?.log?(args...)
     this
 
 moduleKeywords = ['included', 'extended']
