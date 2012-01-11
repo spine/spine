@@ -350,7 +350,7 @@ class Model extends Module
 
   create: (options) ->
     @trigger('beforeCreate', options)
-    @id          = @constructor.uid() unless @id
+    @id          = @cid unless @id
     
     record       = @dup(false)
     @constructor.records[@id]   = record
