@@ -183,6 +183,7 @@ Model.Ajax =
     @ajax().fetch(arguments...)
     
   ajaxChange: (record, type, options = {}) ->
+    return if options.ajax is false
     record.ajax()[type](options.ajax, options)
     
 Model.Ajax.Methods = 
