@@ -11,10 +11,13 @@ Ajax =
   requests: []
 
   disable: (callback) ->
-    @enabled = false
-    do callback
-    @enabled = true
-
+    if @enabled    
+      @enabled = false
+      do callback
+      @enabled = true
+    else
+      do callback
+    
   requestNext: ->
     next = @requests.shift()
     if next
