@@ -6,6 +6,7 @@ $.fn.item = ->
   item = $(@)
   item = item.data("item") or item.tmplItem?().data
   item?.reload?()
+  item
 
 $.fn.forItem = (item) ->
   @filter ->
