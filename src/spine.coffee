@@ -133,7 +133,7 @@ class Model extends Module
       
       @crecords[record.cid] = record
 
-    @trigger('refresh', not options.clear and records)
+    @trigger('refresh', not options.clear and @cloneArray(records))
     this
 
   @select: (callback) ->
