@@ -100,10 +100,9 @@ class Model extends Module
   @toString: -> "#{@className}(#{@attributes.join(", ")})"
 
   @find: (id) ->
-    if ("#{id}").match(/c-\d+/)
-      return @findCID(id)
-    
     record = @records[id]
+    if !record and ("#{id}").match(/c-\d+/)
+      return @findCID(id)
     throw('Unknown record') unless record
     record.clone()
     
@@ -124,13 +123,11 @@ class Model extends Module
       @crecords = {}
       
     records = @fromJSON(values)
-
     records = [records] unless isArray(records)
 
     for record in records
       record.id           or= record.cid
       @records[record.id]   = record
-      
       @crecords[record.cid] = record
 
     @trigger('refresh', not options.clear and @cloneArray(records))
