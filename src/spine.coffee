@@ -127,6 +127,7 @@ class Model extends Module
 
     for record in records
       record.id           or= record.cid
+      record.index        = i
       @records[record.id]   = record
       @crecords[record.cid] = record
 
