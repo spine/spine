@@ -70,15 +70,17 @@ class Collection extends Base
     ).success(@recordsResponse)
      .error(@errorResponse)
     
-  fetch: (params = {}) ->
+  fetch: (params = {}, options = {}) ->
     if id = params.id
       delete params.id
       @find(id, params).success (record) =>
-        @model.refresh(record)
+        @model.refresh(record, options)
     else
       @all(params).success (records) =>
-        @model.refresh(records)
-    
+        @model.refresh(records, options)
+
+  # Private
+
   recordsResponse: (data, status, xhr) =>
     @model.trigger('ajaxSuccess', null, status, xhr)
 
@@ -181,7 +183,9 @@ Model.Ajax =
     
     @extend Extend
     @include Include
-    
+
+  # Private
+
   ajaxFetch: ->
     @ajax().fetch(arguments...)
     
