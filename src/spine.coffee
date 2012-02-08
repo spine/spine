@@ -396,6 +396,7 @@ class Controller extends Module
     @el = $(@el)
 
     @el.addClass(@className) if @className
+    @el.attr(@attributes) if @attributes
 
     @release -> @el.remove()
 
