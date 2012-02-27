@@ -403,7 +403,7 @@ class Controller extends Module
     @events = @constructor.events unless @events
     @elements = @constructor.elements unless @elements
 
-    @delegateEvents() if @events
+    @delegateEvents(@events) if @events
     @refreshElements() if @elements
 
     super
@@ -416,8 +416,8 @@ class Controller extends Module
 
   $: (selector) -> $(selector, @el)
 
-  delegateEvents: ->
-    for key, method of @events
+  delegateEvents: (events) ->
+    for key, method of events
       unless typeof(method) is 'function'
         method = @proxy(@[method])
 
@@ -462,7 +462,7 @@ class Controller extends Module
   replace: (element) ->
     [previous, @el] = [@el, $(element.el or element)]
     previous.replaceWith(@el)
-    @delegateEvents()
+    @delegateEvents(@events)
     @refreshElements()
     @el
 
