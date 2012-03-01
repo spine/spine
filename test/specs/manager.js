@@ -1,4 +1,4 @@
-describe("Ajax", function(){
+describe("Manager", function(){
   var Users;
   var Groups;
   var users;
@@ -74,6 +74,18 @@ describe("Ajax", function(){
       users.deactivate = spy;
       groups.active(1, 2, 3);
       expect(users.deactivate).toHaveBeenCalledWith(1, 2, 3);
+    });
+    
+    it("should support redirects within activate", function() {
+      var manager = new Spine.Manager(users, groups);
+      
+      groups.deactivate = spy;
+      spyOn(users, 'activate').andReturn(false)
+      
+      manager.change(users)
+      console.log(manager.controllers)
+      
+      expect(spy).wasNotCalled()
     });
   });
 });

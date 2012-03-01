@@ -28,7 +28,8 @@ class Spine.Manager extends Spine.Module
   change: (current, args...) ->
     for cont in @controllers
       if cont is current
-        cont.activate(args...)
+        redirect = cont.activate(args...) is false
+        break if redirect
       else
         cont.deactivate(args...)
 
