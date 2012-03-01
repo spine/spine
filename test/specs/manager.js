@@ -83,8 +83,6 @@ describe("Manager", function(){
       spyOn(users, 'activate').andReturn(false)
       
       manager.change(users)
-      console.log(manager.controllers)
-      
       expect(spy).wasNotCalled()
     });
   });
