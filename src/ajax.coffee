@@ -125,6 +125,7 @@ class Singleton extends Base
       @ajax(
         params,
         type: 'DELETE'
+        data: null
         url:  Ajax.getURL(@record)
       ).success(@recordResponse(options))
        .error(@errorResponse(options))
