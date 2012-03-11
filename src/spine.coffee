@@ -224,15 +224,15 @@ class Model extends Module
 
   @idCounter: 0
 
-  @uid: ->
-    @idCounter++
+  @uid: (prefix='') ->
+    prefix + @idCounter++
 
   # Instance
 
   constructor: (atts) ->
     super
     @load atts if atts
-    @cid or= 'c-' + @constructor.uid()
+    @cid or= @constructor.uid('c-')
 
   isNew: ->
     not @exists()
