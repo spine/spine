@@ -276,8 +276,11 @@ class Model extends Module
     @trigger('save', options)
     record
 
-  updateAttribute: (name, value) ->
-    @[name] = value
+  updateAttribute: (key, value) ->
+    if typeof @[key] is 'function'
+      @[key](value)
+    else
+      @[key] = value
     @save()
 
   updateAttributes: (atts, options) ->
