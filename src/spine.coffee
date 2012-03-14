@@ -276,9 +276,9 @@ class Model extends Module
     @trigger('save', options)
     record
 
-  updateAttribute: (name, value) ->
+  updateAttribute: (name, value, options) ->
     @[name] = value
-    @save()
+    @save(options)
 
   updateAttributes: (atts, options) ->
     @load(atts)
