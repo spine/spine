@@ -24,6 +24,38 @@ describe("Ajax", function(){
   	});
   });
   
+  it("can GET a collection on fetch", function(){
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+
+    User.fetch();
+
+    expect(jQuery.ajax).toHaveBeenCalledWith({
+      type:         'GET', 
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      contentType:  'application/json', 
+      dataType:     'json', 
+      url:          '/users', 
+      processData:  false
+    });
+  });
+
+  it("can GET a record on fetch", function(){
+    User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
+
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+
+    User.fetch({id: "IDD"});
+
+    expect(jQuery.ajax).toHaveBeenCalledWith({
+      type:         'GET', 
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      contentType:  'application/json', 
+      dataType:     'json', 
+      url:          '/users/IDD', 
+      processData:  false
+    });
+  });
+  
   it("can send POST on create", function(){
     spyOn(jQuery, "ajax").andReturn(jqXHR);
     
