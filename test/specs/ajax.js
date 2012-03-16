@@ -24,6 +24,38 @@ describe("Ajax", function(){
   	});
   });
   
+  it("can GET a collection on fetch", function(){
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+
+    User.fetch();
+
+    expect(jQuery.ajax).toHaveBeenCalledWith({
+      type:         'GET', 
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      contentType:  'application/json', 
+      dataType:     'json', 
+      url:          '/users', 
+      processData:  false
+    });
+  });
+
+  it("can GET a record on fetch", function(){
+    User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
+
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+
+    User.fetch({id: "IDD"});
+
+    expect(jQuery.ajax).toHaveBeenCalledWith({
+      type:         'GET', 
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      contentType:  'application/json', 
+      dataType:     'json', 
+      url:          '/users/IDD', 
+      processData:  false
+    });
+  });
+  
   it("can send POST on create", function(){
     spyOn(jQuery, "ajax").andReturn(jqXHR);
     
@@ -136,6 +168,14 @@ describe("Ajax", function(){
       User.create({first: "Second"}, {error: spy});
       jqXHR.reject();
       expect(spy).toHaveBeenCalled();
+    });
+    
+    it("can cancel ajax on change", function() {
+      spyOn(jQuery, "ajax").andReturn(jqXHR);
+      
+      User.create({first: "Second"}, {ajax: false});
+      jqXHR.resolve();
+      expect(jQuery.ajax).not.toHaveBeenCalled();
     });
 
     it("should expose the defaults object", function(){
