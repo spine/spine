@@ -169,6 +169,14 @@ describe("Ajax", function(){
       jqXHR.reject();
       expect(spy).toHaveBeenCalled();
     });
+    
+    it("can cancel ajax on change", function() {
+      spyOn(jQuery, "ajax").andReturn(jqXHR);
+      
+      User.create({first: "Second"}, {ajax: false});
+      jqXHR.resolve();
+      expect(jQuery.ajax).not.toHaveBeenCalled();
+    });
 
     it("should expose the defaults object", function(){
       expect(Spine.Ajax.defaults).toBeDefined();
