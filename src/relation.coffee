@@ -16,6 +16,9 @@ class Collection extends Spine.Module
   last: ->
     values = @all()
     values[values.length - 1]
+  
+  count: ->
+    @all().length
     
   find: (id) ->
     records = @select (rec) =>
