@@ -194,4 +194,18 @@ describe("Ajax", function(){
       expect(User.url()).toBe('http://example.com/users');
       expect(user.url()).toBe('http://example.com/users/1');
     });
+
+    it("should refresh a tree of objects without calling back to the server", function() {
+      spyOn(jQuery, "ajax").andReturn(jqXHR);
+      var Dog = Spine.Model.setup("Dog", ["name"]);
+      Dog.extend(Spine.Model.Ajax);
+      Dog.belongsTo("user", User);
+      User.hasOne("dog", Dog);
+
+      User.refresh({"id": 1, "first":"First", "last":"Last", "dog_id": 2, "dog": {"id":2, "name":"Dog"}});
+      expect(jQuery.ajax).not.toHaveBeenCalled();
+
+      Dog.refresh({"id":3, "name":"Dog", "user":{"id": 4, "first":"First", "last":"Last", "dog_id": 3}});
+      expect(jQuery.ajax).not.toHaveBeenCalled();
+    });
 });

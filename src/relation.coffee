@@ -65,11 +65,9 @@ class Instance extends Spine.Module
     @record[@fkey] and @model.exists(@record[@fkey])
     
   update: (value) ->
-    unless value instanceof @model
-      value = new @model(value)
-    value.save() if value.isNew()
     @record[@fkey] = value and value.id
-    
+    @model.refresh(value)
+
 class Singleton extends Spine.Module
   constructor: (options = {}) ->
     for key, value of options
@@ -79,11 +77,8 @@ class Singleton extends Spine.Module
     @record.id and @model.findByAttribute(@fkey, @record.id)
 
   update: (value) ->
-    unless value instanceof @model
-      value = @model.fromJSON(value)
-    
     value[@fkey] = @record.id
-    value.save()
+    @model.refresh(value)
 
 singularize = (str) ->
   str.replace(/s$/, '')
