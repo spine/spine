@@ -22,14 +22,17 @@ class Spine.List extends Spine.Controller
     
     @children().removeClass('active')
     @children().forItem(@current).addClass('active')
-  
+
+  maybeSelectFirst: ->
+    unless @children('.active').length
+      @children(':first').click()
+    
   render: (items) ->
     @items = items if items
     @html @template(@items)
     @change @current
     if @selectFirst
-      unless @children('.active').length
-        @children(':first').click()
+      @maybeSelectFirst()
         
   children: (sel) ->
     @el.children(sel)

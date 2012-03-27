@@ -1,7 +1,7 @@
 { 
   "name": "spine", 
   "description": "MVC Framework.", 
-  "version": "1.0.6", 
+  "version": "1.0.9", 
   "author": "maccman", 
   "licenses":
     [{ 
@@ -10,7 +10,7 @@
     }], 
   "repository": { 
     "type" : "git", 
-    "url": "http://github.com/maccman/spine.git"
+    "url": "http://github.com/richtera/spine.git"
   }, 
   "main" : "./index.js"
 }

@@ -188,13 +188,13 @@ class Model extends Module
     if typeof callbackOrParams is 'function'
       @bind('change', callbackOrParams)
     else
-      @trigger('change', callbackOrParams)
+      @trigger('change', arguments...)
 
   @fetch: (callbackOrParams) ->
     if typeof callbackOrParams is 'function'
       @bind('fetch', callbackOrParams)
     else
-      @trigger('fetch', callbackOrParams)
+      @trigger('fetch', arguments...)
 
   @toJSON: ->
     @recordsValues()
@@ -248,6 +248,7 @@ class Model extends Module
         @[key](value)
       else
         @[key] = value
+    @id = @_id if @_id
     this
 
   attributes: ->
@@ -324,10 +325,21 @@ class Model extends Module
   toString: ->
     "<#{@constructor.className} (#{JSON.stringify(@)})>"
 
+  populateAt: (obj, key, value) ->
+    index = key.indexOf('.')
+    if index == -1
+      obj[key] = value
+    else
+      rem = key.substring(index + 1)
+      key = key.substring(0, index)
+      if not obj[key]
+        obj[key] = {}
+      @populateAt(obj[key], rem, value)
+  
   fromForm: (form) ->
     result = {}
     for key in $(form).serializeArray()
-      result[key.name] = key.value
+      @populateAt(result, key.name, key.value)
     @load(result)
 
   exists: ->
