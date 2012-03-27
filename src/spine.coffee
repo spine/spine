@@ -402,10 +402,10 @@ class Controller extends Module
 
     @events = @constructor.events unless @events
     @elements = @constructor.elements unless @elements
+    @controllers = []
 
     @delegateEvents(@events) if @events
     @refreshElements() if @elements
-
     super
 
   release: (callback) =>
@@ -438,22 +438,26 @@ class Controller extends Module
     setTimeout(@proxy(func), timeout || 0)
 
   html: (element) ->
+    @controllers = []
     @el.html(element.el or element)
     @refreshElements()
     @el
 
   append: (elements...) ->
+    @controllers.push(e) for e in elements when e.el
     elements = (e.el or e for e in elements)
     @el.append(elements...)
     @refreshElements()
     @el
 
   appendTo: (element) ->
+    element.controllers?.push(this) if element.el
     @el.appendTo(element.el or element)
     @refreshElements()
     @el
 
   prepend: (elements...) ->
+    @controllers.push(e) for e in elements when e.el
     elements = (e.el or e for e in elements)
     @el.prepend(elements...)
     @refreshElements()

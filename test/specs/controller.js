@@ -90,4 +90,51 @@ describe("Controller", function(){
     var users = new Users();
     expect(users.el.attr("style")).toEqual("width: 100%");
   });
+
+  it("saves controllers on append", function() {
+    AnotherController = Spine.Controller.sub()
+    var users = new Users();
+    var ac    = new AnotherController();
+    expect(users.controllers).toEqual([]);
+    users.append(ac);
+    expect(users.controllers.length).toEqual(1);
+    expect(users.controllers).toEqual([ac]);
+  });
+
+  it("saves controllers on prepend", function() {
+    AnotherController = Spine.Controller.sub()
+    var users = new Users();
+    var ac    = new AnotherController();
+    expect(users.controllers).toEqual([]);
+    users.prepend(ac);
+    expect(users.controllers.length).toEqual(1);
+    expect(users.controllers).toEqual([ac]);
+  });
+
+  it("does not save elements to controllers", function() {
+    var users = new Users();
+    expect(users.controllers).toEqual([]);
+    users.append($("<div></div>"));
+    expect(users.controllers).toEqual([]);
+  });
+
+  it("clears the controllers internal variable on an html call", function() {
+    AnotherController = Spine.Controller.sub()
+    var users = new Users();
+    var ac    = new AnotherController();
+    expect(users.controllers).toEqual([]);
+    users.append(ac);
+    expect(users.controllers).toEqual([ac]);
+    users.html("<div></div>");
+    expect(users.controllers).toEqual([]);
+  });
+
+  it("adds the controllers to the internals on an appendTo call", function() {
+    AnotherController = Spine.Controller.sub()
+    var users = new Users();
+    var ac    = new AnotherController();
+    expect(ac.controllers).toEqual([]);
+    users.appendTo(ac);
+    expect(ac.controllers).toEqual([users]);
+  });
 });
