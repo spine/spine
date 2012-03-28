@@ -13,8 +13,12 @@ Ajax =
   disable: (callback) ->
     if @enabled    
       @enabled = false
-      do callback
-      @enabled = true
+      try
+        do callback
+      catch e
+        throw e
+      finally
+        @enabled = true
     else
       do callback
     
