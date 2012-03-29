@@ -5,6 +5,7 @@ describe("Ajax", function(){
   beforeEach(function(){
     Spine.Ajax.requests = [];
     Spine.Ajax.pending  = false;
+    Spine.Model.host = '';
     
     User = Spine.Model.setup("User", ["first", "last"]);
     User.extend(Spine.Model.Ajax);
@@ -189,9 +190,31 @@ describe("Ajax", function(){
       var user = new User({id: 1});
       expect(user.url()).toBe('/users/1');      
       expect(user.url('custom')).toBe('/users/1/custom');
+    });
+    
+    describe("host", function(){
+      var Message;
       
-      Spine.Model.host = 'http://example.com';
-      expect(User.url()).toBe('http://example.com/users');
-      expect(user.url()).toBe('http://example.com/users/1');
+      beforeEach(function(){
+        Message = Spine.Model.setup("Message", ["text", "createdAt"]);
+        Message.extend(Spine.Model.Ajax);
+      });
+      
+      it("can be defined globally or for a model", function(){
+        Spine.Model.host = 'http://api.backend.com';
+        Message.host = 'http://messaging.backend.com';
+        
+        expect(User.url()).toBe('http://api.backend.com/users');
+        expect(Message.url()).toBe('http://messaging.backend.com/messages');
+      });
+      
+      it("can be a function", function(){
+        var configuration = function(service){
+          return { host: 'http://' + service + '.backend.com' };
+        };
+        
+        Message.host = function(){ return configuration('messaging').host };
+        expect(Message.url()).toBe('http://messaging.backend.com/messages');
+      });
     });
 });

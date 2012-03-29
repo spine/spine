@@ -173,8 +173,12 @@ Extend =
 
   url: (args...) ->
     args.unshift(@className.toLowerCase() + 's')
-    args.unshift(Model.host)
+    args.unshift(@modelHost())
     args.join('/')
+  
+  modelHost: ->
+    host = @host or Model.host
+    if typeof host is 'function' then host() else host
       
 Model.Ajax =
   extended: ->
