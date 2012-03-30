@@ -25,7 +25,7 @@ class Collection extends Spine.Module
 
   findAllByAttribute: (name, value) ->
     @model.select (rec) =>
-      rec[name] is value
+      @associated(rec) and rec[name] is value
 
   findByAttribute: (name, value) ->
     @findAllByAttribute(name, value)[0]
