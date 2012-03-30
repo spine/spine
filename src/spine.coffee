@@ -130,6 +130,8 @@ class Model extends Module
       @records[record.id]   = record
       @crecords[record.cid] = record
 
+    @resetIdCounter()
+
     @trigger('refresh', not options.clear and @cloneArray(records))
     this
 
@@ -224,7 +226,11 @@ class Model extends Module
 
   @idCounter: 0
 
-  @uid: (prefix='') ->
+  @resetIdCounter: ->
+    ids = (model.id for model in @all()).sort()
+    @idCounter = (ids[ids.length - 1] or -1) + 1
+
+  @uid: (prefix = '') ->
     prefix + @idCounter++
 
   # Instance

@@ -4,25 +4,26 @@ $      = Spine.$
 class Spine.List extends Spine.Controller
   events:
     'click .item': 'click'
-    
+
   selectFirst: false
-    
+
   constructor: ->
     super
     @bind 'change', @change
-    
-  template: -> arguments[0]
-  
+
+  template: ->
+    throw 'Override template'
+
   change: (item) =>
     @current = item
 
     unless @current
       @children().removeClass('active')
       return
-    
+
     @children().removeClass('active')
-    @children().forItem(@current).addClass('active')
-  
+    @children().get(@items.indexOf(@current)).addClass('active')
+
   render: (items) ->
     @items = items if items
     @html @template(@items)
@@ -30,13 +31,13 @@ class Spine.List extends Spine.Controller
     if @selectFirst
       unless @children('.active').length
         @children(':first').click()
-        
+
   children: (sel) ->
     @el.children(sel)
-    
+
   click: (e) ->
-    item = $(e.currentTarget).item()
+    item = @items[$(e.currentTarget).index()]
     @trigger('change', item)
     true
-    
+
 module?.exports = Spine.List
