@@ -45,7 +45,7 @@ class Collection extends Spine.Module
       record[@fkey] = @record.id
       @model.records[record.id] = record
 
-    @model.trigger('refresh', records)
+    @model.trigger('refresh', @model.cloneArray(records))
 
   create: (record) ->
     record[@fkey] = @record.id
