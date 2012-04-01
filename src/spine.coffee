@@ -6,7 +6,7 @@ Events =
     for name in evs
       calls[name] or= []
       calls[name].push(callback)
-    this
+    @
 
   one: (ev, callback) ->
     @bind ev, ->
@@ -27,21 +27,21 @@ Events =
   unbind: (ev, callback) ->
     unless ev
       @_callbacks = {}
-      return this
+      return @
 
     list = @_callbacks?[ev]
-    return this unless list
+    return @ unless list
 
     unless callback
       delete @_callbacks[ev]
-      return this
+      return @
 
     for cb, i in list when cb is callback
       list = list.slice()
       list.splice(i, 1)
       @_callbacks[ev] = list
       break
-    this
+    @
 
 Log =
   trace: true
@@ -52,7 +52,7 @@ Log =
     return unless @trace
     if @logPrefix then args.unshift(@logPrefix)
     console?.log?(args...)
-    this
+    @
 
 moduleKeywords = ['included', 'extended']
 
@@ -62,14 +62,14 @@ class Module
     for key, value of obj when key not in moduleKeywords
       @::[key] = value
     obj.included?.apply(@)
-    this
+    @
 
   @extend: (obj) ->
     throw('extend(obj) requires obj') unless obj
     for key, value of obj when key not in moduleKeywords
       @[key] = value
     obj.extended?.apply(@)
-    this
+    @
 
   @proxy: (func) ->
     => func.apply(@, arguments)
@@ -95,7 +95,7 @@ class Model extends Module
     @attributes and= makeArray(@attributes)
     @attributes or=  []
     @unbind()
-    this
+    @
 
   @toString: -> "#{@className}(#{@attributes.join(", ")})"
 
@@ -133,7 +133,7 @@ class Model extends Module
     @resetIdCounter()
 
     @trigger('refresh', not options.clear and @cloneArray(records))
-    this
+    @
 
   @select: (callback) ->
     result = (record for id, record of @records when callback(record))
@@ -211,7 +211,7 @@ class Model extends Module
       new @(objects)
 
   @fromForm: ->
-    (new this).fromForm(arguments...)
+    (new @).fromForm(arguments...)
 
   # Private
 
@@ -254,11 +254,11 @@ class Model extends Module
         @[key](value)
       else
         @[key] = value
-    this
+    @
 
   attributes: ->
     result = {}
-    for key in @constructor.attributes when key of this
+    for key in @constructor.attributes when key of @
       if typeof @[key] is 'function'
         result[key] = @[key]()
       else
@@ -305,7 +305,7 @@ class Model extends Module
     @trigger('destroy', options)
     @trigger('change', 'destroy', options)
     @unbind()
-    this
+    @
 
   dup: (newRecord) ->
     result = new @constructor(@attributes())
@@ -319,7 +319,7 @@ class Model extends Module
     Object.create(@)
 
   reload: ->
-    return this if @isNew()
+    return @ if @isNew()
     original = @constructor.find(@id)
     @load(original.attributes())
     original
@@ -479,7 +479,7 @@ $ = window?.jQuery or window?.Zepto or (element) -> element
 unless typeof Object.create is 'function'
   Object.create = (o) ->
     Func = ->
-    Func.prototype = o
+    Func:: = o
     new Func()
 
 isArray = (value) ->
@@ -491,7 +491,7 @@ isBlank = (value) ->
   true
 
 makeArray = (args) ->
-  Array.prototype.slice.call(args, 0)
+  Array::slice.call(args, 0)
 
 # Globals
 
@@ -517,18 +517,18 @@ Module.extend.call(Spine, Events)
 Module.create = Module.sub =
   Controller.create = Controller.sub =
     Model.sub = (instances, statics) ->
-      class result extends this
+      class result extends @
       result.include(instances) if instances
       result.extend(statics) if statics
       result.unbind?()
       result
 
 Model.setup = (name, attributes = []) ->
-  class Instance extends this
+  class Instance extends @
   Instance.configure(name, attributes...)
   Instance
 
 Module.init = Controller.init = Model.init = (a1, a2, a3, a4, a5) ->
-  new this(a1, a2, a3, a4, a5)
+  new @(a1, a2, a3, a4, a5)
 
 Spine.Class = Module

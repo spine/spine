@@ -159,7 +159,7 @@ class Singleton extends Base
 Model.host = ''
 
 Include =
-  ajax: -> new Singleton(this)
+  ajax: -> new Singleton(@)
 
   url: (args...) ->
     url = Ajax.getURL(@constructor)
@@ -169,7 +169,7 @@ Include =
     args.join('/')
     
 Extend = 
-  ajax: -> new Collection(this)
+  ajax: -> new Collection(@)
 
   url: (args...) ->
     args.unshift(@className.toLowerCase() + 's')
