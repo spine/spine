@@ -71,8 +71,8 @@ class Module
     obj.extended?.apply(@)
     this
 
-  @proxy: (func) ->
-    => func.apply(@, arguments)
+  @proxy: ->
+    @::proxy.apply(@, arguments)
 
   proxy: (func) ->
     => func.apply(@, arguments)
@@ -491,7 +491,7 @@ isBlank = (value) ->
   true
 
 makeArray = (args) ->
-  Array.prototype.slice.call(args, 0)
+  Array::slice.call(args, 0)
 
 # Globals
 
