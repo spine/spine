@@ -72,7 +72,7 @@ class Module
     this
 
   @proxy: ->
-    @::proxy.apply(@, arguments)
+    => func.apply(@, arguments)
 
   proxy: (func) ->
     => func.apply(@, arguments)
