@@ -71,7 +71,7 @@ class Module
     obj.extended?.apply(@)
     this
 
-  @proxy: ->
+  @proxy: (func) ->
     => func.apply(@, arguments)
 
   proxy: (func) ->
