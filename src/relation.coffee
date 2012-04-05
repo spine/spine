@@ -7,6 +7,16 @@ class Collection extends Spine.Module
     for key, value of options
       @[key] = value
 
+  add: (item) ->
+    if isArray(item)
+      @add i for i in item
+    else
+      item = @model.find item unless item instanceof @model
+      item.__proto__[@fkey] = @record.id
+
+  remove: (item) ->
+    delete item.__proto__[@fkey]
+        
   all: ->
     @model.select (rec) => @associated(rec)
 
@@ -56,6 +66,68 @@ class Collection extends Spine.Module
   associated: (record) ->
     record[@fkey] is @record.id
 
+class M2MCollection extends Spine.Module
+  constructor: (options={}) ->
+    for key, value of options
+      @[key] = value
+
+  add: (item) ->
+    if isArray(item)
+      @add i for i in item
+
+    else
+      item = @model.find item unless item instanceof @model
+      tmp = new @hub()
+      if @left_to_right
+        tmp["#{@rev_name}_id"] = @record.id
+        tmp["#{@name}_id"] = item.id
+
+      else
+        tmp["#{@rev_name}_id"] = item.id
+        tmp["#{@name}_id"] = @record.id
+      tmp.save()
+
+  remove: (item) ->
+    i.destroy() for i in @hub.select (item) =>
+      @associated(item)
+
+  _link: (items) ->
+    items.map (item) =>
+      if @left_to_right then return @model.find item["#{@name}_id"]
+      else return @model.find item["#{@rev_name}_id"]
+
+  all: ->
+    @_link @hub.select (item) =>
+      @associated(item)
+
+  first: ->
+    @all()[0]
+
+  last: ->
+    values = @all()
+    values[values.length -1]
+  
+  find: (id) ->
+    records = @hub.select (rec) =>
+      @associated(rec, id)
+
+    throw 'Unknown record' unless records[0]
+    @_link(records)[0]
+
+  create: (record) ->
+    @add @model.create(record)
+
+  associated: (record, id) ->
+    if @left_to_right
+      return false unless record["#{@rev_name}_id"] is @record.id
+      return record["#{@rev_name}_id"] is id if id
+      
+    else
+      return false unless record["#{@name}_id"] is @record.id
+      return record["#{@name}_id"] is id if id
+
+    true
+    
 class Instance extends Spine.Module
   constructor: (options = {}) ->
     for key, value of options
@@ -68,7 +140,7 @@ class Instance extends Spine.Module
     unless value instanceof @model
       value = new @model(value)
     value.save() if value.isNew()
-    @record[@fkey] = value and value.id
+    @record.__proto__[@fkey] = value and value.id
 
 class Singleton extends Spine.Module
   constructor: (options = {}) ->
@@ -142,3 +214,49 @@ Spine.Model.extend
     @::[name] = (value) ->
       association(@).update(value) if value?
       association(@).find()
+
+
+
+
+  foreignKey: (model, name, rev_name) ->
+    rev_name ?= @className.toLowerCase()
+    rev_name = singularize underscore rev_name
+
+    model = require(model) if typeof model is 'string'
+    name ?= model.className.toLowerCase()
+    name = singularize underscore name
+
+    @belongsTo name, model
+    model.hasMany "#{rev_name}s", @
+
+
+  manyToMany: (model, name, rev_name) ->
+    rev_name ?= @className.toLowerCase()
+    rev_name = singularize underscore rev_name
+    rev_model = @
+
+    model = require(model) if typeof model is 'string'
+    name ?= model.className.toLowerCase()
+    name = singularize underscore name
+
+    local = typeof model.loadLocal is 'function' and typeof rev_model.loadLocal is 'function'
+
+    class tmpModel extends Spine.Model
+      @configure "_#{rev_name}s_to_#{name}s", "#{@rev_name}_id", "#{@name}_id"
+      @extend Spine.Model.Local if local
+
+    tmpModel.fetch() if local
+
+    tmpModel.foreignKey rev_model, "#{rev_name}"
+    tmpModel.foreignKey model, "#{name}"
+
+
+    association = (record, model, left_to_right) ->
+      new M2MCollection {name, rev_name, record, model, hub: tmpModel, left_to_right}
+
+
+    rev_model::["#{name}s"] = (value) ->
+      association(@, model, true)
+
+    model::["#{rev_name}s"] = (value) ->
+      association(@, rev_model, false)

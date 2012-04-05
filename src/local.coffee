@@ -6,11 +6,16 @@ Spine.Model.Local =
     @fetch @loadLocal
 
   saveLocal: ->
-    result = JSON.stringify(@)
+    result = JSON.stringify(
+      records  : @
+      idCounter: @idCounter
+    )
     localStorage[@className] = result
 
   loadLocal: ->
     result = localStorage[@className]
-    @refresh(result or [], clear: true)
+    {records, idCounter} = JSON.parse(result) or {}
+    @refresh(records or [], clear: true)
+    @idCounter = idCounter or 0
 
 module?.exports = Spine.Model.Local

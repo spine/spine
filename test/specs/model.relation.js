@@ -64,4 +64,51 @@ describe("Model.Relation", function(){
     expect( album.photos().first().name ).toBe("Beautiful photo 1");
     expect( album.photos().last().name ).toBe("Beautiful photo 2");
   });
+
+  it("should be possible to setup foreignKey", function(){
+    Photo.foreignKey(Album);
+    
+    expect(Photo.attributes).toEqual(["name", "album_id"]);
+    
+    var album = Album.create({name: "First Album"});
+    var photo = Photo.create({album: album});
+    
+    expect( photo.album() ).toBeTruthy();
+    expect( photo.album().name ).toBe("First Album");
+  });
+
+  it("should be possible to add and remove child", function(){
+    Photo.foreignKey(Album);
+    
+    expect(Photo.attributes).toEqual(["name", "album_id"]);
+    
+    var album = Album.create({name: "First Album"});
+    var photo = Photo.create({name: "Photo"});
+
+    album.photos().add(photo);
+    
+    expect( photo.album() ).toBeTruthy();
+    expect( photo.album().name ).toBe("First Album");
+
+    album.photos().remove(photo);
+
+    expect( photo.album() ).toBeFalsy();
+    expect( album.photos().all().length ).toBe(0);
+  });
+
+  it("shold be possible to define and use manyToMany", function(){
+    Tag = Spine.Model.setup("Tag", ["name"]);
+    Album.manyToMany(Tag);
+
+    var tag_nature = Tag.create({ name: "nature" }),
+    tag_old        = Tag.create({ name: "old" }),
+    tag_city       = Tag.create({ name: "city" }),
+    tag_new        = Tag.create({ name: "new" }),
+    album_new_city = Album.create({ name: "new city" }),
+    album_old_city = Album.create({ name: "old city" }),
+    album_
+
+    throw 'erroringing!!';
+
+  })
 });
