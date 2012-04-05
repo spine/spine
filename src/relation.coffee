@@ -1,6 +1,6 @@
 Spine   = @Spine or require('spine')
 isArray = Spine.isArray
-require = ((value) -> eval(value)) unless require?
+require = @require or ((value) -> eval(value))
 
 class Collection extends Spine.Module
   constructor: (options = {}) ->
@@ -25,7 +25,7 @@ class Collection extends Spine.Module
 
   findAllByAttribute: (name, value) ->
     @model.select (rec) =>
-      rec[name] is value
+      @associated(rec) and rec[name] is value
 
   findByAttribute: (name, value) ->
     @findAllByAttribute(name, value)[0]
@@ -45,7 +45,7 @@ class Collection extends Spine.Module
       record[@fkey] = @record.id
       @model.records[record.id] = record
 
-    @model.trigger('refresh', records)
+    @model.trigger('refresh', @model.cloneArray(records))
 
   create: (record) ->
     record[@fkey] = @record.id

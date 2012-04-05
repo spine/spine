@@ -57,4 +57,15 @@ describe("Class", function(){
     expect(function(){ User.include(); }).toThrow();
     expect(function(){ User.extend(); }).toThrow();
   });
+
+  it("can proxy functions in class/instance context", function(){
+    var func = function(){
+      return this;
+    };
+
+    expect(User.proxy(func)()).toBe(User);
+
+    var user = new User();
+    expect(user.proxy(func)()).toBe(user);
+  });
 });
