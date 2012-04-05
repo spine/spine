@@ -227,11 +227,14 @@ class Model extends Module
   @idCounter: 0
 
   @resetIdCounter: ->
-    ids = (model.id for model in @all()).sort()
-    @idCounter = (ids[ids.length - 1] or -1) + 1
+    ids = (
+      for model in @all()
+        model.id[@prefix.length ..] * 1
+    ).sort((x, y) -> x - y)
+    @idCounter = (ids[ids.length - 1] or - 1) + 1
 
-  @uid: (prefix = '') ->
-    prefix + @idCounter++
+  @uid: (@prefix = '') ->
+    @prefix + @idCounter++
 
   # Instance
 
