@@ -22,7 +22,7 @@ class Spine.List extends Spine.Controller
       return
 
     @children().removeClass('active')
-    @children().get(@items.indexOf(@current)).addClass('active')
+    $(@children().get(@items.indexOf(@current))).addClass('active')
 
   render: (items) ->
     @items = items if items
