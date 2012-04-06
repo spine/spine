@@ -64,7 +64,7 @@ class Spine.Stack extends Spine.Controller
     @manager = new Spine.Manager
 
     for key, value of @controllers
-      @[key] = new value(stack: @)
+      @[key] = new value(stack: @, el: $ '#'+key)
       @add(@[key])
 
     for key, value of @routes
@@ -78,5 +78,5 @@ class Spine.Stack extends Spine.Controller
   add: (controller) ->
     @manager.add(controller)
     @append(controller)
-
+    
 module?.exports = Spine.Manager

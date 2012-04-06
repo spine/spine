@@ -7,6 +7,29 @@ describe("Model.Relation", function(){
     Photo = Spine.Model.setup("Photo", ["name"]);
   });
 
+  it("should honour manyToMany associations", function(){
+    var Viewer = Spine.Model.setup("Viewer", ["name"]);
+    Album.manyToMany("viewers", Viewer);
+
+    var album = Album.create();
+    var album2 = Album.create();
+        
+    expect( album.viewers() ).toBeTruthy();
+    expect( album2.viewers() ).toBeTruthy();
+    expect( album.viewers().all() ).toEqual([]);
+    expect( album2.viewers().all() ).toEqual([]);
+
+    album.viewers().create({name: "First Friend"});
+    album2.viewers().add(album.viewers().first());
+
+    expect( album.viewers() ).toBeTruthy();
+    expect( album2.viewers() ).toBeTruthy();
+    expect( album.viewers().first().id ).toBe( album2.viewers().first().id );
+    expect( album.viewers().all().length ).toEqual(1);
+    expect( album2.viewers().all().length ).toEqual(1);
+
+  }); 
+  
   it("should honour hasMany associations", function(){
     Album.hasMany("photos", Photo);
     Photo.belongsTo("album", Album);
@@ -35,6 +58,7 @@ describe("Model.Relation", function(){
     expect( photo.album() ).toBeTruthy();
     expect( photo.album().name ).toBe("First Album");
   });
+});
 
   it("should load nested Singleton record", function(){
     Album.hasOne("photo", Photo);
@@ -65,3 +89,4 @@ describe("Model.Relation", function(){
     expect( album.photos().last().name ).toBe("Beautiful photo 2");
   });
 });
+>>>>>>> 956f192037fefa57a280b910477f7f4d6d3e792f

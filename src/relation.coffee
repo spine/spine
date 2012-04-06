@@ -85,6 +85,55 @@ class Singleton extends Spine.Module
     value[@fkey] = @record.id
     value.save()
 
+class ManyToMany extends Spine.Module
+  constructor: (options = {}) ->
+    for key, value of options
+      @[key] = value
+    @record[@fkey] ?= []
+  
+  add: (mod) ->
+    @record[@fkey].push mod.id
+    @record.update()
+  
+  remove: (mod) ->
+    r=@record
+    r[@fkey][t..t] = [] if (t = r[@fkey].indexOf(mod.id)) > -1
+    r.update()
+
+  all: ->
+    (@model.find(id) for id in @record[@fkey])
+    
+  first: ->
+    @all()[0]
+    
+  last: ->
+    values = @all()
+    values[values.length - 1]
+    
+  find: (id) ->
+    records = @model.select (rec) =>
+      @associated(rec) and rec.id is id
+    throw('Unknown record') unless records[0]
+    records[0]
+    
+  select: (cb) ->
+    @model.select (rec) =>
+      @associated(rec) and cb(rec)
+    
+  refresh: (values) ->
+    @record[@fkey] = (value.id for value in values) 
+    @model.trigger('refresh')
+    
+  create: (record) ->
+    mod = @model.create(record)
+    @add mod
+    mod
+    
+  # Private
+  
+  associated: (record) ->
+    record.id in @record[@fkey]
+
 singularize = (str) ->
   str.replace(/s$/, '')
 
@@ -142,3 +191,18 @@ Spine.Model.extend
     @::[name] = (value) ->
       association(@).update(value) if value?
       association(@).find()
+
+  manyToMany: (name, model, fkey) ->
+    fkey ?= "#{singularize(name)}_ids"
+    association = (record) -> 
+      model = eval(model) if typeof model is 'string'
+      
+      new ManyToMany 
+        name: name, model: model, 
+        record: record, fkey: fkey
+    
+    @attributes.push(fkey)
+    @::[name] = (value) ->
+      association(@).refresh(value) if value?
+      association(@)
+
