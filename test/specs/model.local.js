@@ -23,4 +23,13 @@ describe("Model.Local", function(){
     User.refresh([{name: "Bob", id: "b"}]);
     expect(User.idCounter).toEqual(0);
   });
+
+  it("should work with cIDs", function(){
+    User.refresh([
+      {name: "Bob", id: "c-1"},
+      {name: "Bob", id: "c-3"},
+      {name: "Bob", id: "c-2"}
+    ]);
+    expect(User.idCounter).toEqual(4);
+  });
 });
