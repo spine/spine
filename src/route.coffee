@@ -108,7 +108,11 @@ class Spine.Route extends Spine.Module
       namedParam.lastIndex = 0
       while (match = namedParam.exec(path)) != null
         @names.push(match[1])
-        
+
+      splatParam.lastIndex = 0
+      while (match = splatParam.exec(path)) != null
+        @names.push(match[1])
+  
       path = path.replace(escapeRegExp, '\\$&')
                  .replace(namedParam, '([^\/]*)')
                  .replace(splatParam, '(.*?)')
