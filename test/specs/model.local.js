@@ -32,4 +32,9 @@ describe("Model.Local", function(){
     ]);
     expect(User.idCounter).toEqual(4);
   });
+
+  it("should work with a blank refresh", function(){
+    User.refresh([]);
+    expect(User.idCounter).toEqual(0);
+  });
 });

@@ -229,7 +229,7 @@ class Model extends Module
   @resetIdCounter: ->
     ids        = (model.id for model in @all()).sort((a, b) -> a > b)
     lastID     = ids[ids.length - 1]
-    lastID     = lastID.replace?(/^c-/, '') or lastID
+    lastID     = lastID?.replace?(/^c-/, '') or lastID
     lastID     = parseInt(lastID, 10)
     @idCounter = (lastID + 1) or 0
 
