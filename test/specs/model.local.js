@@ -18,4 +18,9 @@ describe("Model.Local", function(){
     User.refresh([{name: "Bob", id: 1}]);
     expect(User.idCounter).toEqual(2);
   });
+
+  it("should work with non string IDs", function(){
+    User.refresh([{name: "Bob", id: "b"}]);
+    expect(User.idCounter).toEqual(0);
+  });
 });

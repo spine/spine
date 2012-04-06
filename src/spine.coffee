@@ -227,8 +227,8 @@ class Model extends Module
   @idCounter: 0
 
   @resetIdCounter: ->
-    ids = (model.id for model in @all()).sort()
-    @idCounter = (ids[ids.length - 1] or -1) + 1
+    ids        = (model.id for model in @all()).sort((a, b) -> a > b)
+    @idCounter = (parseInt(ids[ids.length - 1], 10) or -1) + 1
 
   @uid: (prefix = '') ->
     prefix + @idCounter++
