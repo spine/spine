@@ -411,6 +411,14 @@ describe("Model", function(){
       asset.updateAttributes({name: "lonely heart.png"});
     });
 
+    it("should pass refreshed records with refresh event", function(){
+      Asset.bind("refresh", function(assets){
+        expect(assets[0].name).toBe("cartoon world.png")
+      });
+
+      Asset.refresh([{name: "cartoon world.png"}]);
+    });
+
     it("should be able to unbind instance events", function(){
       var asset = Asset.create({name: "cartoon world.png"});
 
