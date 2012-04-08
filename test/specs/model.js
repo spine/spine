@@ -10,6 +10,34 @@ describe("Model", function(){
     expect(Asset.first()).toEqual(asset);
   });
 
+  it("creates record with ids in right order", function(){
+    expect(Asset.create().id).toEqual("c-0");
+    expect(Asset.create().id).toEqual("c-1");
+
+    var asset = new Asset()
+    asset.save()
+    expect(asset.id).toEqual("c-2");
+  });
+
+  it("can create records with custom prefix different for models", function(){
+    Asset.prefix = "x-";
+    expect(Asset.create().id).toEqual("x-0");
+
+    var Asset2 = Spine.Model.setup("Asset2");
+    Asset2.prefix = "y-";
+    expect(Asset2.create().id).toEqual("y-0");
+  });
+
+  it("can find records with custom prefix", function(){
+    Asset.prefix = "x-";
+
+    var asset = Asset.create({name: "something"});
+    expect(Asset.find("x-0").name).toEqual("something");
+
+    asset.changeID("yz");
+    expect(Asset.find("x-0")).toEqual(asset);
+  });
+
   it("can update records", function(){
     var asset = Asset.create({name: "test.pdf"});
 

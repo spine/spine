@@ -101,7 +101,7 @@ class Model extends Module
 
   @find: (id) ->
     record = @records[id]
-    if !record and ("#{id}").match(/c-\d+/)
+    if !record and ("#{id}").match(new RegExp("^#{@prefix}\\d+"))
       return @findCID(id)
     throw('Unknown record') unless record
     record.clone()
@@ -226,22 +226,24 @@ class Model extends Module
 
   @idCounter: 0
 
+  @prefix: 'c-'
+
   @resetIdCounter: ->
     ids        = (model.id for model in @all()).sort((a, b) -> a > b)
     lastID     = ids[ids.length - 1]
-    lastID     = lastID?.replace?(/^c-/, '') or lastID
+    lastID     = lastID?.replace?(new RegExp("^#{@prefix}"), '') or lastID
     lastID     = parseInt(lastID, 10)
     @idCounter = (lastID + 1) or 0
 
-  @uid: (prefix = '') ->
-    prefix + @idCounter++
+  @uid: ->
+    @prefix + @idCounter++
 
   # Instance
 
   constructor: (atts) ->
     super
     @load atts if atts
-    @cid or= @constructor.uid('c-')
+    @cid or= @id or @constructor.uid()
 
   isNew: ->
     not @exists()
