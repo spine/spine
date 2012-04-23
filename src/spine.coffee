@@ -379,7 +379,7 @@ class Model extends Module
   one: (events, callback) ->
     binder = @bind events, =>
       @constructor.unbind(events, binder)
-      callback.apply(@)
+      callback.apply(@, arguments)
 
   trigger: (args...) ->
     args.splice(1, 0, @)
