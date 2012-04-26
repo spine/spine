@@ -227,8 +227,11 @@ class Model extends Module
   @idCounter: 0
 
   @resetIdCounter: ->
-    ids = (model.id for model in @all()).sort()
-    @idCounter = (ids[ids.length - 1] or -1) + 1
+    ids        = (model.id for model in @all()).sort((a, b) -> a > b)
+    lastID     = ids[ids.length - 1]
+    lastID     = lastID?.replace?(/^c-/, '') or lastID
+    lastID     = parseInt(lastID, 10)
+    @idCounter = (lastID + 1) or 0
 
   @uid: (prefix = '') ->
     prefix + @idCounter++
@@ -376,7 +379,7 @@ class Model extends Module
   one: (events, callback) ->
     binder = @bind events, =>
       @constructor.unbind(events, binder)
-      callback.apply(@)
+      callback.apply(@, arguments)
 
   trigger: (args...) ->
     args.splice(1, 0, @)
@@ -404,8 +407,6 @@ class Controller extends Module
     @el.addClass(@className) if @className
     @el.attr(@attributes) if @attributes
 
-    @release -> @el.remove()
-
     @events = @constructor.events unless @events
     @elements = @constructor.elements unless @elements
 
@@ -414,11 +415,9 @@ class Controller extends Module
 
     super
 
-  release: (callback) =>
-    if typeof callback is 'function'
-      @bind 'release', callback
-    else
-      @trigger 'release'
+  release: =>
+    @el.remove()
+    @unbind()
 
   $: (selector) -> $(selector, @el)
 
@@ -491,7 +490,7 @@ isBlank = (value) ->
   true
 
 makeArray = (args) ->
-  Array.prototype.slice.call(args, 0)
+  Array::slice.call(args, 0)
 
 # Globals
 

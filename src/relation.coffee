@@ -1,6 +1,6 @@
 Spine   = @Spine or require('spine')
 isArray = Spine.isArray
-require = ((value) -> eval(value)) unless require?
+require = @require or ((value) -> eval(value))
 
 class Collection extends Spine.Module
   constructor: (options = {}) ->

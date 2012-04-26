@@ -390,7 +390,20 @@ describe("Model", function(){
       var asset = new Asset({name: "cartoon world.png"});
       asset.save();
 
-      expect(spy).toHaveBeenCalled();
+      expect(spy).toHaveBeenCalledWith(asset, {});
+      spy.reset();
+
+      asset.save();
+      expect(spy).not.toHaveBeenCalled();
+    });
+    
+    it("should be able to bind once on instance", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+
+      asset.one("save", spy);
+      asset.save();
+
+      expect(spy).toHaveBeenCalledWith(asset, {});
       spy.reset();
 
       asset.save();
