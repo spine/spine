@@ -97,6 +97,16 @@ class Model extends Module
     @unbind()
     this
 
+  @deserialize: (deserializers) ->
+    @deserializers or= {}
+    for keys, deserializer of deserializers
+      @deserializers[key] = deserializer for key in keys.split(/\s+/)
+  
+  @serialize: (serializers) ->
+    @serializers or= {}
+    for keys, serializer of serializers
+      @serializers[key] = serializer for key in keys.split(/\s+/)
+  
   @toString: -> "#{@className}(#{@attributes.join(", ")})"
 
   @find: (id) ->
@@ -254,21 +264,27 @@ class Model extends Module
   load: (atts) ->
     for key, value of atts
       if typeof @[key] is 'function'
-        @[key](value)
+        @[key](@deserialize(key, value))
       else
-        @[key] = value
+        @[key] = @deserialize(key, value)
     this
-
+  
   attributes: ->
     result = {}
     for key in @constructor.attributes when key of this
       if typeof @[key] is 'function'
-        result[key] = @[key]()
+        result[key] = @serialize(key, @[key]())
       else
-        result[key] = @[key]
+        result[key] = @serialize(key, @[key])
     result.id = @id if @id
     result
 
+  deserialize: (key, value) ->
+    if @constructor.deserializers?[key] then @constructor.deserializers[key](value) else value
+  
+  serialize: (key, value) ->
+    if @constructor.serializers?[key] then @constructor.serializers[key](value) else value
+  
   eql: (rec) ->
     !!(rec and rec.constructor is @constructor and
         (rec.cid is @cid) or (rec.id and rec.id is @id))
