@@ -423,8 +423,12 @@ class Controller extends Module
 
   delegateEvents: (events) ->
     for key, method of events
+
       unless typeof(method) is 'function'
-        method = @proxy(@[method])
+        # Always return true from event handlers
+        method = do (method) => =>
+          @[method].apply(this, arguments)
+          true
 
       match      = key.match(@eventSplitter)
       eventName  = match[1]
