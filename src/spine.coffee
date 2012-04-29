@@ -169,12 +169,10 @@ class Model extends Module
     @recordsValues().length
 
   @deleteAll: ->
-    for key, value of @records
-      delete @records[key]
+    record.delete() for id, record of @records
 
   @destroyAll: ->
-    for key, value of @records
-      @records[key].destroy()
+    record.destroy() for id, record of @records
 
   @update: (id, atts, options) ->
     @find(id).updateAttributes(atts, options)
@@ -296,14 +294,13 @@ class Model extends Module
   changeID: (id) ->
     records = @constructor.records
     records[id] = records[@id]
-    delete records[@id]
+    records[@id].delete()
     @id = id
     @save()
 
   destroy: (options = {}) ->
     @trigger('beforeDestroy', options)
-    delete @constructor.records[@id]
-    delete @constructor.crecords[@cid]
+    @delete()
     @destroyed = true
     @trigger('destroy', options)
     @trigger('change', 'destroy', options)
@@ -343,6 +340,10 @@ class Model extends Module
     @id && @id of @constructor.records
 
   # Private
+
+  delete: ->
+    delete @constructor.records[@id] if @id
+    delete @constructor.crecords[@cid]
 
   update: (options) ->
     @trigger('beforeUpdate', options)

@@ -35,9 +35,9 @@ class Collection extends Spine.Module
       @associated(rec) and cb(rec)
 
   refresh: (values) ->
-    delete @model.records[record.id] for record in @all()
+    record.delete() for record in @all()
+    
     records = @model.fromJSON(values)
-
     records = [records] unless isArray(records)
 
     for record in records
