@@ -132,7 +132,7 @@ class Model extends Module
 
     @resetIdCounter()
 
-    @trigger('refresh', not options.clear and @cloneArray(records))
+    @trigger('refresh', @cloneArray(records))
     this
 
   @select: (callback) ->
