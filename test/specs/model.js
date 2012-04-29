@@ -10,6 +10,12 @@ describe("Model", function(){
     expect(Asset.first()).toEqual(asset);
   });
 
+  it("can create multiple records", function(){
+    var asset_list = [{name: "test.pdf"}, {name: "test1.pdf"}, {name: "test3.pdf"}],
+    asset = Asset.create(asset_list);
+    expect(Asset.count()).toEqual(3);
+  });
+
   it("can update records", function(){
     var asset = Asset.create({name: "test.pdf"});
 

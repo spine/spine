@@ -180,8 +180,10 @@ class Model extends Module
     @find(id).updateAttributes(atts, options)
 
   @create: (atts, options) ->
-    record = new @(atts)
-    record.save(options)
+    atts = if isArray(atts) then atts.slice() else [atts]
+    for att in atts
+      record = new @(att)
+      record.save(options)
 
   @destroy: (id, options) ->
     @find(id).destroy(options)
