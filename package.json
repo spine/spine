@@ -12,5 +12,16 @@
     "type" : "git", 
     "url": "http://github.com/maccman/spine.git"
   }, 
-  "main" : "./index.js"
+  "main" : "./index.js",
+  "devDependencies": {
+    "coffee-script": "1.2.x",
+    "mocha": "1.0.x",
+    "should": "0.6.x",
+    "sinon": "1.3.x",
+    "jQuery": "latest",
+    "zombie": "latest"
+  },
+  "scripts": {
+    "test": "mocha"
+  }
 }
