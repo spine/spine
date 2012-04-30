@@ -319,7 +319,7 @@ class Model extends Module
     result
 
   clone: ->
-    Object.create(@)
+    createObject(@)
 
   reload: ->
     return this if @isNew()
@@ -479,11 +479,10 @@ class Controller extends Module
 
 $ = window?.jQuery or window?.Zepto or (element) -> element
 
-unless typeof Object.create is 'function'
-  Object.create = (o) ->
-    Func = ->
-    Func.prototype = o
-    new Func()
+createObject = Object.create or (o) ->
+  Func = ->
+  Func.prototype = o
+  new Func()
 
 isArray = (value) ->
   Object::toString.call(value) is '[object Array]'
