@@ -6,6 +6,6 @@ Spine is opinionated in its approach to web application architecture and design.
 
 The library is written in [CoffeeScript](http://jashkenas.github.com/coffee-script), but doesn't necessarily require CoffeeScript to develop applications - you can use whichever language you're most familiar with.
 
-Spine is tiny, the library comes in at around 500 lines of CoffeeScript, that's about 2K minified & compressed. Being lightweight and simple is fundamental to Spine.
+Spine is tiny, the library comes in at around 500 lines of CoffeeScript. Being lightweight and simple is fundamental to Spine.
 
 For documentation, usage, and examples, see: [spinejs.com](http://spinejs.com)
