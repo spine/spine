@@ -1,4 +1,5 @@
-Spine  = (global or window).Spine or require('spine')
+Spine  = do -> @Spine ? require('spine')
+localStorage = do -> @localStorage
 
 Spine.Model.Local =
   extended: ->

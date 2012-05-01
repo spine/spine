@@ -1,5 +1,7 @@
-Spine  = (global or window).Spine or require('spine')
-$     = Spine.$
+Spine    = do -> @Spine ? require('spine')
+$        = Spine.$
+window   = do -> @window
+document = do -> @document
 
 hashStrip    = /^#*/
 namedParam   = /:([\w\d]+)/g

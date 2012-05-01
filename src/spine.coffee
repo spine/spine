@@ -388,6 +388,8 @@ class Model extends Module
   unbind: ->
     @trigger('unbind')
 
+document = do -> @document
+
 class Controller extends Module
   @include Events
   @include Log
@@ -478,7 +480,7 @@ class Controller extends Module
 
 # Utilities & Shims
 
-$ = window?.jQuery or window?.Zepto or (element) -> element
+$ = (do -> @$) or ((element) -> element)
 
 createObject = Object.create or (o) ->
   Func = ->

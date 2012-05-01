@@ -1,4 +1,4 @@
-Spine  = (global or window).Spine or require('spine')
+Spine  = do -> @Spine ? require('spine')
 $      = Spine.$
 
 class Spine.Manager extends Spine.Module

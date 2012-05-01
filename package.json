@@ -1,17 +1,17 @@
-{ 
-  "name": "spine", 
-  "description": "MVC Framework.", 
-  "version": "1.0.6", 
-  "author": "maccman", 
+{
+  "name": "spine",
+  "description": "MVC Framework.",
+  "version": "1.0.6",
+  "author": "maccman",
   "licenses":
-    [{ 
-      "type": "MIT", 
+    [{
+      "type": "MIT",
       "url": "https://github.com/maccman/spine/blob/master/LICENSE"
-    }], 
-  "repository": { 
-    "type" : "git", 
+    }],
+  "repository": {
+    "type" : "git",
     "url": "http://github.com/maccman/spine.git"
-  }, 
+  },
   "main" : "./index.js",
   "devDependencies": {
     "coffee-script": "1.2.x",
@@ -22,6 +22,6 @@
     "zombie": "latest"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "DOLLAR=jQuery mocha"
   }
 }

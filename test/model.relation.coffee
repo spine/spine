@@ -3,25 +3,26 @@ sinon  = require 'sinon'
 zombie = require 'zombie'
 
 describe "Model.Relation", ->
-  $ = jQuery = undefined
+  $ = undefined
 
   before (done) ->
     browser = new zombie.Browser()
 
     browser.visit("file://localhost#{__dirname}/index.html", ->
-      global.document      ?= browser.document
-      global.window        ?= browser.window
-      global.window.jQuery ?= require('jQuery').create(window)
+      global.document = browser.document
+      global.window   = browser.window
+      global.$        = require(process.env.DOLLAR).create(window)
+      global.Spine    = require '../src/spine'
 
-      global.Spine ?= require '../src/spine'
       require '../src/relation'
-      $ = jQuery = Spine.$
+
+      $ = Spine.$
 
       done()
     )
 
   after ->
-    delete global[key] for key in ['document', 'window', 'Spine']
+    delete global[key] for key in ['document', 'window', '$', 'Spine']
 
   Album = undefined
   Photo = undefined

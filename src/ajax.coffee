@@ -1,4 +1,4 @@
-Spine  = (global or window).Spine or require('spine')
+Spine  = do -> @Spine ? require('spine')
 $      = Spine.$
 Model  = Spine.Model
 

@@ -3,26 +3,27 @@ sinon  = require 'sinon'
 zombie = require 'zombie'
 
 describe "Model.Local", ->
-  $ = jQuery = undefined
+  $ = undefined
 
   before (done) ->
     browser = new zombie.Browser()
 
     browser.visit("file://localhost#{__dirname}/index.html", ->
-      global.document      ?= browser.document
-      global.window        ?= browser.window
-      global.window.jQuery ?= require('jQuery').create(window)
-      global.localStorage  ?= browser.localStorage('test')
+      global.document      = browser.document
+      global.window        = browser.window
+      global.$             = require(process.env.DOLLAR).create(window)
+      global.localStorage  = browser.localStorage('test')
+      global.Spine         = require '../src/spine'
 
-      global.Spine ?= require '../src/spine'
       require '../src/local'
-      $ = jQuery = Spine.$
+
+      $ = Spine.$
 
       done()
     )
 
   after ->
-    delete global[key] for key in ['document', 'window', 'localStorage', 'Spine']
+    delete global[key] for key in ['document', 'window', '$', 'localStorage', 'Spine']
 
   User = undefined
 
