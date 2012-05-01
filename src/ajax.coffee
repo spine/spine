@@ -176,7 +176,7 @@ Extend =
   ajax: -> new Collection(this)
 
   url: (args...) ->
-    args.unshift(@className.toLowerCase() + 's')
+    args.unshift(@className.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase() + 's')
     args.unshift(Model.host)
     args.join('/')
 
