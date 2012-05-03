@@ -417,8 +417,8 @@ class Controller extends Module
 
   release: =>
     @el.remove()
-    @unbind()
     @trigger 'release'
+    @unbind()
 
   $: (selector) -> $(selector, @el)
 

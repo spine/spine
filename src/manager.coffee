@@ -1,4 +1,4 @@
-Spine  = @Spine or require('spine')
+Spine  = do -> @Spine or require('spine')
 $      = Spine.$
 
 class Spine.Manager extends Spine.Module
