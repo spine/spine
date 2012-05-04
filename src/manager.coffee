@@ -80,3 +80,4 @@ class Spine.Stack extends Spine.Controller
     @append(controller)
 
 module?.exports = Spine.Manager
+module?.exports.Stack = Spine.Stack
