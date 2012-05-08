@@ -425,8 +425,12 @@ class Controller extends Module
   delegateEvents: (events) ->
     for key, method of events
 
-      unless typeof(method) is 'function'
+      if typeof(method) is 'function'
         # Always return true from event handlers
+        method = do (method) => =>
+          method.apply(this, arguments)
+          true
+      else
         method = do (method) => =>
           @[method].apply(this, arguments)
           true
