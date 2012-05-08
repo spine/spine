@@ -430,6 +430,10 @@ class Controller extends Module
         method = do (method) => =>
           @[method].apply(this, arguments)
           true
+      else
+        method = do (method) => =>
+          method.apply(this, arguments)
+          true
 
       match      = key.match(@eventSplitter)
       eventName  = match[1]
