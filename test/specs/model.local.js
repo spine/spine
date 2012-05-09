@@ -30,7 +30,7 @@ describe("Model.Local", function(){
       {name: "Bob", id: "c-3"},
       {name: "Bob", id: "c-2"}
     ]);
-    expect(User.idCounter).toEqual(4);
+    expect(User.idCounter).toEqual(3);
   });
 
   it("should work with a blank refresh", function(){
