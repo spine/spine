@@ -317,6 +317,12 @@ describe("Model", function(){
       expect(spy).toHaveBeenCalledWith(asset2);
     });
 
+    it("can fire initialize events", function(){
+      Asset.bind("initialize", spy);
+      var asset = new Asset({name: "cartoon world.png"});
+      expect(spy).toHaveBeenCalledWith(asset, {name: "cartoon world.png"});
+    });
+
     it("can fire create events", function(){
       Asset.bind("create", spy);
       var asset = Asset.create({name: "cartoon world.png"});

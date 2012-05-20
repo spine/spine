@@ -242,6 +242,7 @@ class Model extends Module
     super
     @load atts if atts
     @cid or= @constructor.uid('c-')
+    @trigger('initialize', atts)
 
   isNew: ->
     not @exists()
