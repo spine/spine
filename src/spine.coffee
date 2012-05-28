@@ -130,8 +130,6 @@ class Model extends Module
       @records[record.id]   = record
       @crecords[record.cid] = record
 
-    @resetIdCounter()
-
     @trigger('refresh', @cloneArray(records))
     this
 
@@ -226,14 +224,6 @@ class Model extends Module
 
   @idCounter: 0
 
-  @resetIdCounter: ->
-    parseCID = (cid) ->
-      cid     = cid?.replace?(/^c-/, '') or cid
-      parseInt(cid, 10)
-    ids        = (parseCID(model.cid) for model in @all()).sort((a, b) -> a > b)
-    lastID     = ids[ids.length - 1]
-    @idCounter = (lastID + 1) or 0
-
   @uid: (prefix = '') ->
     prefix + @idCounter++
 
@@ -242,7 +232,7 @@ class Model extends Module
   constructor: (atts) ->
     super
     @load atts if atts
-    @cid or= @constructor.uid('c-')
+    @cid = @constructor.uid('c-')
 
   isNew: ->
     not @exists()
