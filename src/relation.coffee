@@ -34,10 +34,12 @@ class Collection extends Spine.Module
     @model.select (rec) =>
       @associated(rec) and cb(rec)
 
-  refresh: (values) ->
-    delete @model.records[record.id] for record in @all()
-    records = @model.fromJSON(values)
+  refresh: (values, options = {}) ->
+    if options.clear
+      delete @model.records[record.id] for record in @all()
+      delete @model.crecords[record.cid] for record in @all()
 
+    records = @model.fromJSON(values)
     records = [records] unless isArray(records)
 
     for record in records
@@ -47,9 +49,9 @@ class Collection extends Spine.Module
 
     @model.trigger('refresh', @model.cloneArray(records))
 
-  create: (record) ->
+  create: (record, options = {}) ->
     record[@fkey] = @record.id
-    @model.create(record)
+    @model.create(record, options)
 
   # Private
 
