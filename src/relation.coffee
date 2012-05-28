@@ -10,6 +10,12 @@ class Collection extends Spine.Module
   all: ->
     @model.select (rec) => @associated(rec)
 
+  count: ->
+    @all().length
+
+  empty: ->
+    @count() == 0
+
   first: ->
     @all()[0]
 

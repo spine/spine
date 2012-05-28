@@ -64,4 +64,36 @@ describe("Model.Relation", function(){
     expect( album.photos().first().name ).toBe("Beautiful photo 1");
     expect( album.photos().last().name ).toBe("Beautiful photo 2");
   });
+
+  it("should know the Collection's count", function(){
+    Album.destroyAll();
+    Photo.destroyAll();
+    
+    Album.hasMany("photos", Photo);
+    Photo.belongsTo("album", Album);
+
+    var album = Album.create({name: "First Album"});
+
+    expect( album.photos().count() ).toBe(0);
+
+    album.photos().create({ name: 'Beautiful photo 1' });
+
+    expect( album.photos().count() ).toBe(1);
+  });
+
+  it("should know if it's Collection is empty", function(){
+    Album.destroyAll();
+    Photo.destroyAll();
+    
+    Album.hasMany("photos", Photo);
+    Photo.belongsTo("album", Album);
+
+    var album = Album.create({name: "First Album"});
+
+    expect( album.photos().empty() ).toBe(true);
+
+    album.photos().create({ name: 'Beautiful photo 1' });
+
+    expect( album.photos().empty() ).toBe(false);
+  });
 });
