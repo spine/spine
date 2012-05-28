@@ -10,6 +10,15 @@ describe("Model", function(){
     expect(Asset.first()).toEqual(asset);
   });
 
+  it("creates record with ids in right order", function(){
+    expect(Asset.create().id).toEqual("c-0");
+    expect(Asset.create().id).toEqual("c-1");
+
+    var asset = new Asset()
+    asset.save()
+    expect(asset.id).toEqual("c-2");
+  });
+
   it("can update records", function(){
     var asset = Asset.create({name: "test.pdf"});
 

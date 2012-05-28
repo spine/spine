@@ -242,7 +242,7 @@ class Model extends Module
   constructor: (atts) ->
     super
     @load atts if atts
-    @cid or= @constructor.uid('c-')
+    @cid or= @id or @constructor.uid('c-')
 
   isNew: ->
     not @exists()
