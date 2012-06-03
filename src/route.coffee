@@ -17,6 +17,7 @@ class Spine.Route extends Spine.Module
     trigger: true
     history: false
     shim: false
+    root: '/'
 
   @add: (path, callback) ->
     if (typeof path is 'object' and path not instanceof RegExp)
@@ -36,6 +37,18 @@ class Spine.Route extends Spine.Module
       $(window).bind('popstate', @change)
     else
       $(window).bind('hashchange', @change)
+
+    @fragment = @getFragment()
+    loc = window.location
+    atRoot = (loc.pathname is @options.root) and not loc.search
+
+    if not @history and not atRoot
+      @fragment = @getFragment(true)
+      window.location.replace @options.root + window.location.search + "#/" + @fragment
+      true
+    else
+      window.history.replaceState {}, document.title, loc.protocol + "//" + loc.host + @fragment if @history and atRoot and loc.hash
+
     @change()
 
   @unbind: ->
@@ -84,7 +97,13 @@ class Spine.Route extends Spine.Module
 
   @getHash: -> window.location.hash
 
-  @getFragment: -> @getHash().replace(hashStrip, '')
+  @getFragment: (forcePushState) ->
+    if forcePushState
+      fragment = window.location.pathname
+    else
+      fragment = @getHash()
+    fragment = fragment.substr(@options.root.length) unless fragment.indexOf(@options.root)
+    fragment.replace hashStrip, ''
 
   @getHost: ->
     (document.location + '').replace(@getPath() + @getHash(), '')
