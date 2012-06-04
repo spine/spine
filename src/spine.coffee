@@ -225,7 +225,9 @@ class Model extends Module
   @idCounter: 0
 
   @uid: (prefix = '') ->
-    prefix + @idCounter++
+    uid = prefix + @idCounter++
+    uid = @uid(prefix) if @exists(uid)
+    uid
 
   # Instance
 
