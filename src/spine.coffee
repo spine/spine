@@ -11,7 +11,7 @@ Events =
   one: (ev, callback) ->
     @bind ev, ->
       @unbind(ev, arguments.callee)
-      callback.apply(@, arguments)
+      callback.apply(this, arguments)
 
   trigger: (args...) ->
     ev = args.shift()
@@ -20,7 +20,7 @@ Events =
     return unless list
 
     for callback in list
-      if callback.apply(@, args) is false
+      if callback.apply(this, args) is false
         break
     true
 
@@ -58,24 +58,24 @@ moduleKeywords = ['included', 'extended']
 
 class Module
   @include: (obj) ->
-    throw(new Error('include(obj) requires obj')) unless obj
+    throw new Error('include(obj) requires obj') unless obj
     for key, value of obj when key not in moduleKeywords
       @::[key] = value
-    obj.included?.apply(@)
+    obj.included?.apply(this)
     this
 
   @extend: (obj) ->
-    throw(new Error('extend(obj) requires obj')) unless obj
+    throw new Error('extend(obj) requires obj') unless obj
     for key, value of obj when key not in moduleKeywords
       @[key] = value
-    obj.extended?.apply(@)
+    obj.extended?.apply(this)
     this
 
   @proxy: (func) ->
-    => func.apply(@, arguments)
+    => func.apply(this, arguments)
 
   proxy: (func) ->
-    => func.apply(@, arguments)
+    => func.apply(this, arguments)
 
   constructor: ->
     @init?(arguments...)
@@ -103,12 +103,12 @@ class Model extends Module
     record = @records[id]
     if !record and ("#{id}").match(/c-\d+/)
       return @findCID(id)
-    throw(new Error('Unknown record')) unless record
+    throw new Error('Unknown record') unless record
     record.clone()
 
   @findCID: (cid) ->
     record = @crecords[cid]
-    throw(new Error('Unknown record')) unless record
+    throw new Error('Unknown record') unless record
     record.clone()
 
   @exists: (id) ->
@@ -312,7 +312,7 @@ class Model extends Module
     result
 
   clone: ->
-    createObject(@)
+    createObject(this)
 
   reload: ->
     return this if @isNew()
@@ -324,7 +324,7 @@ class Model extends Module
     @attributes()
 
   toString: ->
-    "<#{@constructor.className} (#{JSON.stringify(@)})>"
+    "<#{@constructor.className} (#{JSON.stringify(this)})>"
 
   fromForm: (form) ->
     result = {}
@@ -362,7 +362,7 @@ class Model extends Module
   bind: (events, callback) ->
     @constructor.bind events, binder = (record) =>
       if record && @eql(record)
-        callback.apply(@, arguments)
+        callback.apply(this, arguments)
     @constructor.bind 'unbind', unbinder = (record) =>
       if record && @eql(record)
         @constructor.unbind(events, binder)
@@ -372,10 +372,10 @@ class Model extends Module
   one: (events, callback) ->
     binder = @bind events, =>
       @constructor.unbind(events, binder)
-      callback.apply(@, arguments)
+      callback.apply(this, arguments)
 
   trigger: (args...) ->
-    args.splice(1, 0, @)
+    args.splice(1, 0, this)
     @constructor.trigger(args...)
 
   unbind: ->
@@ -424,6 +424,9 @@ class Controller extends Module
           method.apply(this, arguments)
           true
       else
+        unless @[method]
+          throw new Error("#{method} doesn't exist")
+
         method = do (method) => =>
           @[method].apply(this, arguments)
           true
