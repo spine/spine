@@ -394,8 +394,9 @@ class Controller extends Module
     for key, value of @options
       @[key] = value
 
-    @el = document.createElement(@tag) unless @el
-    @el = $(@el)
+    @el  = document.createElement(@tag) unless @el
+    @el  = $(@el)
+    @$el = @el
 
     @el.addClass(@className) if @className
     @el.attr(@attributes) if @attributes
