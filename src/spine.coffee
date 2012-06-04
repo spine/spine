@@ -58,14 +58,14 @@ moduleKeywords = ['included', 'extended']
 
 class Module
   @include: (obj) ->
-    throw('include(obj) requires obj') unless obj
+    throw(new Error('include(obj) requires obj')) unless obj
     for key, value of obj when key not in moduleKeywords
       @::[key] = value
     obj.included?.apply(@)
     this
 
   @extend: (obj) ->
-    throw('extend(obj) requires obj') unless obj
+    throw(new Error('extend(obj) requires obj')) unless obj
     for key, value of obj when key not in moduleKeywords
       @[key] = value
     obj.extended?.apply(@)
@@ -103,12 +103,12 @@ class Model extends Module
     record = @records[id]
     if !record and ("#{id}").match(/c-\d+/)
       return @findCID(id)
-    throw('Unknown record') unless record
+    throw(new Error('Unknown record')) unless record
     record.clone()
 
   @findCID: (cid) ->
     record = @crecords[cid]
-    throw('Unknown record') unless record
+    throw(new Error('Unknown record')) unless record
     record.clone()
 
   @exists: (id) ->
