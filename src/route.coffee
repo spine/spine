@@ -24,6 +24,11 @@ class Spine.Route extends Spine.Module
     else
       @routes.push(new @(path, callback))
 
+  @addMap: (list) ->
+    newArray = []
+    newArray.push(new @(key, value)) for key, value of list
+    @routes.push(newArray)
+
   @setup: (options = {}) ->
     @options = $.extend({}, @options, options)
 
@@ -96,10 +101,18 @@ class Spine.Route extends Spine.Module
     @matchRoute(@path)
 
   @matchRoute: (path, options) ->
+    contextualMatches = []
     for route in @routes
-      if route.match(path, options)
+      if route instanceof Array
+        for contextRoute in route
+          if contextRoute.match(path, options)
+            contextualMatches.push(contextRoute)
+            break
+      else if route.match(path, options)
         @trigger('change', route, path)
         return route
+    for match in contextualMatches
+      @trigger('change', match, path)
 
   constructor: (@path, @callback) ->
     @names = []
@@ -137,11 +150,10 @@ class Spine.Route extends Spine.Module
 Spine.Route.change = Spine.Route.proxy(Spine.Route.change)
 
 Spine.Controller.include
-  route: (path, callback) ->
-    Spine.Route.add(path, @proxy(callback))
-
   routes: (routes) ->
-    @route(key, value) for key, value of routes
+    proxiedRoutes = {}
+    proxiedRoutes[path] = @proxy(callback) for path, callback of routes 
+    Spine.Route.addMap(proxiedRoutes)
 
   navigate: ->
     Spine.Route.navigate.apply(Spine.Route, arguments)

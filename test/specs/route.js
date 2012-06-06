@@ -24,6 +24,39 @@ describe("Routing", function(){
     window.location.hash = "";
   });
 
+  it ("can pass routes to different controllers while maintaining order definition", function(){
+    var A = Spine.Controller.sub({
+      shouldCallA: function(){},
+      init: function(){
+        this.routes({
+          "xxx":function(){this.shouldCallA();}, 
+          ":any": function(){
+            expect(true).toBe(false);
+          }
+        });
+      }
+    });
+    var B = Spine.Controller.sub({
+      shouldCallB: function(){},
+      init: function(){
+        this.routes({
+          "xxx":function(){this.shouldCallB();}, 
+          ":any": function(){
+            expect(true).toBe(false);
+          }
+        });
+      }
+    });
+    var a = new A();
+    var b = new B();
+    spyOn(a,'shouldCallA');
+    spyOn(b,'shouldCallB');
+
+    Route.navigate('xxx');
+
+    expect(a.shouldCallA).toHaveBeenCalled();
+    expect(b.shouldCallB).toHaveBeenCalled();
+  });
   it("can can navigate", function(){
     Route.navigate("/users/1");
     expect(window.location.hash).toEqual("#/users/1");

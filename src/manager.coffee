@@ -54,7 +54,7 @@ Spine.Controller.include
 
 class Spine.Stack extends Spine.Controller
   controllers: {}
-  routes: {}
+  map: {}
 
   className: 'spine stack'
 
@@ -67,12 +67,14 @@ class Spine.Stack extends Spine.Controller
       @[key] = new value(stack: @)
       @add(@[key])
 
-    for key, value of @routes
+    resolvedRoutes = {}
+    for key, value of @map
       do (key, value) =>
         callback = value if typeof value is 'function'
         callback or= => @[value].active(arguments...)
-        @route(key, callback)
-
+        resolvedRoutes[key] = callback
+    @routes resolvedRoutes
+    
     @[@default].active() if @default
 
   add: (controller) ->

@@ -62,6 +62,22 @@ describe("Ajax", function(){
       expect(spy).toHaveBeenCalledWith(users);
     });
 
+    it ("should manage routes", function(){
+      var A = Spine.Stack.sub({
+        shouldCall:function(){},
+        map: {
+          'xxx': function(){this.shouldCall()}, 
+          ':other': function(){
+            expect(true).toBe(false);
+          }
+        }
+      });
+      var a = new A();
+      spyOn(a,'shouldCall');
+      Spine.Route.navigate('xxx');
+      expect(a.shouldCall).toHaveBeenCalled();
+    });
+
     it("should call activate on controller", function(){
       new Spine.Manager(users, groups);
       users.activate = spy;
