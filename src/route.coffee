@@ -87,7 +87,7 @@ class Spine.Route extends Spine.Module
   @getFragment: -> @getHash().replace(hashStrip, '')
 
   @getHost: ->
-    (document.location + '').replace(@getPath() + @getHash(), '')
+    window.location.protocol + '//' + window.location.host
 
   @change: ->
     path = if @getFragment() isnt '' then @getFragment() else @getPath()
