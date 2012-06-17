@@ -39,6 +39,8 @@ class Spine.Route extends Spine.Module
     @change()
 
   @unbind: ->
+    return if @options.shim
+
     if @history
       $(window).unbind('popstate', @change)
     else
