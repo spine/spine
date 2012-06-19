@@ -1,6 +1,6 @@
 # Spine
 
-[![Build Status](https://secure.travis-ci.org/abernier/spine.png?branch=phantomjs-travis)](https://secure.travis-ci.org/abernier/spine.png?branch=phantomjs-travis)
+[![Build Status](https://secure.travis-ci.org/abernier/spine.png?branch=phantomjs-travis)](http://travis-ci.org/abernier/spine)
 
 Spine is a lightweight framework for building JavaScript web applications. Spine gives you an MVC structure and then gets out of your way, allowing you to concentrate on the fun stuff, building awesome web applications.
 

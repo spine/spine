@@ -1,4 +1,4 @@
 language: node_js
 node_js:
   - 0.6
-script: "for i in test/*.html; do phantomjs test/lib/run-jasmine.phantom.js file://`pwd`/$i; done"
+script: "npm test"
