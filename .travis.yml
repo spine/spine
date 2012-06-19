@@ -1,0 +1,4 @@
+language: node_js
+node_js:
+  - 0.7
+script: for i in test/*.html; do phantomjs test/lib/run-jasmine.phantom.js $i; done
