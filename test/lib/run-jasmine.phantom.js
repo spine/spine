@@ -61,19 +61,20 @@ page.open(system.args[1], function(status){
                 return false;
             });
         }, function(){
-            page.evaluate(function(){
+            var passed = page.evaluate(function(){
                 console.log(document.body.querySelector('.description').innerText);
-                list = document.body.querySelectorAll('div.jasmine_reporter > div.suite.failed');
-                for (i = 0; i < list.length; ++i) {
-                    el = list[i];
-                    desc = el.querySelectorAll('.description');
+                var list = document.body.querySelectorAll('div.jasmine_reporter > div.suite.failed');
+                for (var i = 0; i < list.length; ++i) {
+                    var el = list[i];
+                    var desc = el.querySelectorAll('.description');
                     console.log('');
-                    for (j = 0; j < desc.length; ++j) {
+                    for (var j = 0; j < desc.length; ++j) {
                         console.log(desc[j].innerText);
                     }
                 }
+                return list.length === 0;
             });
-            phantom.exit();
+            phantom.exit(passed ? 0 : 1);
         });
     }
 });
