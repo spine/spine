@@ -1,4 +1,4 @@
-describe("Ajax", function(){
+describe("Manager", function(){
   var Users;
   var Groups;
   var users;
