@@ -68,16 +68,16 @@ page.open(system.args[1], function (status) {
 
             var format = (function () {
                 function indent(level) {
-                    var ret = '  ';
+                    var ret = '';
 
                     for (var i = 0; i < level; i += 1) {
-                        ret += ret;
+                        ret = ret + '  ';
                     }
                     return ret;
                 }
 
                 function tick(el) {
-                    return $(el).is('.passed') ? '✓' : '✖';
+                    return $(el).is('.passed') ? '\033[32m✓\033[0m' : '\033[31m✖';
                 }
 
                 function desc(el, strong) {
@@ -87,14 +87,14 @@ page.open(system.args[1], function (status) {
 
                     ret = $(el).find('> .description').text();
                     if (strong) {
-                        ret = ret.toUpperCase();
+                        ret = '\033[1m' + ret;
                     }
 
                     return ret;
                 }
 
                 return function (el, level, strong) {
-                    return indent(level) + tick(el) + ' ' + desc(el, strong);
+                    return '\033[1m' + indent(level) + tick(el) + ' ' + desc(el, strong);
                 };
             }());
 
