@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Spine</title>
+  <link rel="stylesheet" href="lib/jasmine.css">
+  <script src="lib/jasmine.js"></script>
+  <script src="lib/jasmine-html.js"></script>
+
+  <script src="lib/jquery.js"></script>
+  <script src="../lib/spine.js"></script>
+  <script src="../lib/local.js"></script>
+  <script src="../lib/relation.js"></script>
+
+  <script src="specs/class.js"></script>
+  <script src="specs/events.js"></script>
+  <script src="specs/model.js"></script>
+  <script src="specs/model.local.js"></script>
+  <script src="specs/model.relation.js"></script>
+  <script src="specs/controller.js"></script>
+</head>
+<body>
+  <script>
+    jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
+    jasmine.getEnv().execute();
+  </script>
+</body>
+</html>

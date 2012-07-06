@@ -12,8 +12,13 @@
     "type" : "git",
     "url": "http://github.com/maccman/spine.git"
   },
-  "main" : "./index.js",
+  "devDependencies": {
+    "coffee-script": "1.3.x"
+  },
+  "main": "./index.js",
   "scripts": {
-    "test": "for i in test/*.html; do phantomjs test/lib/run-jasmine.phantom.js file://`pwd`/$i; done"
+    "build": "make",
+    "test": "make test-run",
+    "prepublish": "make test-run"
   }
 }
