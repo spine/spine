@@ -76,7 +76,7 @@ class Collection extends Base
 
   fetch: (params = {}, options = {}) ->
     if id = params.id
-      delete params.id
+      params.id = undefined
       @find(id, params).success (record) =>
         @model.refresh(record, options)
     else

@@ -33,7 +33,7 @@ Events =
     return this unless list
 
     unless callback
-      delete @_callbacks[ev]
+      @_callbacks[ev] = undefined
       return this
 
     for cb, i in list when cb is callback
@@ -168,7 +168,7 @@ class Model extends Module
 
   @deleteAll: ->
     for key, value of @records
-      delete @records[key]
+      @records[key] = undefined
 
   @destroyAll: ->
     for key, value of @records
@@ -289,14 +289,14 @@ class Model extends Module
   changeID: (id) ->
     records = @constructor.records
     records[id] = records[@id]
-    delete records[@id]
+    records[@id] = undefined
     @id = id
     @save()
 
   destroy: (options = {}) ->
     @trigger('beforeDestroy', options)
-    delete @constructor.records[@id]
-    delete @constructor.crecords[@cid]
+    @constructor.records[@id] = undefined
+    @constructor.crecords[@cid] = undefined
     @destroyed = true
     @trigger('destroy', options)
     @trigger('change', 'destroy', options)
@@ -308,7 +308,7 @@ class Model extends Module
     if newRecord is false
       result.cid = @cid
     else
-      delete result.id
+      result.id = undefined
     result
 
   clone: ->
