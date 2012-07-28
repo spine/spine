@@ -3,8 +3,7 @@ describe("Ajax", function(){
   var jqXHR;
 
   beforeEach(function(){
-    Spine.Ajax.requests = [];
-    Spine.Ajax.pending  = false;
+    Spine.Ajax.clearQueue();
 
     User = Spine.Model.setup("User", ["first", "last"]);
     User.extend(Spine.Model.Ajax);
@@ -17,7 +16,7 @@ describe("Ajax", function(){
       getAllResponseHeaders: function() {},
       getResponseHeader: function() {},
       overrideMimeType: function() { return this; },
-      abort: function() { return this; },
+      abort: function() { this.reject(arguments); return this; },
       success: jqXHR.done,
       error: jqXHR.fail,
       complete: jqXHR.done
@@ -73,125 +72,157 @@ describe("Ajax", function(){
   });
 
   it("can send PUT on update", function(){
-      User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
+    User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
 
-      spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
 
-      User.first().updateAttributes({first: "John2", last: "Williams2"});
+    User.first().updateAttributes({first: "John2", last: "Williams2"});
 
-      expect(jQuery.ajax).toHaveBeenCalledWith({
-        type:         'PUT',
-        headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
-        contentType:  'application/json',
-        dataType:     'json',
-        data:         '{"first":"John2","last":"Williams2","id":"IDD"}',
-        url:          '/users/IDD',
-        processData:  false
-      });
+    expect(jQuery.ajax).toHaveBeenCalledWith({
+      type:         'PUT',
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      contentType:  'application/json',
+      dataType:     'json',
+      data:         '{"first":"John2","last":"Williams2","id":"IDD"}',
+      url:          '/users/IDD',
+      processData:  false
     });
+  });
 
-    it("can send DELETE on destroy", function(){
-      User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
+  it("can send DELETE on destroy", function(){
+    User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
 
-      spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
 
-      User.first().destroy();
+    User.first().destroy();
 
-      expect(jQuery.ajax).toHaveBeenCalledWith({
-        contentType: 'application/json',
-        headers:     { 'X-Requested-With' : 'XMLHttpRequest' },
-        dataType:   'json',
-        processData: false,
-        type:        'DELETE',
-        url:         '/users/IDD'
-      })
-    });
+    expect(jQuery.ajax).toHaveBeenCalledWith({
+      contentType: 'application/json',
+      headers:     { 'X-Requested-With' : 'XMLHttpRequest' },
+      dataType:   'json',
+      processData: false,
+      type:        'DELETE',
+      url:         '/users/IDD'
+    })
+  });
 
-    it("can update record after PUT/POST", function(){
-      spyOn(jQuery, "ajax").andReturn(jqXHR);
+  it("can update record after PUT/POST", function(){
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
 
-      User.create({first: "Hans", last: "Zimmer", id: "IDD"});
+    User.create({first: "Hans", last: "Zimmer", id: "IDD"});
 
-      var newAtts = {first: "Hans2", last: "Zimmer2", id: "IDD"};
-      jqXHR.resolve(newAtts);
+    var newAtts = {first: "Hans2", last: "Zimmer2", id: "IDD"};
+    jqXHR.resolve(newAtts);
 
-      expect(User.first().attributes()).toEqual(newAtts);
-    });
+    expect(User.first().attributes()).toEqual(newAtts);
+  });
 
-    it("can change record ID after PUT/POST", function(){
-      spyOn(jQuery, "ajax").andReturn(jqXHR);
+  it("can change record ID after PUT/POST", function(){
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
 
-      User.create({id: "IDD"});
+    User.create({id: "IDD"});
 
-      var newAtts = {id: "IDD2"};
-      jqXHR.resolve(newAtts);
+    var newAtts = {id: "IDD2"};
+    jqXHR.resolve(newAtts);
 
-      expect(User.first().id).toEqual("IDD2");
-      expect(User.records["IDD2"]).toEqual(User.first());
-    });
+    expect(User.first().id).toEqual("IDD2");
+    expect(User.records["IDD2"]).toEqual(User.first());
+  });
 
-    it("should send requests syncronously", function(){
-      spyOn(jQuery, "ajax").andReturn(jqXHR);
+  it("should send requests syncronously", function(){
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
 
-      User.create({first: "First"});
+    User.create({first: "First"});
 
-      expect(jQuery.ajax).toHaveBeenCalled();
+    expect(jQuery.ajax).toHaveBeenCalled();
 
-      jQuery.ajax.reset()
+    jQuery.ajax.reset()
 
-      User.create({first: "Second"});
+    User.create({first: "Second"});
 
-      expect(jQuery.ajax).not.toHaveBeenCalled();
-      jqXHR.resolve();
-      expect(jQuery.ajax).toHaveBeenCalled();
-    });
+    expect(jQuery.ajax).not.toHaveBeenCalled();
+    jqXHR.resolve();
+    expect(jQuery.ajax).toHaveBeenCalled();
+  });
 
-    it("should have success callbacks", function(){
-      spyOn(jQuery, "ajax").andReturn(jqXHR);
+  it("should return promise objects", function(){
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
+    var user = User.find("IDD");
 
-      var noop = {spy: function(){}};
-      spyOn(noop, "spy");
-      var spy = noop.spy;
+    var noop = {spy: function(){}};
+    spyOn(noop, "spy");
+    var spy = noop.spy;
 
-      User.create({first: "Second"}, {success: spy});
-      jqXHR.resolve();
-      expect(spy).toHaveBeenCalled();
-    });
+    user.ajax().update().done(spy);
+    jqXHR.resolve();
+    expect(spy).toHaveBeenCalled();
+  });
 
-    it("should have error callbacks", function(){
-      spyOn(jQuery, "ajax").andReturn(jqXHR);
+  it("should allow promise objects to abort the request and dequeue", function(){
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
+    var user = User.find("IDD");
 
-      var noop = {spy: function(){}};
-      spyOn(noop, "spy");
-      var spy = noop.spy;
+    var noop = {spy: function(){}};
+    spyOn(noop, "spy");
+    var spy = noop.spy;
 
-      User.create({first: "Second"}, {error: spy});
-      jqXHR.reject();
-      expect(spy).toHaveBeenCalled();
-    });
+    user.ajax().update().fail(spy);
+    expect(Spine.Ajax.queue().length).toEqual(1);
 
-    it("can cancel ajax on change", function() {
-      spyOn(jQuery, "ajax").andReturn(jqXHR);
+    jqXHR.abort();
+    expect(Spine.Ajax.queue().length).toEqual(0);
+    expect(spy).toHaveBeenCalled();
+  });
 
-      User.create({first: "Second"}, {ajax: false});
-      jqXHR.resolve();
-      expect(jQuery.ajax).not.toHaveBeenCalled();
-    });
+  it("should have success callbacks", function(){
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
 
-    it("should expose the defaults object", function(){
-      expect(Spine.Ajax.defaults).toBeDefined();
-    });
+    var noop = {spy: function(){}};
+    spyOn(noop, "spy");
+    var spy = noop.spy;
 
-    it("should have a url function", function(){
-      expect(User.url()).toBe('/users');
-      expect(User.url('search')).toBe('/users/search');
+    User.create({first: "Second"}, {success: spy});
+    jqXHR.resolve();
+    expect(spy).toHaveBeenCalled();
+  });
 
-      var user = new User({id: 1});
-      expect(user.url()).toBe('/users/1');
-      expect(user.url('custom')).toBe('/users/1/custom');
+  it("should have error callbacks", function(){
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
 
-      Spine.Model.host = 'http://example.com';
-      expect(User.url()).toBe('http://example.com/users');
-      expect(user.url()).toBe('http://example.com/users/1');
-    });
+    var noop = {spy: function(){}};
+    spyOn(noop, "spy");
+    var spy = noop.spy;
+
+    User.create({first: "Second"}, {error: spy});
+    jqXHR.reject();
+    expect(spy).toHaveBeenCalled();
+  });
+
+  it("can cancel ajax on change", function() {
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+
+    User.create({first: "Second"}, {ajax: false});
+    jqXHR.resolve();
+    expect(jQuery.ajax).not.toHaveBeenCalled();
+  });
+
+  it("should expose the defaults object", function(){
+    expect(Spine.Ajax.defaults).toBeDefined();
+  });
+
+  it("should have a url function", function(){
+    expect(User.url()).toBe('/users');
+    expect(User.url('search')).toBe('/users/search');
+
+    var user = new User({id: 1});
+    expect(user.url()).toBe('/users/1');
+    expect(user.url('custom')).toBe('/users/1/custom');
+
+    Spine.Model.host = 'http://example.com';
+    expect(User.url()).toBe('http://example.com/users');
+    expect(user.url()).toBe('http://example.com/users/1');
+  });
+
 });
