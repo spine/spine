@@ -35,7 +35,8 @@ describe("Ajax", function(){
       contentType:  'application/json',
       dataType:     'json',
       url:          '/users',
-      processData:  false
+      processData:  false,
+      parallel:     true
     });
   });
 
@@ -52,7 +53,8 @@ describe("Ajax", function(){
       contentType:  'application/json',
       dataType:     'json',
       url:          '/users/IDD',
-      processData:  false
+      processData:  false,
+      parallel:     true
     });
   });
 
@@ -130,7 +132,7 @@ describe("Ajax", function(){
       expect(User.records["IDD2"]).toEqual(User.first());
     });
 
-    it("should send requests syncronously", function(){
+    it("should send requests serially", function(){
       spyOn(jQuery, "ajax").andReturn(jqXHR);
 
       User.create({first: "First"});
@@ -144,6 +146,16 @@ describe("Ajax", function(){
       expect(jQuery.ajax).not.toHaveBeenCalled();
       jqXHR.resolve();
       expect(jQuery.ajax).toHaveBeenCalled();
+    });
+    
+    it("should send GET requests in parallel", function() {
+        spyOn(jQuery, "ajax").andReturn(jqXHR);
+        
+        User.fetch();
+        expect(jQuery.ajax).toHaveBeenCalled();
+        
+        User.fetch();
+        expect(jQuery.ajax.calls.length).toEqual(2);
     });
 
     it("should have success callbacks", function(){

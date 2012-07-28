@@ -23,23 +23,27 @@ Ajax =
       do callback
 
   requestNext: ->
-    next = @requests.shift()
-    if next
-      @request(next)
+    nextRequest = @requests.shift()
+    if nextRequest
+      @request(nextRequest)
     else
       @pending = false
 
-  request: (callback) ->
-    (do callback).complete(=> do @requestNext)
+  request: (request) ->
+    $.ajax(
+      request.params
+    ).success(request.success)
+     .error(request.error)
+     .complete( => do @requestNext )
 
-  queue: (callback) ->
+  queue: (request) ->
     return unless @enabled
     if @pending
-      @requests.push(callback)
+      @requests.push(request)
     else
-      @pending = true
-      @request(callback)
-    callback
+      @pending = true unless request.params.type == 'GET' and request.params.parallel
+      @request(request)
+    request
 
 class Base
   defaults:
@@ -48,40 +52,41 @@ class Base
     processData: false
     headers: {'X-Requested-With': 'XMLHttpRequest'}
 
-  ajax: (params, defaults) ->
-    $.ajax($.extend({}, @defaults, defaults, params))
-
-  queue: (callback) ->
-    Ajax.queue(callback)
+  queue: (params, defaults, success = [], error = []) ->
+    request = 
+      params: $.extend {}, @defaults, defaults, params
+      success: if typeof success is 'function' then [success] else success
+      error: if typeof error is 'function' then [error] else error
+    Ajax.queue(request)
 
 class Collection extends Base
   constructor: (@model) ->
 
-  find: (id, params) ->
+  find: (id, params, success = ->) ->
     record = new @model(id: id)
-    @ajax(
-      params,
-      type: 'GET',
-      url:  Ajax.getURL(record)
-    ).success(@recordsResponse)
-     .error(@errorResponse)
+    @queue params, {
+        type: 'GET',
+        url:  Ajax.getURL(record),
+        parallel: true
+      }, [@recordsResponse, success], [@errorResponse]
 
-  all: (params) ->
-    @ajax(
-      params,
-      type: 'GET',
-      url:  Ajax.getURL(@model)
-    ).success(@recordsResponse)
-     .error(@errorResponse)
+  all: (params, success = ->) ->
+    @queue params, {
+        type: 'GET',
+        url:  Ajax.getURL(@model),
+        parallel: true
+      }, [@recordsResponse, success], [@errorResponse]
 
   fetch: (params = {}, options = {}) ->
     if id = params.id
       delete params.id
-      @find(id, params).success (record) =>
+      @find(id, params, (record) =>
         @model.refresh(record, options)
+      )
     else
-      @all(params).success (records) =>
+      @all(params, (records) =>
         @model.refresh(records, options)
+      )
 
   # Private
 
@@ -96,42 +101,30 @@ class Singleton extends Base
     @model = @record.constructor
 
   reload: (params, options) ->
-    @queue =>
-      @ajax(
-        params,
+    @queue params, {
         type: 'GET'
         url:  Ajax.getURL(@record)
-      ).success(@recordResponse(options))
-       .error(@errorResponse(options))
+      }, @recordResponse(options), @errorResponse(options)
 
   create: (params, options) ->
-    @queue =>
-      @ajax(
-        params,
+    @queue params, {
         type: 'POST'
         data: JSON.stringify(@record)
         url:  Ajax.getURL(@model)
-      ).success(@recordResponse(options))
-       .error(@errorResponse(options))
+      }, @recordResponse(options), @errorResponse(options)
 
   update: (params, options) ->
-    @queue =>
-      @ajax(
-        params,
+    @queue params, {
         type: 'PUT'
         data: JSON.stringify(@record)
         url:  Ajax.getURL(@record)
-      ).success(@recordResponse(options))
-       .error(@errorResponse(options))
+      }, @recordResponse(options), @errorResponse(options)
 
   destroy: (params, options) ->
-    @queue =>
-      @ajax(
-        params,
+    @queue params, {
         type: 'DELETE'
         url:  Ajax.getURL(@record)
-      ).success(@recordResponse(options))
-       .error(@errorResponse(options))
+      }, @recordResponse(options), @errorResponse(options)
 
   # Private
 
