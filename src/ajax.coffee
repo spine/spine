@@ -40,24 +40,36 @@ class Base
     $.ajax @ajaxSettings(params, defaults)
 
   ajaxQueue: (params, defaults) ->
-    jqXHR = undefined
+    jqXHR    = null
     deferred = $.Deferred()
-    promise = deferred.promise()
+
+    promise  = deferred.promise()
     return promise unless Ajax.enabled
-    settings = @ajaxSettings params, defaults
+
+    settings = @ajaxSettings(params, defaults)
+
     request = (next) ->
-      jqXHR = $.ajax(settings).then(next, next).done(deferred.resolve).fail(deferred.reject)
+      jqXHR = $.ajax(settings)
+                .then(next, next)
+                .done(deferred.resolve)
+                .fail(deferred.reject)
+
     promise.abort = (statusText) ->
       return jqXHR.abort(statusText) if jqXHR
-      index = $.inArray request, @queue()
-      @queue().splice index, 1 if index > -1
-      deferred.rejectWith settings.context || settings, [promise, statusText, ""]
+      index = $.inArray(request, @queue())
+      @queue().splice(index, 1) if index > -1
+
+      deferred.rejectWith(
+        settings.context or settings,
+        [promise, statusText, '']
+      )
       promise
+
     @queue request
     promise
 
   ajaxSettings: (params, defaults) ->
-    $.extend {}, @defaults, defaults, params
+    $.extend({}, @defaults, defaults, params)
 
 class Collection extends Base
   constructor: (@model) ->
