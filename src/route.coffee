@@ -92,7 +92,7 @@ class Spine.Route extends Spine.Module
     (document.location + '').replace(@getPath() + @getHash(), '')
 
   @change: ->
-    path = if @getFragment() isnt '' then @getFragment() else @getPath()
+    path = if @history then @getPath() else @getFragment()
     return if path is @path
     @path = path
     @matchRoute(@path)
