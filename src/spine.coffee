@@ -275,11 +275,11 @@ class Model extends Module
 
     @trigger('beforeSave', options)
     record = if @isNew() then @create(options) else @update(options)
-    @stripCloneAtts()
+    @stripCloneAttrs()
     @trigger('save', options)
     record
 
-  stripCloneAtts: ->
+  stripCloneAttrs: ->
     return if @hasOwnProperty 'cid' # Make sure it's not the raw object
     for own key, value of @
       delete @[key] if @attributes()[key]
