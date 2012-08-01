@@ -282,7 +282,7 @@ class Model extends Module
   stripCloneAttrs: ->
     return if @hasOwnProperty 'cid' # Make sure it's not the raw object
     for own key, value of @
-      delete @[key] if @attributes()[key]
+      delete @[key] if @attributes()[key]?
 
   updateAttribute: (name, value, options) ->
     @[name] = value
