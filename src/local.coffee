@@ -6,7 +6,7 @@ Spine.Model.Local =
     @fetch @loadLocal
 
   saveLocal: ->
-    result = JSON.stringify(@)
+    result = JSON.stringify(@.toJSON())
     localStorage[@className] = result
 
   loadLocal: ->
