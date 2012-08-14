@@ -50,9 +50,9 @@ class Base
 
     request = (next) ->
       jqXHR = $.ajax(settings)
-                .then(next, next)
                 .done(deferred.resolve)
                 .fail(deferred.reject)
+                .then(next, next)
 
     promise.abort = (statusText) ->
       return jqXHR.abort(statusText) if jqXHR
