@@ -176,6 +176,16 @@ describe("Ajax", function(){
     expect(spy).toHaveBeenCalled();
   });
 
+  it("should not replace AJAX results when dequeue", function() {
+    User.refresh([], {clear: true});
+
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    jqXHR.resolve([{id: "IDD"}]);
+
+    User.fetch();
+    expect(User.exists("IDD")).toBeTruthy();
+  });
+
   it("should have success callbacks", function(){
     spyOn(jQuery, "ajax").andReturn(jqXHR);
 
