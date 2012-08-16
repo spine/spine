@@ -283,6 +283,7 @@ class Model extends Module
     return if @hasOwnProperty 'cid' # Make sure it's not the raw object
     for own key, value of @
       delete @[key] if @attributes()[key]?
+    this
 
   updateAttribute: (name, value, options) ->
     @[name] = value
