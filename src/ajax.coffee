@@ -124,7 +124,7 @@ class Singleton extends Base
     @ajaxQueue(
       params,
       type: 'POST'
-      data: JSON.stringify(@record)
+      data: JSON.stringify(@record.toJSON())
       url:  Ajax.getURL(@model)
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
@@ -133,7 +133,7 @@ class Singleton extends Base
     @ajaxQueue(
       params,
       type: 'PUT'
-      data: JSON.stringify(@record)
+      data: JSON.stringify(@record.toJSON())
       url:  Ajax.getURL(@record)
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
