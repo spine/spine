@@ -117,7 +117,7 @@ class Singleton extends Base
       params,
       type: 'GET'
       url:  Ajax.getURL(@record)
-    ).done(@recordResponse(options))
+    ).done(@recordResponse('reload',options))
      .fail(@failResponse(options))
 
   create: (params, options) ->
@@ -126,7 +126,7 @@ class Singleton extends Base
       type: 'POST'
       data: JSON.stringify(@record)
       url:  Ajax.getURL(@model)
-    ).done(@recordResponse(options))
+    ).done(@recordResponse('create',options))
      .fail(@failResponse(options))
 
   update: (params, options) ->
@@ -135,7 +135,7 @@ class Singleton extends Base
       type: 'PUT'
       data: JSON.stringify(@record)
       url:  Ajax.getURL(@record)
-    ).done(@recordResponse(options))
+    ).done(@recordResponse('update',options))
      .fail(@failResponse(options))
 
   destroy: (params, options) ->
@@ -143,17 +143,17 @@ class Singleton extends Base
       params,
       type: 'DELETE'
       url:  Ajax.getURL(@record)
-    ).done(@recordResponse(options))
+    ).done(@recordResponse('destroy',options))
      .fail(@failResponse(options))
 
   # Private
 
-  recordResponse: (options = {}) =>
-    (data, status, xhr) =>
-      if Spine.isBlank(data)
+  recordResponse: (event, options = {}) =>
+    (raw, status, xhr) =>
+      if Spine.isBlank(raw)
         data = false
       else
-        data = @model.fromJSON(data)
+        data = @model.fromJSON(raw)
 
       Ajax.disable =>
         if data
@@ -164,9 +164,17 @@ class Singleton extends Base
           # Update with latest data
           @record.updateAttributes(data.attributes())
 
-      @record.trigger('ajaxSuccess', data, status, xhr)
-      options.success?.apply(@record) # Deprecated
-      options.done?.apply(@record)
+          # Success
+          @record.trigger('ajaxSuccess', data, status, xhr)
+          options.success?.apply(@record) # Deprecated
+          options.done?.apply(@record)
+        else 
+          if event is 'create'
+            # Undelete
+            delete @model.records[@record.id];
+            delete @model.crecords[@record.cid];
+
+          @failResponse(options)(null,'error',raw)
 
   failResponse: (options = {}) =>
     (xhr, statusText, error) =>
