@@ -150,7 +150,7 @@ class Singleton extends Base
 
   recordResponse: (options = {}) =>
     (data, status, xhr) =>
-      if Spine.isBlank(data)
+      if @record.destroyed or Spine.isBlank(data)
         data = false
       else
         data = @model.fromJSON(data)
