@@ -129,6 +129,18 @@ describe("Ajax", function(){
     expect(User.records["IDD2"]).toEqual(User.first());
   });
 
+  it("should not recreate records after DELETE", function() {
+    User.refresh([{first: "Phillip", last: "Fry", id: "MYID"}]);
+
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+
+    User.first().destroy();
+    
+    expect(User.count()).toEqual(0);
+    jqXHR.resolve({id: "MYID", name: "Phillip", last: "Fry"});
+    expect(User.count()).toEqual(0);
+  });
+
   it("should send requests syncronously", function(){
     spyOn(jQuery, "ajax").andReturn(jqXHR);
 

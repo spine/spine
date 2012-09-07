@@ -156,7 +156,7 @@ class Singleton extends Base
         data = @model.fromJSON(data)
 
       Ajax.disable =>
-        if data
+        if data and !@record.destroyed
           # ID change, need to do some shifting
           if data.id and @record.id isnt data.id
             @record.changeID(data.id)
