@@ -243,6 +243,7 @@ class Model extends Module
     not @validate()
 
   validate: ->
+    @errors if @errors?
 
   load: (atts) ->
     for key, value of atts
@@ -334,6 +335,19 @@ class Model extends Module
 
   exists: ->
     @id && @id of @constructor.records
+
+  addError: (key, error)->
+    @errors ?= {}
+    @errors[key] ?= {}
+    @errors[key][error] = error
+
+  getErrors: (attr)->
+    errors = []
+    if @errors?
+      for a,e of @errors
+        for k,v of e
+          errors.push v if not attr? or attr is a
+    errors
 
   # Private
 

@@ -313,6 +313,47 @@ describe("Model", function(){
       expect(Asset.idCounter).toEqual(12);
   });
 
+  it("should handle multiple errors during validation", function(){
+    var Person = Spine.Model.setup("Person", ["name", "age"]);
+
+    Person.include({
+      validate: function(){
+        if ( !this.name )
+          this.addError("name", "Name required");
+        else if ( this.name.length < 2 )
+          this.addError("name", "Length of name has to be bigger then 1");
+        if ( !this.age )
+          this.addError("age", "Age required");
+        else if ( isNaN(this.age) )
+          this.addError("age", "Age is not a number");
+        if ( this.age < 0 )
+          this.addError("age", "Age cannot be less then zero");
+        return this.__proto__.__proto__.validate.apply(this);
+      }
+    });
+
+    var person1 = new Person({name: "E", age: 22});
+    expect(person1.isValid()).toBeFalsy("'E' is not enough for the name");
+    expect(person1.getErrors().length == 1).toBeTruthy();
+    expect(person1.getErrors("name")[0] == "Length of name has to be bigger then 1").toBeTruthy();
+
+    var person2 = new Person({name: "Ed", age: -1});
+    expect(person2.isValid()).toBeFalsy("-1 is not a possible age");
+    expect(person2.getErrors().length == 1).toBeTruthy();
+    expect(person2.getErrors("age")[0] == "Age cannot be less then zero").toBeTruthy();
+
+    var person3 = new Person({name: "E", age: -1});
+    expect(person3.isValid()).toBeFalsy();
+    expect(person3.getErrors().length == 2).toBeTruthy();
+    expect(person3.getErrors("name")[0] == "Length of name has to be bigger then 1").toBeTruthy();
+    expect(person3.getErrors("age")[0] == "Age cannot be less then zero").toBeTruthy();
+
+    var person4 = new Person({});
+    expect(person4.isValid()).toBeFalsy();
+    expect(person4.getErrors("name")[0] == "Name required").toBeTruthy();
+    expect(person4.getErrors("age")[0] == "Age required").toBeTruthy();
+  });
+
 
   describe("with spy", function(){
     var spy;
