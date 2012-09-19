@@ -91,8 +91,6 @@ class Model extends Module
     @className  = name
     @records    = {}
     @crecords   = {}
-    @attributes = attributes if attributes.length
-    @attributes and= makeArray(@attributes)
     @attributes or=  []
     @unbind()
     @
