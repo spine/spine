@@ -156,9 +156,9 @@ class Model extends Module
     undefined
 
   @last: ->
-    values = @recordsValues()
-    record = values[values.length - 1]
-    record?.clone()
+    for key, value of @records
+      ;# value exist for last object
+    value?.clone()
 
   @count: ->
     count = 0
