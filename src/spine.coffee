@@ -169,6 +169,21 @@ class Model extends Module
   @destroyAll: ->
     value.destroy()       for key, value of @records
 
+  @toJSON: ->
+    value.toJSON()        for key, value of @records
+
+  @fromJSON: (objects) ->
+    return unless objects
+    if typeof objects is 'string'
+      objects = JSON.parse(objects)
+    if isArray(objects)
+      (new @(value) for value in objects)
+    else
+      new @(objects)
+
+  @fromForm: ->
+    (new @).fromForm(arguments...)
+
   @update: (id, atts, options) ->
     @find(id).updateAttributes(atts, options)
 
@@ -190,21 +205,6 @@ class Model extends Module
       @bind('fetch', callbackOrParams)
     else
       @trigger('fetch', callbackOrParams)
-
-  @toJSON: ->
-    value.toJSON()        for key, value of @records
-
-  @fromJSON: (objects) ->
-    return unless objects
-    if typeof objects is 'string'
-      objects = JSON.parse(objects)
-    if isArray(objects)
-      (new @(value) for value in objects)
-    else
-      new @(objects)
-
-  @fromForm: ->
-    (new @).fromForm(arguments...)
 
   # Private
 
@@ -306,8 +306,7 @@ class Model extends Module
     @load(original.attributes())
     original
 
-  toJSON: ->
-    @attributes()
+  toJSON: @::attributes
 
   toString: ->
     "<#{@constructor.className} (#{JSON.stringify(@)})>"
