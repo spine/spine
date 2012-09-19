@@ -152,9 +152,10 @@ class Model extends Module
     @cloneArray(@recordsValues())
 
   @first: ->
-    record = @recordsValues()[0]
-    record?.clone()
-
+    for key, value of @records
+      return value.clone()
+    undefined
+    
   @last: ->
     values = @recordsValues()
     record = values[values.length - 1]
