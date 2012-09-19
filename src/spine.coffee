@@ -134,7 +134,7 @@ class Model extends Module
     @
 
   @select: (callback) ->
-    record.clone() for id, record of @records when callback(record)
+    value.clone()         for key, value of @records when callback(value)
 
   @findByAttribute: (name, attr) ->
     return value.clone()  for key, value of @records when value[name] is attr
