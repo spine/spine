@@ -35,17 +35,19 @@ class Collection extends Spine.Module
       @associated(rec) and cb(rec)
 
   refresh: (values) ->
-    delete @model.records[record.id] for record in @all()
-    records = @model.fromJSON(values)
+    if values?
+      delete @model.records[record.id] for record in @all()
+      records = @model.fromJSON(values)
 
-    records = [records] unless isArray(records)
+      records = [records] unless isArray(records)
 
-    for record in records
-      record.newRecord = false
-      record[@fkey] = @record.id
-      @model.records[record.id] = record
+      for record in records
+        record.newRecord = false
+        record[@fkey] = @record.id
+        @model.records[record.id] = record
 
-    @model.trigger('refresh', @model.cloneArray(records))
+      @model.trigger('refresh', @model.cloneArray(records))
+    @
 
   create: (record) ->
     record[@fkey] = @record.id
@@ -65,10 +67,12 @@ class Instance extends Spine.Module
     @record[@fkey] and @model.exists(@record[@fkey])
 
   update: (value) ->
-    unless value instanceof @model
-      value = new @model(value)
-    value.save() if value.isNew()
-    @record[@fkey] = value and value.id
+    if value?
+      unless value instanceof @model
+        value = new @model(value)
+      value.save() if value.isNew()
+      @record[@fkey] = value and value.id
+    @
 
 class Singleton extends Spine.Module
   constructor: (options = {}) ->
@@ -79,11 +83,13 @@ class Singleton extends Spine.Module
     @record.id and @model.findByAttribute(@fkey, @record.id)
 
   update: (value) ->
-    unless value instanceof @model
-      value = @model.fromJSON(value)
+    if value?
+      unless value instanceof @model
+        value = @model.fromJSON(value)
 
-    value[@fkey] = @record.id
-    value.save()
+      value[@fkey] = @record.id
+      value.save()
+    @
 
 singularize = (str) ->
   str.replace(/s$/, '')
@@ -108,8 +114,7 @@ Spine.Model.extend
       )
 
     @::[name] = (value) ->
-      association(@).refresh(value) if value?
-      association(@)
+      association(@).refresh(value)
 
   belongsTo: (name, model, fkey) ->
     fkey ?= "#{singularize(name)}_id"
@@ -123,8 +128,7 @@ Spine.Model.extend
       )
 
     @::[name] = (value) ->
-      association(@).update(value) if value?
-      association(@).exists()
+      association(@).update(value).exists()
 
     @attributes.push(fkey)
 
@@ -140,5 +144,4 @@ Spine.Model.extend
       )
 
     @::[name] = (value) ->
-      association(@).update(value) if value?
-      association(@).find()
+      association(@).update(value).find()
