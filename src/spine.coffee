@@ -311,7 +311,7 @@ class Model extends Module
     result
 
   clone: ->
-    createObject(this)
+    createObject(@)
 
   reload: ->
     return this if @isNew()
