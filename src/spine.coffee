@@ -88,10 +88,10 @@ class Model extends Module
   @attributes: []
 
   @configure: (name, attributes...) ->
-    @className  = name
-    @records    = {}
-    @crecords   = {}
-    @attributes or=  []
+    @className    = name
+    @records      = {}
+    @crecords     = {}
+    @attributes or= []
     @unbind()
     @
 
