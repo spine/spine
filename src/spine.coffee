@@ -123,12 +123,14 @@ class Model extends Module
     records = @fromJSON(values)
     records = [records] unless isArray(records)
 
+    values = []
     for record in records
       record.id           or= record.cid
       @records[record.id]   = record
       @crecords[record.cid] = record
+      values.push(record.clone())
 
-    @trigger('refresh', @cloneArray(records))
+    @trigger('refresh', values)
     @
 
   @select: (callback) ->
@@ -208,9 +210,6 @@ class Model extends Module
     (new @).fromForm(arguments...)
 
   # Private
-
-  @cloneArray: (array) ->
-    (value.clone() for value in array)
 
   @idCounter: 0
 
