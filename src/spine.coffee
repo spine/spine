@@ -196,7 +196,7 @@ class Model extends Module
       @trigger('fetch', callbackOrParams)
 
   @toJSON: ->
-    @recordsValues()
+    record.toJSON() for id, record of @records
 
   @fromJSON: (objects) ->
     return unless objects
