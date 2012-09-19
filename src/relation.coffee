@@ -101,47 +101,26 @@ underscore = (str) ->
      .replace(/-/g, '_')
      .toLowerCase()
 
+assoc = (name, model, record, fkey, Ctor) ->
+  model = require(model) if typeof model is 'string'
+  new Ctor(name: name, model: model, record: record, fkey: fkey)
+
 Spine.Model.extend
   hasMany: (name, model, fkey) ->
     fkey ?= "#{underscore(this.className)}_id"
-
-    association = (record) ->
-      model = require(model) if typeof model is 'string'
-
-      new Collection(
-        name: name, model: model,
-        record: record, fkey: fkey
-      )
-
     @::[name] = (value) ->
-      association(@).refresh(value)
+      assoc(name, model, @, fkey, Collection).refresh(value)
 
   belongsTo: (name, model, fkey) ->
     fkey ?= "#{singularize(name)}_id"
-
-    association = (record) ->
-      model = require(model) if typeof model is 'string'
-
-      new Instance(
-        name: name, model: model,
-        record: record, fkey: fkey
-      )
-
     @::[name] = (value) ->
-      association(@).update(value).exists()
+      assoc(name, model, @, fkey, Instance).update(value).exists()
 
     @attributes.push(fkey)
 
   hasOne: (name, model, fkey) ->
     fkey ?= "#{underscore(@className)}_id"
-
-    association = (record) ->
-      model = require(model) if typeof model is 'string'
-
-      new Singleton(
-        name: name, model: model,
-        record: record, fkey: fkey
-      )
-
     @::[name] = (value) ->
-      association(@).update(value).find()
+      assoc(name, value, @, fkey, Singleton).update(value).find()
+  #
+#
