@@ -163,7 +163,10 @@ class Model extends Module
     record?.clone()
 
   @count: ->
-    @recordsValues().length
+    count = 0
+    for id of @records
+      ++count
+    count
 
   @deleteAll: ->
     for key, value of @records
