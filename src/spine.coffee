@@ -155,8 +155,7 @@ class Model extends Module
     undefined
 
   @last: ->
-    for key, value of @records
-      ;# value exist for last object
+    null                  for key, value of @records # value exist for last object
     value?.clone()
 
   @count: ->
