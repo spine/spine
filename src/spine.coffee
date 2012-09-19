@@ -111,9 +111,9 @@ class Model extends Module
 
   @exists: (id) ->
     try
-      return @find(id)
+      @find(id)
     catch e
-      return false
+      false
 
   @refresh: (values, options = {}) ->
     if options.clear
