@@ -494,9 +494,6 @@ isBlank = (value) ->
   return false for key of value
   true
 
-makeArray = (args) ->
-  Array::slice.call(args, 0)
-
 # Globals
 
 Spine = @Spine   = {}
