@@ -249,7 +249,7 @@ class Model extends Module
         @[key](value)
       else
         @[key] = value
-    this
+    @
 
   attributes: ->
     result = {}
