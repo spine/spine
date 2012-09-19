@@ -171,7 +171,7 @@ class Model extends Module
 
   @destroyAll: ->
     for key, value of @records
-      @records[key].destroy()
+      value.destroy()
 
   @update: (id, atts, options) ->
     @find(id).updateAttributes(atts, options)
