@@ -134,15 +134,14 @@ class Model extends Module
   @select: (callback) ->
     record.clone() for id, record of @records when callback(record)
 
-  @findByAttribute: (name, value) ->
-    for id, record of @records
-      if record[name] is value
-        return record.clone()
-    null
+  @findByAttribute: (name, attr) ->
+    for key, value of @records
+      return value.clone() if value[name] is attr
+    undefined
 
-  @findAllByAttribute: (name, value) ->
-    @select (item) ->
-      item[name] is value
+  @findAllByAttribute: (name, attr) ->
+    @select (value) ->
+      value[name] is attr
 
   @each: (callback) ->
     for key, value of @records
@@ -155,7 +154,7 @@ class Model extends Module
     for key, value of @records
       return value.clone()
     undefined
-    
+
   @last: ->
     values = @recordsValues()
     record = values[values.length - 1]
