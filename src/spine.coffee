@@ -148,11 +148,10 @@ class Model extends Module
       callback(value.clone())
 
   @all: ->
-    value.clone() for key, value of @records
+    value.clone()         for key, value of @records
 
   @first: ->
-    for key, value of @records
-      return value.clone()
+    return value.clone()  for key, value of @records
     undefined
 
   @last: ->
@@ -162,17 +161,14 @@ class Model extends Module
 
   @count: ->
     count = 0
-    for id of @records
-      ++count
+    ++count               for key of @records
     count
 
   @deleteAll: ->
-    for key, value of @records
-      delete @records[key]
+    delete @records[key]  for key, value of @records
 
   @destroyAll: ->
-    for key, value of @records
-      value.destroy()
+    value.destroy()       for key, value of @records
 
   @update: (id, atts, options) ->
     @find(id).updateAttributes(atts, options)
@@ -197,7 +193,7 @@ class Model extends Module
       @trigger('fetch', callbackOrParams)
 
   @toJSON: ->
-    record.toJSON() for id, record of @records
+    value.toJSON()        for key, value of @records
 
   @fromJSON: (objects) ->
     return unless objects
