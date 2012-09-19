@@ -145,8 +145,7 @@ class Model extends Module
       value[name] is attr
 
   @each: (callback) ->
-    for key, value of @records
-      callback(value.clone())
+    callback(value.clone()) for key, value of @records
 
   @all: ->
     value.clone()         for key, value of @records
