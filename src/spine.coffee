@@ -148,7 +148,7 @@ class Model extends Module
       callback(value.clone())
 
   @all: ->
-    @cloneArray(@recordsValues())
+    value.clone() for key, value of @records
 
   @first: ->
     for key, value of @records
@@ -212,12 +212,6 @@ class Model extends Module
     (new @).fromForm(arguments...)
 
   # Private
-
-  @recordsValues: ->
-    result = []
-    for key, value of @records
-      result.push(value)
-    result
 
   @cloneArray: (array) ->
     (value.clone() for value in array)
