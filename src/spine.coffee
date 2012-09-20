@@ -127,9 +127,10 @@ class Model extends Module
     if options.clear
       @records  = {}
       @crecords = {}
-
-    records = @fromJSON(values)
-    records = [records] unless isArray(records)
+    return unless objects
+    values = JSON.parse(values) if typeof objects is 'string'
+    
+    records = [values] unless isArray(values) else values
 
     values = []
     for record in records
@@ -179,15 +180,6 @@ class Model extends Module
 
   @toJSON: ->
     value.toJSON()        for key, value of @records
-
-  @fromJSON: (objects) ->
-    return unless objects
-    if typeof objects is 'string'
-      objects = JSON.parse(objects)
-    if isArray(objects)
-      @new(value) for value in objects
-    else
-      @new(objects)
 
   @fromForm: ->
     @new().fromForm(arguments...)
