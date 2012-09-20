@@ -185,18 +185,18 @@ class Model extends Module
     if typeof objects is 'string'
       objects = JSON.parse(objects)
     if isArray(objects)
-      (new @(value) for value in objects)
+      @new(value) for value in objects
     else
-      new @(objects)
+      @new(objects)
 
   @fromForm: ->
-    (new @).fromForm(arguments...)
+    @new().fromForm(arguments...)
 
   @update: (id, atts, options) ->
     @find(id).updateAttributes(atts, options)
 
   @create: (atts, options) ->
-    record = new @(atts)
+    record = @new(atts)
     record.save(options)
 
   @destroy: (id, options) ->
