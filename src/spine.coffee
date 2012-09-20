@@ -128,83 +128,72 @@ class Model extends Module
       @records  = {}
       @crecords = {}
     return unless objects
-    values = JSON.parse(values) if typeof objects is 'string'
     
-    records = [values] unless isArray(values) else values
-
-    values = []
-    for record in records
-      record.id           or= record.cid
-      @records[record.id]   = record
-      @crecords[record.cid] = record
-      values.push(record.clone())
-
-    @trigger('refresh', values)
+    values = JSON.parse(values) if typeof objects is 'string'
+    values = if isArray(values) then values else [values]
+    clonedArray = []
+    clonedArray.push(@new(value).refresh(value)) for value in values
+    #
+    @trigger('refresh', clonedArray)
     @
 
   @select: (callback) ->
-    value.clone()         for key, value of @records when callback(value)
+    value.clone()           for key, value of @records when callback(value)
 
   @findByAttribute: (name, attr) ->
-    return value.clone()  for key, value of @records when value[name] is attr
+    return value.clone()    for key, value of @records when value[name] is attr
     undefined
 
-  @findAllByAttribute: (name, attr) ->
-    @select (value) ->
-      value[name] is attr
+  @findAllByAttribute: (name, attr) -> @select (value) -> value[name] is attr
 
   @each: (callback) ->
     callback(value.clone()) for key, value of @records
 
   @all: ->
-    value.clone()         for key, value of @records
+    value.clone()           for key, value of @records
 
   @first: ->
-    return value.clone()  for key, value of @records
+    return value.clone()    for key, value of @records
     undefined
 
   @last: ->
-    null                  for key, value of @records # value exist for last object
-    value?.clone()
+    null                    for key, value of @records
+    value?.clone() # value exist for last object
 
   @count: ->
     count = 0
-    ++count               for key of @records
+    ++count                 for key of @records
     count
 
   @deleteAll: ->
-    delete @records[key]  for key, value of @records
+    delete @records[key]    for key, value of @records
 
   @destroyAll: ->
-    value.destroy()       for key, value of @records
+    value.destroy()         for key, value of @records
 
   @toJSON: ->
-    value.toJSON()        for key, value of @records
+    value.toJSON()          for key, value of @records
 
   @fromForm: ->
     @new().fromForm(arguments...)
 
+  @create: (atts, options) ->
+    @new(atts).save(options)
+
   @update: (id, atts, options) ->
     @find(id).updateAttributes(atts, options)
-
-  @create: (atts, options) ->
-    record = @new(atts)
-    record.save(options)
 
   @destroy: (id, options) ->
     @find(id).destroy(options)
 
   @change: (callbackOrParams) ->
-    if typeof callbackOrParams is 'function'
-      @bind('change', callbackOrParams)
-    else
-      @trigger('change', callbackOrParams)
+    bindOrTrigger(@, 'change', callbackOrParams)
 
   @fetch: (callbackOrParams) ->
-    if typeof callbackOrParams is 'function'
-      @bind('fetch', callbackOrParams)
-    else
-      @trigger('fetch', callbackOrParams)
+    bindOrTrigger(@, 'fetch', callbackOrParams)
+
+  bindOrTrigger= (self, type, callbackOrParams) ->
+    self[typeof callbackOrParams is 'function' ? 'bind' : 'change'](type, callbackOrParams)
 
   # Private
 
@@ -222,11 +211,23 @@ class Model extends Module
     @load atts if atts
     @cid = @constructor.uid('c-')
 
+  eql: (rec) ->
+    !!(rec and rec.constructor is @constructor and
+        (rec.cid is @cid) or (rec.id and rec.id is @id))
+
   isNew: ->
     not @exists()
 
   isValid: ->
     not @validate()
+
+  isCloned: ->
+    if (protoRecord = @__proto__).__proto__ is @constructor.prototype
+      protoRecord
+    else
+      false
+  exists: ->
+    @id && @id of @constructor.records
 
   validate: ->
 
@@ -238,6 +239,41 @@ class Model extends Module
         @[key] = value
     @
 
+  clone: ->
+    clone = if protoRecord = @isCloned()
+      createObject(protoRecord)
+    else
+      createObject(@)
+    clone.load @attributes()
+    clone
+  
+  # refresh is called whether the record should save to memory(ie, @constructor.records)
+  # both internally (create, update) and externally (such as Spine.Ajax callback)
+  # user should not call this method in general use.
+  refresh: (value, options) ->
+    constructor = @constructor
+    if (protoRecord = @__proto__).__proto__ is constructor.prototype
+      protoRecord.refresh(value, options)
+    else
+      value.id or= value.cid
+      if @id not in constructor.records
+        delete constructor.uncreated_crecords[@cid]
+        constructor.records[@id]   = @
+        constructor.crecords[@cid] = @
+        # okay, save to memory
+      if value.id and @id isnt value.id
+        # ID change, need to do some shifting
+        records = constructor.records
+        records[value.id] = @
+        delete records[@id]
+      # update values(id also)
+      @load(value)
+    @
+
+  changeID: (id) ->
+    @refresh(id: id)
+    @save()
+
   attributes: ->
     result = {}
     for key in @constructor.attributes when key of @
@@ -248,21 +284,15 @@ class Model extends Module
     result.id = @id if @id
     result
 
-  eql: (rec) ->
-    !!(rec and rec.constructor is @constructor and
-        (rec.cid is @cid) or (rec.id and rec.id is @id))
-
   save: (options = {}) ->
-    unless options.validate is false
-      error = @validate()
-      if error
-        @trigger('error', error)
-        return false
+    if options.validate is not false && (error = @validate())
+      @trigger('error', error)
+      return false
 
     @trigger('beforeSave', options)
-    record = if @isNew() then @create(options) else @update(options)
+    cloned = if @isNew() then @create(options) else @update(options)
     @trigger('save', options)
-    record
+    cloned
 
   updateAttribute: (name, value, options) ->
     @[name] = value
@@ -271,13 +301,6 @@ class Model extends Module
   updateAttributes: (atts, options) ->
     @load(atts)
     @save(options)
-
-  changeID: (id) ->
-    records = @constructor.records
-    records[id] = records[@id]
-    delete records[@id]
-    @id = id
-    @save()
 
   destroy: (options = {}) ->
     @trigger('beforeDestroy', options)
@@ -288,17 +311,6 @@ class Model extends Module
     @trigger('change', 'destroy', options)
     @unbind()
     @
-
-  dup: (newRecord) ->
-    result = @constructor.new(@attributes())
-    if newRecord is false
-      result.cid = @cid
-    else
-      delete result.id
-    result
-
-  clone: ->
-    createObject(@)
 
   reload: ->
     return @ if @isNew()
@@ -317,64 +329,54 @@ class Model extends Module
       result[key.name] = key.value
     @load(result)
 
-  exists: ->
-    @id && @id of @constructor.records
-
   bind: (events, callback) ->
-    if (protoRecord = @__proto__).__proto__ is @constructor.prototype
+    if protoRecord = @isCloned()
       protoRecord.bind(events, callback)
       @constructor.bind(events, callback)
     else
       Events.bind.call(@, events, callback)
+    @
 
   one: (events, callback) ->
-    if (protoRecord = @__proto__).__proto__ is @constructor.prototype
+    if protoRecord = @isCloned()
       protoRecord.one(events, callback)
       @constructor.one(events, callback)
     else
       Events.one.call(@, events, callback)
+    @
 
   trigger: (args...) ->
     args.splice(1, 0, @)
-    if (protoRecord = @__proto__).__proto__ is @constructor.prototype
+    if protoRecord = @isCloned()
       protoRecord.trigger(args...)
       @constructor.trigger(args...)
     else
-      Events.trigger.call(@, args...) 
+      Events.trigger.call(@, args...)
+    @
 
   unbind: (args...) ->
-    if (protoRecord = @__proto__).__proto__ is @constructor.prototype
+    if protoRecord = @isCloned()
       protoRecord.unbind(args)
       @constructor.unbind(args)
     else
       Events.unbind.call(@, args)
+    @
 
   # Private
 
   create: (options) ->
     @trigger('beforeCreate', options)
-    @id          = @cid unless @id
-
-    record       = @constructor.uncreated_crecords[@cid]
-    delete @constructor.uncreated_crecords[@cid]
-    @constructor.records[@id]   = record
-    @constructor.crecords[@cid] = record
-
-    clone        = record.clone()
-    clone.trigger('create', options)
-    clone.trigger('change', 'create', options)
-    clone
+    @refresh(@attributes())
+    @clone()
+      .trigger('create', options)
+      .trigger('change', 'create', options)
 
   update: (options) ->
     @trigger('beforeUpdate', options)
-    record = @constructor.records[@id]
-    record.load @attributes()
-
-    clone = record.clone()
-    clone.trigger('update', options)
-    clone.trigger('change', 'update', options)
-    clone
-
+    @refresh(@attributes())
+    @clone()
+      .trigger('update', options)
+      .trigger('change', 'update', options)
 
 class Controller extends Module
   @include Events

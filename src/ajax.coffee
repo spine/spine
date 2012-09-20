@@ -92,13 +92,14 @@ class Collection extends Base
      .fail(@failResponse)
 
   fetch: (params = {}, options = {}) ->
-    if id = params.id
+    promise = if id = params.id
       delete params.id
-      @find(id, params).done (record) =>
-        @model.refresh(record, options)
+      @find(id, params)
     else
-      @all(params).done (records) =>
-        @model.refresh(records, options)
+      @all(params)
+    promise.done (records) =>
+      records = JSON.parse(records)
+      @model.refresh(records, options)
 
   # Private
 
@@ -153,17 +154,9 @@ class Singleton extends Base
       if Spine.isBlank(data)
         data = false
       else
-        data = @model.fromJSON(data)
-
-      Ajax.disable =>
-        if data
-          # ID change, need to do some shifting
-          if data.id and @record.id isnt data.id
-            @record.changeID(data.id)
-
-          # Update with latest data
-          @record.updateAttributes(data.attributes())
-
+        data = JSON.parse(data)
+        @record.refresh(data, options)
+      #
       @record.trigger('ajaxSuccess', data, status, xhr)
       options.success?.apply(@record) # Deprecated
       options.done?.apply(@record)
