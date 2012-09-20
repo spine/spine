@@ -103,7 +103,7 @@ class Model extends Module
     return @find(id) if (id = atts.id)
     record = new @(atts)
     @uncreated_crecords[record.cid] = record
-    record
+    record.clone()
 
   @find: (id) ->
     record = @records[id]
@@ -343,7 +343,8 @@ class Model extends Module
     @trigger('beforeCreate', options)
     @id          = @cid unless @id
 
-    record       = @dup(false)
+    record       = @constructor.uncreated_crecords[@cid]
+    delete @constructor.uncreated_crecords[@cid]
     @constructor.records[@id]   = record
     @constructor.crecords[@cid] = record
 
