@@ -25,7 +25,7 @@ Events =
     true
 
   unbind: (ev, callback) ->
-    unless ev && @_callbacks
+    if !ev || !@_callbacks
       @_callbacks = {}
       return @
 
@@ -224,6 +224,7 @@ class Model extends Module
       protoRecord
     else
       false
+  
   exists: ->
     @id && @id of @constructor.records
 
