@@ -40,7 +40,9 @@ class Collection extends RelationBase
       values = JSON.parse(values) if typeof values is 'string'
       values = if isArray(values) then values else [values]
       ids = {}
-      ids[value.id] = value for value in values
+      for value in values
+        ids[value.id] = value
+        value[@fkey] = @parent.id
       #
       # unassociated @model.records
       records = @model.records
@@ -64,7 +66,9 @@ class Instance extends RelationBase
   refresh: (value) ->
     if value?
       record = @model.new(value).refresh(value)
-      @parent[@fkey] = record and record.id
+      object = {}
+      object[@fkey] = record and record.id
+      @parent.refresh(object)
       record
     else
       @parent[@fkey] and @model.exists(@parent[@fkey])
@@ -73,8 +77,8 @@ class Singleton extends RelationBase
 
   refresh: (value) ->
     if value?
+      value[@fkey] = @parent.id
       record = @model.new(value).refresh(value)
-      record[@fkey] = @parent.id
       record
     else
       @parent.id and @model.findByAttribute(@fkey, @parent.id)
