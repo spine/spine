@@ -127,7 +127,7 @@ class Model extends Module
     if options.clear
       @records  = {}
       @crecords = {}
-    return unless objects
+    return unless values
     
     values = JSON.parse(values) if typeof objects is 'string'
     values = if isArray(values) then values else [values]

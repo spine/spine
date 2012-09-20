@@ -2,16 +2,19 @@ Spine   = @Spine or require('spine')
 isArray = Spine.isArray
 require = @require or ((value) -> eval(value))
 
-class Collection extends Spine.Module
+class RelationBase extends Spine.Module
+
   constructor: (options = {}) ->
     for key, value of options
       @[key] = value
 
+class Collection extends RelationBase
+  
   all: ->
-    @model.select (rec) => @associated(rec)
+    @model.findAllByAttribute(@fkey, @record.id)
 
   first: ->
-    @all()[0]
+    @model.findByAttribute(@fkey, @record.id)
 
   last: ->
     values = @all()
@@ -58,10 +61,7 @@ class Collection extends Spine.Module
   associated: (record) ->
     record[@fkey] is @record.id
 
-class Instance extends Spine.Module
-  constructor: (options = {}) ->
-    for key, value of options
-      @[key] = value
+class Instance extends RelationBase
 
   exists: ->
     @record[@fkey] and @model.exists(@record[@fkey])
@@ -74,10 +74,7 @@ class Instance extends Spine.Module
       @record[@fkey] = value and value.id
     @
 
-class Singleton extends Spine.Module
-  constructor: (options = {}) ->
-    for key, value of options
-      @[key] = value
+class Singleton extends RelationBase
 
   find: ->
     @record.id and @model.findByAttribute(@fkey, @record.id)
