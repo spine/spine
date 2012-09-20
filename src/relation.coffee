@@ -11,22 +11,22 @@ class RelationBase extends Spine.Module
 class Collection extends RelationBase
   
   all: ->
-    @model.findAllByAttribute(@fkey, @record.id)
+    @model.findAllByAttribute(@fkey, @parent.id)
 
   first: ->
-    @model.findByAttribute(@fkey, @record.id)
+    @model.findByAttribute(@fkey, @parent.id)
 
   last: ->
     values = @all()
     values[values.length - 1]
 
   find: (id) ->
-    return record if (record = @model.find(id)) and record[@fkey] is @record.id
+    return record if (record = @model.find(id)) and record[@fkey] is @parent.id
     throw('Unknown record')
 
   select: (callback) ->
     fkey = @fkey
-    rec_id = @record.id
+    rec_id = @parent.id
     @model.select (record) -> record[fkey] is rec_id and callback(record)
 
   findAllByAttribute: (name, value) ->
@@ -51,38 +51,38 @@ class Collection extends RelationBase
     @
 
   create: (value) ->
-    value[@fkey] = @record.id
+    value[@fkey] = @parent.id
     @model.create(value)
 
   # Private
 
   associated: (record) ->
-    record[@fkey] is @record.id
+    record[@fkey] is @parent.id
 
 class Instance extends RelationBase
 
   exists: ->
-    @record[@fkey] and @model.exists(@record[@fkey])
+    @parent[@fkey] and @model.exists(@parent[@fkey])
 
   update: (value) ->
     if value?
       unless value instanceof @model
         value = @model.new(value)
       value.save() if value.isNew()
-      @record[@fkey] = value and value.id
+      @parent[@fkey] = value and value.id
     @
 
 class Singleton extends RelationBase
 
   find: ->
-    @record.id and @model.findByAttribute(@fkey, @record.id)
+    @parent.id and @model.findByAttribute(@fkey, @parent.id)
 
   update: (value) ->
     if value?
       unless value instanceof @model
         value = @model.new(value)
 
-      value[@fkey] = @record.id
+      value[@fkey] = @parent.id
       value.save()
     @
 
@@ -101,6 +101,7 @@ assoc = (name, model, record, fkey, Ctor) ->
   new Ctor(name: name, model: model, record: record, fkey: fkey)
 
 Spine.Model.extend
+  # this is parent...
   hasMany: (name, model, fkey) ->
     fkey ?= "#{underscore(@className)}_id"
     @::[name] = (value) ->
