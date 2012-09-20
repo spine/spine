@@ -75,7 +75,7 @@ class Collection extends Base
   constructor: (@model) ->
 
   find: (id, params) ->
-    record = new @model(id: id)
+    record = @model.new(id: id)
     @ajaxQueue(
       params,
       type: 'GET',
