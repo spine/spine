@@ -332,9 +332,10 @@ class Model extends Module
 
   update: (options) ->
     @trigger('beforeUpdate', options)
-    records = @constructor.records
-    records[@id].load @attributes()
-    clone = records[@id].clone()
+    record = @constructor.records[@id]
+    record.load @attributes()
+    
+    clone = record.clone()
     clone.trigger('update', options)
     clone.trigger('change', 'update', options)
     clone
