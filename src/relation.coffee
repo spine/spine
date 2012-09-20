@@ -61,30 +61,23 @@ class Collection extends RelationBase
 
 class Instance extends RelationBase
 
-  exists: ->
-    @parent[@fkey] and @model.exists(@parent[@fkey])
-
-  update: (value) ->
+  refresh: (value) ->
     if value?
-      unless value instanceof @model
-        value = @model.new(value)
-      value.save() if value.isNew()
-      @parent[@fkey] = value and value.id
-    @
+      record = @model.new(value).refresh(value)
+      @parent[@fkey] = record and record.id
+      record
+    else
+      @parent[@fkey] and @model.exists(@parent[@fkey])
 
 class Singleton extends RelationBase
 
-  find: ->
-    @parent.id and @model.findByAttribute(@fkey, @parent.id)
-
-  update: (value) ->
+  refresh: (value) ->
     if value?
-      unless value instanceof @model
-        value = @model.new(value)
-
-      value[@fkey] = @parent.id
-      value.save()
-    @
+      record = @model.new(value).refresh(value)
+      record[@fkey] = @parent.id
+      record
+    else
+      @parent.id and @model.findByAttribute(@fkey, @parent.id)
 
 singularize = (str) ->
   str.replace(/s$/, '')
@@ -110,13 +103,13 @@ Spine.Model.extend
   belongsTo: (name, model, fkey) ->
     fkey ?= "#{singularize(name)}_id"
     @::[name] = (value) ->
-      assoc(name, model, @, fkey, Instance).update(value).exists()
+      assoc(name, model, @, fkey, Instance).refresh(value)
 
     @attributes.push(fkey)
 
   hasOne: (name, model, fkey) ->
     fkey ?= "#{underscore(@className)}_id"
     @::[name] = (value) ->
-      assoc(name, value, @, fkey, Singleton).update(value).find()
+      assoc(name, value, @, fkey, Singleton).refresh(value)
   #
 #
