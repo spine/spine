@@ -244,7 +244,6 @@ class Model extends Module
       createObject(protoRecord)
     else
       createObject(@)
-    clone.load @attributes()
     clone
   
   # refresh is called whether the record should save to memory(ie, @constructor.records)

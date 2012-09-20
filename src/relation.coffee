@@ -89,9 +89,9 @@ underscore = (str) ->
      .replace(/-/g, '_')
      .toLowerCase()
 
-assoc = (name, model, record, fkey, Ctor) ->
+assoc = (name, model, parent, fkey, Ctor) ->
   model = require(model) if typeof model is 'string'
-  new Ctor(name: name, model: model, record: record, fkey: fkey)
+  new Ctor(name: name, model: model, parent: parent, fkey: fkey)
 
 Spine.Model.extend
   # this is parent...
