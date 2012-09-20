@@ -25,22 +25,20 @@ Events =
     true
 
   unbind: (ev, callback) ->
-    unless ev
+    unless ev && @_callbacks
       @_callbacks = {}
       return @
 
-    list = @_callbacks?[ev]
-    return @ unless list
-
-    unless callback
-      delete @_callbacks[ev]
-      return @
-
-    for cb, i in list when cb is callback
-      list = list.slice()
-      list.splice(i, 1)
-      @_callbacks[ev] = list
-      break
+    calls = @_callbacks
+    for name in ev.split(' ')
+      continue unless (list = calls[name])
+      unless callback
+        delete calls[name]
+      else
+        break for cb, i in list when cb is callback
+        list = list.slice()
+        list.splice(i, 1)
+        calls[name] = list
     @
 
 Log =
