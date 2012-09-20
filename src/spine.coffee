@@ -99,6 +99,12 @@ class Model extends Module
 
   @toString: -> "#{@className}(#{@attributes.join(", ")})"
 
+  @new: (atts) ->
+    return @find(id) if (id = atts.id)
+    record = new @(atts)
+    @uncreated_crecords[record.cid] = record
+    record
+
   @find: (id) ->
     record = @records[id]
     if !record and ("#{id}").match(/c-\d+/)
