@@ -100,7 +100,7 @@ class Model extends Module
   @toString: -> "#{@className}(#{@attributes.join(", ")})"
 
   @new: (atts) ->
-    return @find(id) if (id = atts.id)
+    return record if (id = atts.id) and (record = @exists(id))
     record = new @(atts)
     @uncreated_crecords[record.cid] = record
     record.clone()
