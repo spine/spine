@@ -329,26 +329,33 @@ class Model extends Module
     @id && @id of @constructor.records
 
   bind: (events, callback) ->
-    @constructor.bind events, binder = (record) =>
-      if record && @eql(record)
-        callback.apply(@, arguments)
-    @constructor.bind 'unbind', unbinder = (record) =>
-      if record && @eql(record)
-        @constructor.unbind(events, binder)
-        @constructor.unbind('unbind', unbinder)
-    binder
+    if (protoRecord = @__proto__).__proto__ is @constructor.prototype
+      protoRecord.bind(events, callback)
+      @constructor.bind(events, callback)
+    else
+      Events.bind.call(@, events, callback)
 
   one: (events, callback) ->
-    binder = @bind events, =>
-      @constructor.unbind(events, binder)
-      callback.apply(@, arguments)
+    if (protoRecord = @__proto__).__proto__ is @constructor.prototype
+      protoRecord.one(events, callback)
+      @constructor.one(events, callback)
+    else
+      Events.one.call(@, events, callback)
 
   trigger: (args...) ->
     args.splice(1, 0, @)
-    @constructor.trigger(args...)
+    if (protoRecord = @__proto__).__proto__ is @constructor.prototype
+      protoRecord.trigger(args...)
+      @constructor.trigger(args...)
+    else
+      Events.trigger.call(@, args...) 
 
-  unbind: ->
-    @trigger('unbind')
+  unbind: (args...) ->
+    if (protoRecord = @__proto__).__proto__ is @constructor.prototype
+      protoRecord.unbind(args)
+      @constructor.unbind(args)
+    else
+      Events.unbind.call(@, args)
 
   # Private
 
