@@ -69,7 +69,7 @@ class Instance extends Spine.Module
   update: (value) ->
     if value?
       unless value instanceof @model
-        value = new @model(value)
+        value = @model.new(value)
       value.save() if value.isNew()
       @record[@fkey] = value and value.id
     @
@@ -85,7 +85,7 @@ class Singleton extends Spine.Module
   update: (value) ->
     if value?
       unless value instanceof @model
-        value = @model.fromJSON(value)
+        value = @model.new(value)
 
       value[@fkey] = @record.id
       value.save()
