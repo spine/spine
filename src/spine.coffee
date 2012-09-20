@@ -354,10 +354,10 @@ class Model extends Module
 
   unbind: (args...) ->
     if protoRecord = @isCloned()
-      protoRecord.unbind(args)
-      @constructor.unbind(args)
+      protoRecord.unbind(args...)
+      @constructor.unbind(args...)
     else
-      Events.unbind.call(@, args)
+      Events.unbind.call(@, args...)
     @
 
   # Private
