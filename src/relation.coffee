@@ -21,40 +21,38 @@ class Collection extends RelationBase
     values[values.length - 1]
 
   find: (id) ->
-    records = @select (rec) =>
-      rec.id + '' is id + ''
-    throw('Unknown record') unless records[0]
-    records[0]
+    return record if (record = @model.find(id)) and record[@fkey] is @record.id
+    throw('Unknown record')
+
+  select: (callback) ->
+    fkey = @fkey
+    rec_id = @record.id
+    @model.select (record) -> record[fkey] is rec_id and callback(record)
 
   findAllByAttribute: (name, value) ->
-    @model.select (rec) =>
-      @associated(rec) and rec[name] is value
+    @select (record) -> record[name] is value
 
   findByAttribute: (name, value) ->
     @findAllByAttribute(name, value)[0]
-
-  select: (cb) ->
-    @model.select (rec) =>
-      @associated(rec) and cb(rec)
-
+  
   refresh: (values) ->
     if values?
-      delete @model.records[record.id] for record in @all()
-      records = @model.fromJSON(values)
-
-      records = [records] unless isArray(records)
-
-      for record in records
-        record.newRecord = false
-        record[@fkey] = @record.id
-        @model.records[record.id] = record
-
-      @model.trigger('refresh', @model.cloneArray(records))
+      values = JSON.parse(values) if typeof values is 'string'
+      values = if isArray(values) then values else [values]
+      ids = {}
+      ids[value.id] = value for value in values
+      #
+      # unassociated @model.records
+      records = @model.records
+      delete record[record.id] for record in @all() when ids[record.id] is undefined
+      # TODO: maybe we can create a method named delete in Model.prototype?
+      # do refresh now
+      @model.refresh(values)
     @
 
-  create: (record) ->
-    record[@fkey] = @record.id
-    @model.create(record)
+  create: (value) ->
+    value[@fkey] = @record.id
+    @model.create(value)
 
   # Private
 
@@ -104,7 +102,7 @@ assoc = (name, model, record, fkey, Ctor) ->
 
 Spine.Model.extend
   hasMany: (name, model, fkey) ->
-    fkey ?= "#{underscore(this.className)}_id"
+    fkey ?= "#{underscore(@className)}_id"
     @::[name] = (value) ->
       assoc(name, model, @, fkey, Collection).refresh(value)
 

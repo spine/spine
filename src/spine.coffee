@@ -129,7 +129,7 @@ class Model extends Module
       @crecords = {}
     return unless values
     
-    values = JSON.parse(values) if typeof objects is 'string'
+    values = JSON.parse(values) if typeof values is 'string'
     values = if isArray(values) then values else [values]
     clonedArray = []
     clonedArray.push(@new(value).refresh(value)) for value in values
