@@ -85,13 +85,15 @@ class Model extends Module
 
   @records: {}
   @crecords: {}
+  @uncreated_crecords: {}
   @attributes: []
 
   @configure: (name, attributes...) ->
-    @className    = name
-    @records      = {}
-    @crecords     = {}
-    @attributes or= []
+    @className          = name
+    @records            = {}
+    @crecords           = {}
+    @uncreated_crecords = {}
+    @attributes       or= []
     @unbind()
     @
 
