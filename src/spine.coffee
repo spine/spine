@@ -298,7 +298,7 @@ class Model extends Module
     @
 
   dup: (newRecord) ->
-    result = new @constructor(@attributes())
+    result = @constructor.new(@attributes())
     if newRecord is false
       result.cid = @cid
     else
