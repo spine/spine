@@ -328,32 +328,6 @@ class Model extends Module
   exists: ->
     @id && @id of @constructor.records
 
-  # Private
-
-  update: (options) ->
-    @trigger('beforeUpdate', options)
-    record = @constructor.records[@id]
-    record.load @attributes()
-    
-    clone = record.clone()
-    clone.trigger('update', options)
-    clone.trigger('change', 'update', options)
-    clone
-
-  create: (options) ->
-    @trigger('beforeCreate', options)
-    @id          = @cid unless @id
-
-    record       = @constructor.uncreated_crecords[@cid]
-    delete @constructor.uncreated_crecords[@cid]
-    @constructor.records[@id]   = record
-    @constructor.crecords[@cid] = record
-
-    clone        = record.clone()
-    clone.trigger('create', options)
-    clone.trigger('change', 'create', options)
-    clone
-
   bind: (events, callback) ->
     @constructor.bind events, binder = (record) =>
       if record && @eql(record)
@@ -375,6 +349,33 @@ class Model extends Module
 
   unbind: ->
     @trigger('unbind')
+
+  # Private
+
+  create: (options) ->
+    @trigger('beforeCreate', options)
+    @id          = @cid unless @id
+
+    record       = @constructor.uncreated_crecords[@cid]
+    delete @constructor.uncreated_crecords[@cid]
+    @constructor.records[@id]   = record
+    @constructor.crecords[@cid] = record
+
+    clone        = record.clone()
+    clone.trigger('create', options)
+    clone.trigger('change', 'create', options)
+    clone
+
+  update: (options) ->
+    @trigger('beforeUpdate', options)
+    record = @constructor.records[@id]
+    record.load @attributes()
+
+    clone = record.clone()
+    clone.trigger('update', options)
+    clone.trigger('change', 'update', options)
+    clone
+
 
 class Controller extends Module
   @include Events
