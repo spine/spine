@@ -191,7 +191,7 @@ class Model extends Module
     bindOrTrigger(@, 'fetch', callbackOrParams)
 
   bindOrTrigger= (self, type, callbackOrParams) ->
-    self[if typeof callbackOrParams is 'function' then 'bind' else 'change'](type, callbackOrParams)
+    self[if typeof callbackOrParams is 'function' then 'bind' else 'trigger'](type, callbackOrParams)
 
   # Private
 
