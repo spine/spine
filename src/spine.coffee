@@ -288,9 +288,14 @@ class Model extends Module
       return false
 
     @trigger('beforeSave', options)
-    cloned = if @isNew() then @create(options) else @update(options)
-    @trigger('save', options)
-    cloned
+    type = if @isNew() then 'Create' else 'Update'
+    @trigger('before' + type, options)
+    type = type.toLowerCase()
+    @refresh(@attributes())
+    @clone()
+      .trigger(type, options)
+      .trigger('change', type, options)
+      .trigger('save', options)
 
   updateAttribute: (name, value, options) ->
     @[name] = value
@@ -360,22 +365,6 @@ class Model extends Module
     else
       Events.unbind.call(@, args...)
     @
-
-  # Private
-
-  create: (options) ->
-    @trigger('beforeCreate', options)
-    @refresh(@attributes())
-    @clone()
-      .trigger('create', options)
-      .trigger('change', 'create', options)
-
-  update: (options) ->
-    @trigger('beforeUpdate', options)
-    @refresh(@attributes())
-    @clone()
-      .trigger('update', options)
-      .trigger('change', 'update', options)
 
 class Controller extends Module
   @include Events
