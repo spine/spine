@@ -249,10 +249,10 @@ class Model extends Module
   # both internally (create, update) and externally (such as Spine.Ajax callback)
   # user should not call this method in general use.
   refresh: (value, options) ->
-    constructor = @constructor
-    if (protoRecord = @__proto__).__proto__ is constructor.prototype
+    if protoRecord = @isCloned()
       protoRecord.refresh(value, options)
     else
+      constructor = @constructor
       value.id or= value.cid
       if @id not in constructor.records
         delete constructor.uncreated_crecords[@cid]
