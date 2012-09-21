@@ -521,11 +521,11 @@ Module.extend.call(Spine, Events)
 Module.create = Module.sub =
   Controller.create = Controller.sub =
     Model.sub = (instances, statics) ->
-      class result extends this
-      result.include(instances) if instances
-      result.extend(statics) if statics
-      result.unbind?()
-      result
+      class Result extends this
+      Result.include(instances) if instances
+      Result.extend(statics) if statics
+      Result.unbind?()
+      Result
 
 Model.setup = (name, attributes = []) ->
   class Instance extends this
