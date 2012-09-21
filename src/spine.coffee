@@ -305,7 +305,7 @@ class Model extends Module
     delete @constructor.uncreated_crecords[@cid]
     delete @constructor.records[@id]
     delete @constructor.crecords[@cid]
-    @destroyed = true
+    @refresh(destroyed: true)
     @trigger('destroy', options)
     @trigger('change', 'destroy', options)
     @unbind()
