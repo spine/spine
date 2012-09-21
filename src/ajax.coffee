@@ -179,7 +179,11 @@ Extend =
     args.join('/')
 
 Include =
-  ajax: -> new Singleton(@)
+  ajax: ->
+    if protoRecord = @isCloned()
+      protoRecord.ajax()
+    else
+      @_ajax or= new Singleton(@)
 
   url: (args...) ->
     url = Ajax.getURL(@constructor)
