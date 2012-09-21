@@ -302,6 +302,7 @@ class Model extends Module
 
   destroy: (options = {}) ->
     @trigger('beforeDestroy', options)
+    delete @constructor.uncreated_crecords[@cid]
     delete @constructor.records[@id]
     delete @constructor.crecords[@cid]
     @destroyed = true
