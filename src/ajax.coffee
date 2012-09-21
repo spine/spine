@@ -170,6 +170,14 @@ class Singleton extends Base
 # Ajax endpoint
 Model.host = ''
 
+Extend =
+  ajax: -> new Collection(@)
+
+  url: (args...) ->
+    args.unshift(@className.toLowerCase() + 's')
+    args.unshift(Model.host)
+    args.join('/')
+
 Include =
   ajax: -> new Singleton(@)
 
@@ -178,14 +186,6 @@ Include =
     url += '/' unless url.charAt(url.length - 1) is '/'
     url += encodeURIComponent(@id)
     args.unshift(url)
-    args.join('/')
-
-Extend =
-  ajax: -> new Collection(@)
-
-  url: (args...) ->
-    args.unshift(@className.toLowerCase() + 's')
-    args.unshift(Model.host)
     args.join('/')
 
 Model.Ajax =
