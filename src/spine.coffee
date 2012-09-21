@@ -425,6 +425,7 @@ class Controller extends Module
         @el.bind(eventName, method)
       else
         @el.delegate(selector, eventName, method)
+    @
 
   refreshElements: ->
     for key, value of @elements
