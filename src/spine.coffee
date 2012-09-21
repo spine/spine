@@ -254,7 +254,7 @@ class Model extends Module
     else
       constructor = @constructor
       value.id or= value.cid
-      if @id not in constructor.records
+      if @id not of constructor.records
         delete constructor.uncreated_crecords[@cid]
         constructor.records[@id]   = @
         constructor.crecords[@cid] = @
