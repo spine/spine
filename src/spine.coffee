@@ -308,15 +308,17 @@ class Model extends Module
     @save(options)
 
   destroy: (options = {}) ->
-    @trigger('beforeDestroy', options)
+    clone = @clone()
+    clone.trigger('beforeDestroy', options)
     delete @constructor.uncreated_crecords[@cid]
     delete @constructor.records[@id]
     delete @constructor.crecords[@cid]
     @refresh(destroyed: true)
-    @trigger('destroy', options)
-    @trigger('change', 'destroy', options)
+    clone
+      .trigger('destroy', options)
+      .trigger('change', 'destroy', options)
     @unbind()
-    @
+    clone
 
   reload: ->
     return @ if @isNew()
@@ -352,8 +354,9 @@ class Model extends Module
     @
 
   trigger: (args...) ->
-    if protoRecord = @isCloned()
+    unless ((rec = args[0]) instanceof @constructor) and @isCloned()
       args.splice(1, 0, @)
+    if protoRecord = @isCloned()
       protoRecord.trigger(args...)
       @constructor.trigger(args...)
     else
