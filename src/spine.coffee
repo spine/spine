@@ -287,12 +287,14 @@ class Model extends Module
       @trigger('error', error)
       return false
 
-    @trigger('beforeSave', options)
+    clone = @clone()
     type = if @isNew() then 'Create' else 'Update'
-    @trigger('before' + type, options)
+    clone
+      .trigger('beforeSave', options)
+      .trigger('before' + type, options)
     type = type.toLowerCase()
     @refresh(@attributes())
-    @clone()
+    clone
       .trigger(type, options)
       .trigger('change', type, options)
       .trigger('save', options)
@@ -350,8 +352,8 @@ class Model extends Module
     @
 
   trigger: (args...) ->
-    args.splice(1, 0, @)
     if protoRecord = @isCloned()
+      args.splice(1, 0, @)
       protoRecord.trigger(args...)
       @constructor.trigger(args...)
     else
