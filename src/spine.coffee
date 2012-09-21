@@ -432,7 +432,7 @@ class Controller extends Module
       @[value] = @$(key)
 
   delay: (func, timeout) ->
-    setTimeout(@proxy(func), timeout || 0)
+    setTimeout(@proxy(func), timeout or 0)
 
   html: (element) ->
     @el.html(element.el or element)
