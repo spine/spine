@@ -245,12 +245,15 @@ class Model extends Module
   validate: ->
 
   load: (atts) ->
-    for key, value of atts
-      if typeof @[key] is 'function'
-        @[key](value)
-      else
-        @[key] = value
+    @setAttribute key, value for key, value of atts
     this
+
+  setAttribute: (key, value) ->
+    if typeof @[key] is 'function'
+      @[key](value)
+    else
+      @[key] = value
+    @
 
   attributes: ->
     result = {}
@@ -279,7 +282,7 @@ class Model extends Module
     record
 
   updateAttribute: (name, value, options) ->
-    @[name] = value
+    @setAttribute name, value
     @save(options)
 
   updateAttributes: (atts, options) ->
