@@ -83,12 +83,14 @@ class Module
 class Model extends Module
   @extend Events
 
+  @ids: []
   @records: {}
   @crecords: {}
   @attributes: []
 
   @configure: (name, attributes...) ->
     @className  = name
+    @ids        = []
     @records    = {}
     @crecords   = {}
     @attributes = attributes if attributes.length
@@ -119,6 +121,7 @@ class Model extends Module
 
   @refresh: (values, options = {}) ->
     if options.clear
+      @ids      = []
       @records  = {}
       @crecords = {}
 
@@ -127,6 +130,7 @@ class Model extends Module
 
     for record in records
       record.id           or= record.cid
+      @ids.push(record.id)
       @records[record.id]   = record
       @crecords[record.cid] = record
 
@@ -134,11 +138,12 @@ class Model extends Module
     this
 
   @select: (callback) ->
-    result = (record for id, record of @records when callback(record))
+    result = (@records[id] for id in @ids when callback(@records[id]))
     @cloneArray(result)
 
   @findByAttribute: (name, value) ->
-    for id, record of @records
+    for id in @ids
+      record = @records[id]
       if record[name] is value
         return record.clone()
     null
@@ -148,8 +153,8 @@ class Model extends Module
       item[name] is value
 
   @each: (callback) ->
-    for key, value of @records
-      callback(value.clone())
+    for id in @ids
+      callback(@records[id].clone())
 
   @all: ->
     @cloneArray(@recordsValues())
@@ -164,15 +169,13 @@ class Model extends Module
     record?.clone()
 
   @count: ->
-    @recordsValues().length
+    @ids.length
 
   @deleteAll: ->
-    for key, value of @records
-      delete @records[key]
+    @delete(id) for id in @ids.slice(0)
 
-  @destroyAll: ->
-    for key, value of @records
-      @records[key].destroy()
+  @destroyAll: (options) ->
+    @destroy(id, options) for id in @ids.slice(0)
 
   @update: (id, atts, options) ->
     @find(id).updateAttributes(atts, options)
@@ -180,6 +183,10 @@ class Model extends Module
   @create: (atts, options) ->
     record = new @(atts)
     record.save(options)
+
+  @delete: (id) ->
+    @removeID(id)
+    delete @records[id]
 
   @destroy: (id, options) ->
     @find(id).destroy(options)
@@ -215,8 +222,8 @@ class Model extends Module
 
   @recordsValues: ->
     result = []
-    for key, value of @records
-      result.push(value)
+    for id in @ids
+      result.push(@records[id])
     result
 
   @cloneArray: (array) ->
@@ -228,6 +235,10 @@ class Model extends Module
     uid = prefix + @idCounter++
     uid = @uid(prefix) if @exists(uid)
     uid
+
+  @removeID: (id) ->
+    index = @ids.indexOf(id)
+    @ids.splice(index, 1) if index isnt -1
 
   # Instance
 
@@ -287,6 +298,8 @@ class Model extends Module
     @save(options)
 
   changeID: (id) ->
+    @constructor.ids.push(id)
+    @constructor.removeID(@id)
     records = @constructor.records
     records[id] = records[@id]
     delete records[@id]
@@ -295,6 +308,7 @@ class Model extends Module
 
   destroy: (options = {}) ->
     @trigger('beforeDestroy', options)
+    @constructor.removeID(@id)
     delete @constructor.records[@id]
     delete @constructor.crecords[@cid]
     @destroyed = true
@@ -351,6 +365,7 @@ class Model extends Module
     @id          = @cid unless @id
 
     record       = @dup(false)
+    @constructor.ids.push(@id)
     @constructor.records[@id]   = record
     @constructor.crecords[@cid] = record
 
