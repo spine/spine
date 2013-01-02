@@ -142,3 +142,7 @@ Spine.Model.extend
     @::[name] = (value) ->
       association(@).update(value) if value?
       association(@).find()
+	  
+Spine.Collection = Collection
+Spine.Singleton = Singleton
+Spine.Instance = Instance
