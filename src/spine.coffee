@@ -29,18 +29,20 @@ Events =
       @_callbacks = {}
       return this
 
-    list = @_callbacks?[ev]
-    return this unless list
+    evs  = ev.split(' ')
+    for name in evs
+      list = @_callbacks?[name]
+      continue unless list
 
-    unless callback
-      delete @_callbacks[ev]
-      return this
+      unless callback
+        delete @_callbacks[name]
+        continue
 
-    for cb, i in list when cb is callback
-      list = list.slice()
-      list.splice(i, 1)
-      @_callbacks[ev] = list
-      break
+      for cb, i in list when cb is callback
+        list = list.slice()
+        list.splice(i, 1)
+        @_callbacks[name] = list
+        break
     this
 
 Log =
