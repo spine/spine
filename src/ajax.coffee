@@ -80,16 +80,18 @@ class Collection extends Base
       params,
       type: 'GET',
       url:  Ajax.getURL(record)
-    ).done(@recordsResponse)
-     .fail(@failResponse)
+      success: @recordsResponse
+      error: @failResponse
+    )
 
   all: (params) ->
     @ajaxQueue(
       params,
       type: 'GET',
       url:  Ajax.getURL(@model)
-    ).done(@recordsResponse)
-     .fail(@failResponse)
+      success: @recordsResponse
+      error: @failResponse
+    )
 
   fetch: (params = {}, options = {}) ->
     if id = params.id
@@ -117,8 +119,9 @@ class Singleton extends Base
       params,
       type: 'GET'
       url:  Ajax.getURL(@record)
-    ).done(@recordResponse(options))
-     .fail(@failResponse(options))
+      success: @recordResponse(options)
+      error: @failResponse(options)
+    )
 
   create: (params, options) ->
     @ajaxQueue(
@@ -126,8 +129,9 @@ class Singleton extends Base
       type: 'POST'
       data: JSON.stringify(@record)
       url:  Ajax.getURL(@model)
-    ).done(@recordResponse(options))
-     .fail(@failResponse(options))
+      success: @recordResponse(options)
+      error: @failResponse(options)
+    )
 
   update: (params, options) ->
     @ajaxQueue(
@@ -135,16 +139,18 @@ class Singleton extends Base
       type: 'PUT'
       data: JSON.stringify(@record)
       url:  Ajax.getURL(@record)
-    ).done(@recordResponse(options))
-     .fail(@failResponse(options))
+      success: @recordResponse(options)
+      error: @failResponse(options)
+    )
 
   destroy: (params, options) ->
     @ajaxQueue(
       params,
       type: 'DELETE'
       url:  Ajax.getURL(@record)
-    ).done(@recordResponse(options))
-     .fail(@failResponse(options))
+      success: @recordResponse(options)
+      error: @failResponse(options)
+    )
 
   # Private
 
