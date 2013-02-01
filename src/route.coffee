@@ -28,7 +28,7 @@ class Spine.Route extends Spine.Module
     @options = $.extend({}, @options, options)
 
     if (@options.history)
-      @history = @historySupport && @options.history
+      @history = @historySupport and @options.history
 
     return if @options.shim
 
@@ -68,11 +68,7 @@ class Spine.Route extends Spine.Module
     return if options.shim
 
     if @history
-      history.pushState(
-        {},
-        document.title,
-        @path
-      )
+      history.pushState({}, document.title, @path)
     else
       window.location.hash = @path
 
@@ -98,10 +94,9 @@ class Spine.Route extends Spine.Module
     @matchRoute(@path)
 
   @matchRoute: (path, options) ->
-    for route in @routes
-      if route.match(path, options)
-        @trigger('change', route, path)
-        return route
+    for route in @routes when route.match(path, options)
+      @trigger('change', route, path)
+      return route
 
   constructor: (@path, @callback) ->
     @names = []
@@ -119,7 +114,7 @@ class Spine.Route extends Spine.Module
                  .replace(namedParam, '([^\/]*)')
                  .replace(splatParam, '(.*?)')
 
-      @route = new RegExp('^' + path + '$')
+      @route = new RegExp("^#{path}$")
     else
       @route = path
 
