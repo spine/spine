@@ -75,7 +75,7 @@ class Collection extends Base
   constructor: (@model) ->
 
   find: (id, params) ->
-    record = new @model(id: id)
+    record = @model.new(id: id)
     @ajaxQueue(
       params,
       type: 'GET',
@@ -92,13 +92,14 @@ class Collection extends Base
      .fail(@failResponse)
 
   fetch: (params = {}, options = {}) ->
-    if id = params.id
+    promise = if id = params.id
       delete params.id
-      @find(id, params).done (record) =>
-        @model.refresh(record, options)
+      @find(id, params)
     else
-      @all(params).done (records) =>
-        @model.refresh(records, options)
+      @all(params)
+    promise.done (records) =>
+      records = JSON.parse(records)
+      @model.refresh(records, options)
 
   # Private
 
@@ -153,17 +154,9 @@ class Singleton extends Base
       if Spine.isBlank(data) or @record.destroyed
         data = false
       else
-        data = @model.fromJSON(data)
-
-      Ajax.disable =>
-        if data
-          # ID change, need to do some shifting
-          if data.id and @record.id isnt data.id
-            @record.changeID(data.id)
-
-          # Update with latest data
-          @record.updateAttributes(data.attributes())
-
+        data = JSON.parse(data)
+        @record.refresh(data, options)
+      #
       @record.trigger('ajaxSuccess', data, status, xhr)
       options.success?.apply(@record) # Deprecated
       options.done?.apply(@record)
@@ -177,22 +170,26 @@ class Singleton extends Base
 # Ajax endpoint
 Model.host = ''
 
+Extend =
+  ajax: -> new Collection(@)
+
+  url: (args...) ->
+    args.unshift(@className.toLowerCase() + 's')
+    args.unshift(Model.host)
+    args.join('/')
+
 Include =
-  ajax: -> new Singleton(this)
+  ajax: ->
+    if protoRecord = @isCloned()
+      protoRecord.ajax()
+    else
+      @_ajax or= new Singleton(@)
 
   url: (args...) ->
     url = Ajax.getURL(@constructor)
     url += '/' unless url.charAt(url.length - 1) is '/'
     url += encodeURIComponent(@id)
     args.unshift(url)
-    args.join('/')
-
-Extend =
-  ajax: -> new Collection(this)
-
-  url: (args...) ->
-    args.unshift(@className.toLowerCase() + 's')
-    args.unshift(Model.host)
     args.join('/')
 
 Model.Ajax =

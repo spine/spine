@@ -2,88 +2,86 @@ Spine   = @Spine or require('spine')
 isArray = Spine.isArray
 require = @require or ((value) -> eval(value))
 
-class Collection extends Spine.Module
+class RelationBase extends Spine.Module
+
   constructor: (options = {}) ->
     for key, value of options
       @[key] = value
 
+class Collection extends RelationBase
+  
   all: ->
-    @model.select (rec) => @associated(rec)
+    @model.findAllByAttribute(@fkey, @parent.id)
 
   first: ->
-    @all()[0]
+    @model.findByAttribute(@fkey, @parent.id)
 
   last: ->
     values = @all()
     values[values.length - 1]
 
   find: (id) ->
-    records = @select (rec) =>
-      rec.id + '' is id + ''
-    throw('Unknown record') unless records[0]
-    records[0]
+    return record if (record = @model.find(id)) and record[@fkey] is @parent.id
+    throw('Unknown record')
+
+  select: (callback) ->
+    fkey = @fkey
+    rec_id = @parent.id
+    @model.select (record) -> record[fkey] is rec_id and callback(record)
 
   findAllByAttribute: (name, value) ->
-    @model.select (rec) =>
-      @associated(rec) and rec[name] is value
+    @select (record) -> record[name] is value
 
   findByAttribute: (name, value) ->
     @findAllByAttribute(name, value)[0]
-
-  select: (cb) ->
-    @model.select (rec) =>
-      @associated(rec) and cb(rec)
-
+  
   refresh: (values) ->
-    delete @model.records[record.id] for record in @all()
-    records = @model.fromJSON(values)
+    if values?
+      values = JSON.parse(values) if typeof values is 'string'
+      values = if isArray(values) then values else [values]
+      ids = {}
+      for value in values
+        ids[value.id] = value
+        value[@fkey] = @parent.id
+      #
+      # unassociated @model.records
+      records = @model.records
+      delete record[record.id] for record in @all() when ids[record.id] is undefined
+      # TODO: maybe we can create a method named delete in Model.prototype?
+      # do refresh now
+      @model.refresh(values)
+    @
 
-    records = [records] unless isArray(records)
-
-    for record in records
-      record.newRecord = false
-      record[@fkey] = @record.id
-      @model.records[record.id] = record
-
-    @model.trigger('refresh', @model.cloneArray(records))
-
-  create: (record) ->
-    record[@fkey] = @record.id
-    @model.create(record)
+  create: (value) ->
+    value[@fkey] = @parent.id
+    @model.create(value)
 
   # Private
 
   associated: (record) ->
-    record[@fkey] is @record.id
+    record[@fkey] is @parent.id
 
-class Instance extends Spine.Module
-  constructor: (options = {}) ->
-    for key, value of options
-      @[key] = value
+class Instance extends RelationBase
 
-  exists: ->
-    @record[@fkey] and @model.exists(@record[@fkey])
+  refresh: (value) ->
+    if value?
+      record = @model.new(value).refresh(value)
+      object = {}
+      object[@fkey] = record and record.id
+      @parent.refresh(object)
+      record
+    else
+      @parent[@fkey] and @model.exists(@parent[@fkey])
 
-  update: (value) ->
-    unless value instanceof @model
-      value = new @model(value)
-    value.save() if value.isNew()
-    @record[@fkey] = value and value.id
+class Singleton extends RelationBase
 
-class Singleton extends Spine.Module
-  constructor: (options = {}) ->
-    for key, value of options
-      @[key] = value
-
-  find: ->
-    @record.id and @model.findByAttribute(@fkey, @record.id)
-
-  update: (value) ->
-    unless value instanceof @model
-      value = @model.fromJSON(value)
-
-    value[@fkey] = @record.id
-    value.save()
+  refresh: (value) ->
+    if value?
+      value[@fkey] = @parent.id
+      record = @model.new(value).refresh(value)
+      record
+    else
+      @parent.id and @model.findByAttribute(@fkey, @parent.id)
 
 singularize = (str) ->
   str.replace(/s$/, '')
@@ -95,50 +93,27 @@ underscore = (str) ->
      .replace(/-/g, '_')
      .toLowerCase()
 
+assoc = (name, model, parent, fkey, Ctor) ->
+  model = require(model) if typeof model is 'string'
+  new Ctor(name: name, model: model, parent: parent, fkey: fkey)
+
 Spine.Model.extend
+  # this is parent...
   hasMany: (name, model, fkey) ->
-    fkey ?= "#{underscore(this.className)}_id"
-
-    association = (record) ->
-      model = require(model) if typeof model is 'string'
-
-      new Collection(
-        name: name, model: model,
-        record: record, fkey: fkey
-      )
-
+    fkey ?= "#{underscore(@className)}_id"
     @::[name] = (value) ->
-      association(@).refresh(value) if value?
-      association(@)
+      assoc(name, model, @, fkey, Collection).refresh(value)
 
   belongsTo: (name, model, fkey) ->
     fkey ?= "#{singularize(name)}_id"
-
-    association = (record) ->
-      model = require(model) if typeof model is 'string'
-
-      new Instance(
-        name: name, model: model,
-        record: record, fkey: fkey
-      )
-
     @::[name] = (value) ->
-      association(@).update(value) if value?
-      association(@).exists()
+      assoc(name, model, @, fkey, Instance).refresh(value)
 
     @attributes.push(fkey)
 
   hasOne: (name, model, fkey) ->
     fkey ?= "#{underscore(@className)}_id"
-
-    association = (record) ->
-      model = require(model) if typeof model is 'string'
-
-      new Singleton(
-        name: name, model: model,
-        record: record, fkey: fkey
-      )
-
     @::[name] = (value) ->
-      association(@).update(value) if value?
-      association(@).find()
+      assoc(name, value, @, fkey, Singleton).refresh(value)
+  #
+#
