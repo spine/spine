@@ -6,11 +6,11 @@
   "licenses":
     [{
       "type": "MIT",
-      "url": "https://github.com/maccman/spine/blob/master/LICENSE"
+      "url": "https://github.com/spine/spine/blob/master/LICENSE"
     }],
   "repository": {
     "type" : "git",
-    "url": "http://github.com/maccman/spine.git"
+    "url": "http://github.com/spine/spine.git"
   },
   "main" : "./index.js",
   "scripts": {
