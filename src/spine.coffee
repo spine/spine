@@ -6,12 +6,12 @@ Events =
     for name in evs
       calls[name] or= []
       calls[name].push(callback)
-    this
+    @
 
   one: (ev, callback) ->
     @bind ev, ->
       @unbind(ev, arguments.callee)
-      callback.apply(this, arguments)
+      callback.apply(@, arguments)
 
   trigger: (args...) ->
     ev = args.shift()
@@ -20,28 +20,28 @@ Events =
     return unless list
 
     for callback in list
-      if callback.apply(this, args) is false
+      if callback.apply(@, args) is false
         break
     true
 
   unbind: (ev, callback) ->
     unless ev
       @_callbacks = {}
-      return this
+      return @
 
     list = @_callbacks?[ev]
-    return this unless list
+    return @ unless list
 
     unless callback
       delete @_callbacks[ev]
-      return this
+      return @
 
     for cb, i in list when cb is callback
       list = list.slice()
       list.splice(i, 1)
       @_callbacks[ev] = list
       break
-    this
+    @
 
 Log =
   trace: true
@@ -52,7 +52,7 @@ Log =
     return unless @trace
     if @logPrefix then args.unshift(@logPrefix)
     console?.log?(args...)
-    this
+    @
 
 moduleKeywords = ['included', 'extended']
 
@@ -61,21 +61,21 @@ class Module
     throw new Error('include(obj) requires obj') unless obj
     for key, value of obj when key not in moduleKeywords
       @::[key] = value
-    obj.included?.apply(this)
-    this
+    obj.included?.apply(@)
+    @
 
   @extend: (obj) ->
     throw new Error('extend(obj) requires obj') unless obj
     for key, value of obj when key not in moduleKeywords
       @[key] = value
-    obj.extended?.apply(this)
-    this
+    obj.extended?.apply(@)
+    @
 
   @proxy: (func) ->
-    => func.apply(this, arguments)
+    => func.apply(@, arguments)
 
   proxy: (func) ->
-    => func.apply(this, arguments)
+    => func.apply(@, arguments)
 
   constructor: ->
     @init?(arguments...)
@@ -88,14 +88,12 @@ class Model extends Module
   @attributes: []
 
   @configure: (name, attributes...) ->
-    @className  = name
-    @records    = {}
-    @crecords   = {}
-    @attributes = attributes if attributes.length
-    @attributes and= makeArray(@attributes)
-    @attributes or=  []
+    @className    = name
+    @records      = {}
+    @crecords     = {}
+    @attributes or= []
     @unbind()
-    this
+    @
 
   @toString: -> "#{@className}(#{@attributes.join(", ")})"
 
@@ -113,9 +111,9 @@ class Model extends Module
 
   @exists: (id) ->
     try
-      return @find(id)
+      @find(id)
     catch e
-      return false
+      false
 
   @refresh: (values, options = {}) ->
     if options.clear
@@ -125,54 +123,66 @@ class Model extends Module
     records = @fromJSON(values)
     records = [records] unless isArray(records)
 
+    values = []
     for record in records
       record.id           or= record.cid
       @records[record.id]   = record
       @crecords[record.cid] = record
+      values.push(record.clone())
 
-    @trigger('refresh', @cloneArray(records))
-    this
+    @trigger('refresh', values)
+    @
 
   @select: (callback) ->
-    result = (record for id, record of @records when callback(record))
-    @cloneArray(result)
+    value.clone()         for key, value of @records when callback(value)
 
-  @findByAttribute: (name, value) ->
-    for id, record of @records
-      if record[name] is value
-        return record.clone()
-    null
+  @findByAttribute: (name, attr) ->
+    return value.clone()  for key, value of @records when value[name] is attr
+    undefined
 
-  @findAllByAttribute: (name, value) ->
-    @select (item) ->
-      item[name] is value
+  @findAllByAttribute: (name, attr) ->
+    @select (value) ->
+      value[name] is attr
 
   @each: (callback) ->
-    for key, value of @records
-      callback(value.clone())
+    callback(value.clone()) for key, value of @records
 
   @all: ->
-    @cloneArray(@recordsValues())
+    value.clone()         for key, value of @records
 
   @first: ->
-    record = @recordsValues()[0]
-    record?.clone()
+    return value.clone()  for key, value of @records
+    undefined
 
   @last: ->
-    values = @recordsValues()
-    record = values[values.length - 1]
-    record?.clone()
+    null                  for key, value of @records # value exist for last object
+    value?.clone()
 
   @count: ->
-    @recordsValues().length
+    count = 0
+    ++count               for key of @records
+    count
 
   @deleteAll: ->
-    for key, value of @records
-      delete @records[key]
+    delete @records[key]  for key, value of @records
 
   @destroyAll: ->
-    for key, value of @records
-      @records[key].destroy()
+    value.destroy()       for key, value of @records
+
+  @toJSON: ->
+    value.toJSON()        for key, value of @records
+
+  @fromJSON: (objects) ->
+    return unless objects
+    if typeof objects is 'string'
+      objects = JSON.parse(objects)
+    if isArray(objects)
+      (new @(value) for value in objects)
+    else
+      new @(objects)
+
+  @fromForm: ->
+    (new @).fromForm(arguments...)
 
   @update: (id, atts, options) ->
     @find(id).updateAttributes(atts, options)
@@ -196,31 +206,7 @@ class Model extends Module
     else
       @trigger('fetch', callbackOrParams)
 
-  @toJSON: ->
-    @recordsValues()
-
-  @fromJSON: (objects) ->
-    return unless objects
-    if typeof objects is 'string'
-      objects = JSON.parse(objects)
-    if isArray(objects)
-      (new @(value) for value in objects)
-    else
-      new @(objects)
-
-  @fromForm: ->
-    (new this).fromForm(arguments...)
-
   # Private
-
-  @recordsValues: ->
-    result = []
-    for key, value of @records
-      result.push(value)
-    result
-
-  @cloneArray: (array) ->
-    (value.clone() for value in array)
 
   @idCounter: 0
 
@@ -250,11 +236,11 @@ class Model extends Module
         @[key](value)
       else
         @[key] = value
-    this
+    @
 
   attributes: ->
     result = {}
-    for key in @constructor.attributes when key of this
+    for key in @constructor.attributes when key of @
       if typeof @[key] is 'function'
         result[key] = @[key]()
       else
@@ -308,7 +294,7 @@ class Model extends Module
     @trigger('destroy', options)
     @trigger('change', 'destroy', options)
     @unbind()
-    this
+    @
 
   dup: (newRecord) ->
     result = new @constructor(@attributes())
@@ -319,19 +305,18 @@ class Model extends Module
     result
 
   clone: ->
-    createObject(this)
+    createObject(@)
 
   reload: ->
-    return this if @isNew()
+    return @ if @isNew()
     original = @constructor.find(@id)
     @load(original.attributes())
     original
 
-  toJSON: ->
-    @attributes()
+  toJSON: @::attributes
 
   toString: ->
-    "<#{@constructor.className} (#{JSON.stringify(this)})>"
+    "<#{@constructor.className} (#{JSON.stringify(@)})>"
 
   fromForm: (form) ->
     result = {}
@@ -369,7 +354,7 @@ class Model extends Module
   bind: (events, callback) ->
     @constructor.bind events, binder = (record) =>
       if record && @eql(record)
-        callback.apply(this, arguments)
+        callback.apply(@, arguments)
     @constructor.bind 'unbind', unbinder = (record) =>
       if record && @eql(record)
         @constructor.unbind(events, binder)
@@ -379,10 +364,10 @@ class Model extends Module
   one: (events, callback) ->
     binder = @bind events, =>
       @constructor.unbind(events, binder)
-      callback.apply(this, arguments)
+      callback.apply(@, arguments)
 
   trigger: (args...) ->
-    args.splice(1, 0, this)
+    args.splice(1, 0, @)
     @constructor.trigger(args...)
 
   unbind: ->
@@ -429,14 +414,14 @@ class Controller extends Module
       if typeof(method) is 'function'
         # Always return true from event handlers
         method = do (method) => =>
-          method.apply(this, arguments)
+          method.apply(@, arguments)
           true
       else
         unless @[method]
           throw new Error("#{method} doesn't exist")
 
         method = do (method) => =>
-          @[method].apply(this, arguments)
+          @[method].apply(@, arguments)
           true
 
       match      = key.match(@eventSplitter)
@@ -447,13 +432,14 @@ class Controller extends Module
         @el.bind(eventName, method)
       else
         @el.delegate(selector, eventName, method)
+    @
 
   refreshElements: ->
     for key, value of @elements
       @[value] = @$(key)
 
   delay: (func, timeout) ->
-    setTimeout(@proxy(func), timeout || 0)
+    setTimeout(@proxy(func), timeout or 0)
 
   html: (element) ->
     @el.html(element.el or element)
@@ -500,9 +486,6 @@ isBlank = (value) ->
   return true unless value
   return false for key of value
   true
-
-makeArray = (args) ->
-  Array::slice.call(args, 0)
 
 # Globals
 
