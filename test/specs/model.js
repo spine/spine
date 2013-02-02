@@ -313,13 +313,6 @@ describe("Model", function(){
       expect(Asset.idCounter).toEqual(12);
   });
 
-  it("should keep model references in sync", function(){
-      ref1 = Asset.create({name: "Bob"});
-      ref2 = Asset.all()[0]
-      ref1.updateAttribute("name", "Jack");
-      ref2.updateAttribute("name", "Smith");
-      expect(ref2.name).toEqual(ref1.name);
-  });
 
   describe("with spy", function(){
     var spy;
