@@ -19,8 +19,8 @@ class Collection extends Spine.Module
 
   find: (id) ->
     records = @select (rec) =>
-      rec.id + '' is id + ''
-    throw('Unknown record') unless records[0]
+      "#{rec.id}" is "#{id}"
+    throw new Error("\"#{@model.className}\" model could not find a record for the ID \"#{id}\"") unless records[0]
     records[0]
 
   findAllByAttribute: (name, value) ->
