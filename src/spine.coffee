@@ -103,12 +103,12 @@ class Model extends Module
     record = @records[id]
     if !record and ("#{id}").match(/c-\d+/)
       return @findCID(id)
-    throw new Error("\"#{@className}\" model could not find a record for the ID \"#{id}\"") unless record
+    throw new Error('Unknown record') unless record
     record.clone()
 
   @findCID: (cid) ->
     record = @crecords[cid]
-    throw new Error("\"#{@className}\" model could not find a record for the ID \"#{id}\"") unless record
+    throw new Error('Unknown record') unless record
     record.clone()
 
   @exists: (id) ->
