@@ -31,7 +31,7 @@ class Base
   defaults:
     # [@fabdrol] I commented these out and moved them to their respective methods
     # [@fabdrol] See issue #387: https://github.com/maccman/spine/issues/387 
-    # contentType: 'application/json'
+    contentType: 'application/json'
     # dataType: 'json'
     processData: false
     headers: {'X-Requested-With': 'XMLHttpRequest'}
