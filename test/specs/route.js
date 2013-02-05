@@ -290,14 +290,11 @@ describe("Routing", function () {
 
       setUrl('/foo');
       Route.change();
-
       expect(Route.path).toBe('/foo');
     });
 
-
     it("can navigate", function () {
       Route.add("/users/1", function () {});
-
       navigate("/users/1").done(function () {
         expect(window.location.pathname).toBe("/users/1");
       });
