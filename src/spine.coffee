@@ -12,6 +12,7 @@ Events =
     @bind ev, ->
       @unbind(ev, arguments.callee)
       callback.apply(this, arguments)
+    this
 
   trigger: (args...) ->
     ev = args.shift()
