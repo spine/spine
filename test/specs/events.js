@@ -42,6 +42,16 @@ describe("Events", function(){
     expect(spy).not.toHaveBeenCalled();
   });
 
+  it("can unbind one event", function(){
+    EventTest.bind("house car windows", spy);
+    EventTest.unbind("car windows");
+    EventTest.trigger("car");
+    EventTest.trigger("windows");
+    expect(spy).not.toHaveBeenCalled();
+    EventTest.trigger("house");
+    expect(spy).toHaveBeenCalled();
+  });
+
   it("can bind to a single event", function(){
     EventTest.one("indahouse", spy);
     EventTest.trigger("indahouse");
