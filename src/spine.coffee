@@ -45,6 +45,9 @@ Events =
         break
     this
 
+Events.on = Events.bind
+Events.off = Events.unbind
+
 Log =
   trace: true
 
