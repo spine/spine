@@ -1,3 +1,7 @@
+#testHelpers {
+  font-family: Monaco,"Lucida Console",monospace;
+}
+
 #testHelpers ul {
   padding:2px 5px;
 }
@@ -16,4 +20,14 @@
   font-weight: bold;
 }
 
+#testHelpers form {
+  padding: 0px 5px;
+}
 
+#testHelpers label {
+  margin-left: 10px;
+}
+
+#usedJquerysrc {
+  font-size:10px
+}
