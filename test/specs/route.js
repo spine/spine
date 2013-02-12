@@ -43,7 +43,8 @@ describe("Routing", function () {
     expect(Route.options).toEqual({
       trigger: true,
       history: false,
-      shim: false
+      shim: false,
+      replace: false
     });
   });
 
@@ -174,6 +175,7 @@ describe("Routing", function () {
             trigger: true,
             history: false,
             shim: true,
+            replace: false,
             match: ["/users/1/2", "1", "2"], id: "1", id2: "2"
           }]));
         });
@@ -188,6 +190,7 @@ describe("Routing", function () {
             trigger: true,
             history: false,
             shim: true,
+            replace: false,
             match: ["/page/gah", "gah"], stuff: "gah"
           }]));
         });
