@@ -17,6 +17,7 @@ class Spine.Route extends Spine.Module
     trigger: true
     history: false
     shim: false
+    replace: false
 
   @add: (path, callback) ->
     if (typeof path is 'object' and path not instanceof RegExp)
@@ -67,7 +68,9 @@ class Spine.Route extends Spine.Module
 
     return if options.shim
 
-    if @history
+    if @history and options.replace
+      history.replaceState({}, document.title, @path)
+    else if @history
       history.pushState({}, document.title, @path)
     else
       window.location.hash = @path
