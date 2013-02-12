@@ -19,6 +19,7 @@ body { background-color: #eeeeee; padding: 0; margin: 5px; overflow-y: scroll; }
 #HTMLReporter .symbolSummary li.skipped:before { color: #bababa; content: "\02022"; }
 #HTMLReporter .symbolSummary li.pending { line-height: 11px; }
 #HTMLReporter .symbolSummary li.pending:before { color: #aaaaaa; content: "-"; }
+#HTMLReporter .exceptions { color: #fff; float: right; margin-top: 5px; margin-right: 5px; }
 #HTMLReporter .bar { line-height: 28px; font-size: 14px; display: block; color: #eee; }
 #HTMLReporter .runningAlert { background-color: #666666; }
 #HTMLReporter .skippedAlert { background-color: #aaaaaa; }
@@ -79,3 +80,4 @@ body { background-color: #eeeeee; padding: 0; margin: 5px; overflow-y: scroll; }
 #TrivialReporter.show-passed .passed, #TrivialReporter.show-skipped .skipped { display: block; }
 #TrivialReporter #jasmine_content { position: fixed; right: 100%; }
 #TrivialReporter .runner { border: 1px solid gray; display: block; margin: 5px 0; padding: 2px 0 2px 10px; }
+

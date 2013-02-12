@@ -225,7 +225,8 @@ describe("Routing", function () {
 
 
     it("should have bound 'hashchange' event to window", function () {
-      var events = $(window).data('events') || {};
+      // $(window).data('events') was the way to get events before jquery 1.8
+      var events = $(window).data('events') || $._data(window, "events");
 
       expect('hashchange' in events).toBe(true);
     });
@@ -271,7 +272,8 @@ describe("Routing", function () {
 
 
     it("should have bound 'popstate' event to window", function () {
-      var events = $(window).data('events') || {};
+      // $(window).data('events') was the way to get events before jquery 1.8
+      var events = $(window).data('events') || $._data(window, "events");
 
       expect('popstate' in events).toBe(true);
     });
@@ -290,14 +292,11 @@ describe("Routing", function () {
 
       setUrl('/foo');
       Route.change();
-
       expect(Route.path).toBe('/foo');
     });
 
-
     it("can navigate", function () {
       Route.add("/users/1", function () {});
-
       navigate("/users/1").done(function () {
         expect(window.location.pathname).toBe("/users/1");
       });
