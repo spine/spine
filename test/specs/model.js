@@ -371,6 +371,13 @@ describe("Model", function(){
       expect(spy).toHaveBeenCalledWith(asset, {});
     });
 
+    it("can fire destroy events when destroy all record with options", function(){
+      Asset.bind("destroy", spy);
+      var asset = Asset.create({name: "cartoon world.png"});
+      Asset.destroyAll({ajax: false});
+      expect(spy).toHaveBeenCalledWith(asset, {ajax: false});
+    });
+
     it("can fire events on record", function(){
       var asset = Asset.create({name: "cartoon world.png"});
       asset.bind("save", spy);
