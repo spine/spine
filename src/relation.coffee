@@ -35,7 +35,7 @@ class Collection extends Spine.Module
       @associated(rec) and cb(rec)
 
   refresh: (values) ->
-    delete @model.records[record.id] for record in @all()
+    @model.delete(record.id) for record in @all()
     records = @model.fromJSON(values)
 
     records = [records] unless isArray(records)
@@ -43,6 +43,7 @@ class Collection extends Spine.Module
     for record in records
       record.newRecord = false
       record[@fkey] = @record.id
+      @model.ids.push(record.id)
       @model.records[record.id] = record
 
     @model.trigger('refresh', @model.cloneArray(records))

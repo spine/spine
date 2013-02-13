@@ -65,36 +65,38 @@ describe("Model", function(){
   });
 
   it("can select records", function(){
-    var asset1 = Asset.create({name: "test.pdf"});
-    var asset2 = Asset.create({name: "foo.pdf"});
+    var asset1 = Asset.create({id: 3, name: "test.pdf"});
+    var asset2 = Asset.create({id: 2, name: "foo.pdf"});
+    var asset3 = Asset.create({id: 1, name: "foo.pdf"});
 
     var selected = Asset.select(function(rec){ return rec.name == "foo.pdf" });
 
-    expect(selected).toEqual([asset2]);
+    expect(selected).toEqual([asset2, asset3]);
   });
 
   it("can return all records", function(){
-    var asset1 = Asset.create({name: "test.pdf"});
-    var asset2 = Asset.create({name: "foo.pdf"});
+    var asset1 = Asset.create({id: 2, name: "test.pdf"});
+    var asset2 = Asset.create({id: 1, name: "foo.pdf"});
 
     expect(Asset.all()).toEqual([asset1, asset2]);
   });
 
   it("can find records by attribute", function(){
-    var asset = Asset.create({name: "foo.pdf"});
+    var asset1 = Asset.create({id: 2, name: "foo.pdf"});
+    var asset2 = Asset.create({id: 1, name: "foo.pdf"});
     Asset.create({name: "test.pdf"});
 
     var findOne = Asset.findByAttribute("name", "foo.pdf");
-    expect(findOne).toEqual(asset);
+    expect(findOne).toEqual(asset1);
 
     var findAll = Asset.findAllByAttribute("name", "foo.pdf");
-    expect(findAll).toEqual([asset]);
+    expect(findAll).toEqual([asset1, asset2]);
   });
 
   it("can find first/last record", function(){
-    var first = Asset.create({name: "foo.pdf"});
-    Asset.create({name: "test.pdf"});
-    var last = Asset.create({name: "wem.pdf"});
+    var first = Asset.create({id: 3, name: "foo.pdf"});
+    Asset.create({id: 2, name: "test.pdf"});
+    var last = Asset.create({id: 1, name: "wem.pdf"});
 
     expect(Asset.first()).toEqual(first);
     expect(Asset.last()).toEqual(last);
@@ -331,8 +333,8 @@ describe("Model", function(){
     });
 
     it("can interate over records", function(){
-      var asset1 = Asset.create({name: "test.pdf"});
-      var asset2 = Asset.create({name: "foo.pdf"});
+      var asset1 = Asset.create({id: 2, name: "test.pdf"});
+      var asset2 = Asset.create({id: 1, name: "foo.pdf"});
 
       Asset.each(spy);
       expect(spy).toHaveBeenCalledWith(asset1);
