@@ -198,7 +198,20 @@ describe("Model", function(){
     expect(asset.first_name).toEqual("Alex");
     expect(asset.last_name).toEqual("MacCaw");
   });
-
+  
+  it("can updateAttribute() respecting getters/setters", function(){
+    Asset.include({
+      name: function(name) {
+        if (name) this._name = name;
+        return this._name;
+      }
+    })
+    
+    var asset = new Asset();
+    asset.updateAttribute("name", "Bob");
+    expect(asset.name()).toEqual("Bob");
+  });
+  
   it("attributes() respecting getters/setters", function(){
     Asset.include({
       name: function(){
