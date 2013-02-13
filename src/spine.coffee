@@ -291,8 +291,9 @@ class Model extends Module
     this
 
   updateAttribute: (name, value, options) ->
-    @[name] = value
-    @save(options)
+    atts = {}
+    atts[name] = value
+    @updateAttributes(atts, options)
 
   updateAttributes: (atts, options) ->
     @load(atts)
