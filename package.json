@@ -1,8 +1,10 @@
 {
   "name": "spine",
   "description": "MVC Framework.",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "author": "maccman",
+  "keywords": ["spine", "coffeescript", "MVC"],
+  "contributors": ["maccman", "aeischeid", "cengebretson"],
   "licenses":
     [{
       "type": "MIT",
