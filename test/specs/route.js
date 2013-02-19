@@ -47,6 +47,12 @@ describe("Routing", function () {
       replace: false
     });
   });
+  
+  it("should be able to get the host", function() {
+    host = Route.getHost();
+    expect(host).not.toBeNull();
+    //console.log('result of getHost()', host)
+  });
 
 
   describe('With shim', function () {
@@ -234,7 +240,6 @@ describe("Routing", function () {
       expect('hashchange' in events).toBe(true);
     });
 
-
     it("should unbind", function () {
       Route.unbind();
       var events = $(window).data('events') || {};
@@ -242,6 +247,10 @@ describe("Routing", function () {
       expect('hashchange' in events).toBe(false);
     });
 
+    it("can get a path", function () {
+      // not checking weather the path is correct, just that it is something...
+      expect(Route.getPath()).toBeDefined();
+    });
 
     it("can set its path", function () {
       delete Route.path // Remove path which has been set by @setup > @change
@@ -251,8 +260,7 @@ describe("Routing", function () {
 
       expect(Route.path).toBe('/foo');
     });
-
-
+    
     it("can navigate", function () {
       Route.add("/users/1", function () {});
 
@@ -281,7 +289,6 @@ describe("Routing", function () {
       expect('popstate' in events).toBe(true);
     });
 
-
     it("should unbind", function () {
       Route.unbind();
       var events = $(window).data('events') || {};
@@ -289,6 +296,10 @@ describe("Routing", function () {
       expect('popstate' in events).toBe(false);
     });
 
+    it("can get a path", function () {
+      // not checking weather the path is correct, just that it is something...
+      expect(Route.getPath()).toBeDefined();
+    });
 
     it("can set its path", function () {
       delete Route.path // Remove path which has been set by @setup > @change
