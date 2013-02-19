@@ -42,7 +42,7 @@ var waitFor = (function () {
 }());
 
 if (system.args.length < 2 || system.args.length > 3) {
-    console.log('Usage: run-jasmine.js URL [simple|colors]');
+    console.log('Usage: run-jasmine.phantom.js URL [formatter]');
     phantom.exit(1);
 }
 
