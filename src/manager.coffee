@@ -64,6 +64,7 @@ class Spine.Stack extends Spine.Controller
     @manager = new Spine.Manager
 
     for key, value of @controllers
+      throw Error "'@#{ key }' already assigned - choose a different name" if @[key]?
       @[key] = new value(stack: @)
       @add(@[key])
 

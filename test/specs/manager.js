@@ -12,6 +12,17 @@ describe("Manager", function(){
     groups = new Groups();
   });
 
+  it("shouldn't overwrite existing methods in Spine.Stack.constructor()", function(){
+    var BadStack = Spine.Stack.sub({
+      controllers: {
+        manager: Users
+      }
+    });
+    expect(function(){
+      new BadStack
+    }).toThrow();
+  });
+
   it("should toggle active class", function(){
     new Spine.Manager(users, groups);
 
