@@ -37,7 +37,15 @@
     </form>
   </div>
   <script type="text/javascript">
-    jasmine.getEnv().addReporter(new jasmine.HtmlReporter());
+    var jasmineEnv = jasmine.getEnv();
+    jasmineEnv.updateInterval = 250;
+
+    var htmlReporter = new jasmine.HtmlReporter();
+    jasmineEnv.addReporter(htmlReporter);
+    jasmineEnv.specFilter = function(spec) {
+      return htmlReporter.specFilter(spec);
+    };
+
     jasmine.getEnv().execute();
     document.getElementById('usedJquerysrc').innerHTML = window.jquerySrc;
   </script>
