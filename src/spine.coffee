@@ -38,7 +38,7 @@ Events =
         delete @_callbacks[name]
         continue
 
-      for cb, i in list when cb is callback
+      for cb, i in list when (cb is callback)
         list = list.slice()
         list.splice(i, 1)
         @_callbacks[name] = list
@@ -376,10 +376,11 @@ class Model extends Module
     @constructor.bind events, binder = (record) =>
       if record && @eql(record)
         callback.apply(this, arguments)
-    @constructor.bind 'unbind', unbinder = (record) =>
-      if record && @eql(record)
-        @constructor.unbind(events, binder)
-        @constructor.unbind('unbind', unbinder)
+    @constructor.bind "unbind", unbinder = (record, event, cb) =>
+      if record && @eql(record) and (not event or events is event)
+        if not cb or cb is callback
+          @constructor.unbind(events, binder)
+          @constructor.unbind("unbind", unbinder)
     binder
 
   one: (events, callback) ->
@@ -391,8 +392,8 @@ class Model extends Module
     args.splice(1, 0, this)
     @constructor.trigger(args...)
 
-  unbind: ->
-    @trigger('unbind')
+  unbind: (events, callback) ->
+    @trigger('unbind', events, callback)
 
 class Controller extends Module
   @include Events
