@@ -466,11 +466,22 @@ describe("Model", function(){
     it("should be able to unbind individual instance events", function(){
       var asset = Asset.create({name: "cartoon world.png"});
 
-      asset.bind("save, refresh, change", spy);
+      asset.bind("save, customEvent", spy);
       asset.unbind('save');
       asset.save();
-
       expect(spy).not.toHaveBeenCalled();
+      asset.trigger('customEvent');
+      expect(spy).toHaveBeenCalled();
+    });
+    
+    it("should be able to unbind individual callbacks to individual instance events", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.bind("customEvent", spy);
+      asset.bind("customEvent", spy2);
+      asset.unbind("customEvent", spy2);
+      asset.trigger('customEvent');
+      expect(spy).toHaveBeenCalled();
+      expect(spy2).not.toHaveBeenCalled();
     });
 
     it("should unbind events on instance destroy", function(){
