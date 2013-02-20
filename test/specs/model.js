@@ -453,11 +453,21 @@ describe("Model", function(){
       asset.updateAttributes({name: "lonely heart.png"});
     });
 
-    it("should be able to unbind instance events", function(){
+    it("should be able to unbind all instance events", function(){
       var asset = Asset.create({name: "cartoon world.png"});
 
       asset.bind("save", spy);
       asset.unbind();
+      asset.save();
+
+      expect(spy).not.toHaveBeenCalled();
+    });
+    
+    it("should be able to unbind individual instance events", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+
+      asset.bind("save, refresh, change", spy);
+      asset.unbind('save');
       asset.save();
 
       expect(spy).not.toHaveBeenCalled();
