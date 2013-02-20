@@ -476,6 +476,9 @@ describe("Model", function(){
     
     it("should be able to unbind individual callbacks to individual instance events", function(){
       var asset = Asset.create({name: "cartoon world.png"});
+      var noop2 = {spy2: function(){}};
+      spyOn(noop2, "spy2");
+      var spy2 = noop2.spy2;
       asset.bind("customEvent", spy);
       asset.bind("customEvent", spy2);
       asset.unbind("customEvent", spy2);
