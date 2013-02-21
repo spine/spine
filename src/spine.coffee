@@ -376,16 +376,19 @@ class Model extends Module
     @constructor.bind events, binder = (record) =>
       if record && @eql(record)
         callback.apply(this, arguments)
-    @constructor.bind "unbind", unbinder = (record, event, cb) =>
-      if record && @eql(record) and (not event or events is event)
-        if not cb or cb is callback
-          @constructor.unbind(events, binder)
-          @constructor.unbind("unbind", unbinder)
-    binder
+    for evs in events.split(' ') 
+      do (evs) =>
+        @constructor.bind "unbind", unbinder = (record, event, cb) =>
+          if record && @eql(record)
+            return if event and event isnt evs
+            return if cb and cb isnt callback
+            @constructor.unbind(event, binder)
+            @constructor.unbind("unbind", unbinder)
+    this
 
   one: (events, callback) ->
-    binder = @bind events, =>
-      @constructor.unbind(events, binder)
+    @bind events, =>
+      @unbind(events, arguments.callee)
       callback.apply(this, arguments)
 
   trigger: (args...) ->
@@ -393,7 +396,11 @@ class Model extends Module
     @constructor.trigger(args...)
 
   unbind: (events, callback) ->
-    @trigger('unbind', events, callback)
+    if events
+      for event in events.split(' ') 
+        @trigger('unbind', event, callback)
+    else
+      @trigger('unbind')
 
 class Controller extends Module
   @include Events

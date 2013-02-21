@@ -482,10 +482,41 @@ describe("Model", function(){
       var spy2 = noop2.spy2;
       asset.bind("customEvent", spy);
       asset.bind("customEvent", spy2);
+      asset.trigger("customEvent");
+      expect(spy).toHaveBeenCalled();
+      expect(spy2).toHaveBeenCalled();
+      spy.reset();
+      spy2.reset();
       asset.unbind("customEvent", spy2);
       asset.trigger('customEvent');
       expect(spy).toHaveBeenCalled();
       expect(spy2).not.toHaveBeenCalled();
+    });
+
+    it("should be able to unbind a single event that uses a callback another event is bind to.", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.bind("customEvent1 customEvent2", spy);
+      asset.trigger("customEvent1");
+      asset.trigger("customEvent2");
+      expect(spy.calls.length).toEqual(2);
+      spy.reset();
+      asset.unbind("customEvent1");
+      asset.trigger("customEvent1");
+      asset.trigger("customEvent2");
+      expect(spy.calls.length).toEqual(1);
+    });
+
+    it("should be able to bind and unbind multiple events with a single call.", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.bind("customEvent1 customEvent2", spy)
+      asset.trigger("customEvent1");
+      asset.trigger("customEvent2");
+      expect(spy.calls.length).toEqual(2);
+      spy.reset();
+      asset.unbind("customEvent1 customEvent2")
+      asset.trigger("customEvent1");
+      asset.trigger("customEvent2");
+      expect(spy.calls.length).toEqual(0);
     });
 
     it("should unbind events on instance destroy", function(){
