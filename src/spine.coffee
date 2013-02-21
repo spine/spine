@@ -15,6 +15,9 @@ Events =
 
   trigger: (args...) ->
     ev = args.shift()
+    
+    options = args[args.length-1]
+    return if typeof options is 'object' and options.silent
 
     list = @hasOwnProperty('_callbacks') and @_callbacks?[ev]
     return unless list
