@@ -376,11 +376,12 @@ class Model extends Module
     @constructor.bind events, binder = (record) =>
       if record && @eql(record)
         callback.apply(this, arguments)
-    for evs in events.split(' ') 
-      do (evs) =>
+    # create a wrapper function to be called with 'unbind' for each event 
+    for singleEvent in events.split(' ') 
+      do (singleEvent) =>
         @constructor.bind "unbind", unbinder = (record, event, cb) =>
           if record && @eql(record)
-            return if event and event isnt evs
+            return if event and event isnt singleEvent
             return if cb and cb isnt callback
             @constructor.unbind(event, binder)
             @constructor.unbind("unbind", unbinder)
