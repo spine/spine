@@ -62,7 +62,10 @@ describe("Events", function(){
     ListenTest = Spine.Class.create();
     ListenTest.extend(Spine.Events);
     ListenTest.listenTo(EventTest, "daddyo", spy);
-    ListenTest.stopListening("daddyo");
+    EventTest.trigger("daddyo");
+    expect(spy).toHaveBeenCalled();
+    spy.reset();
+    ListenTest.stopListening(EventTest, "daddyo");
     EventTest.trigger("daddyo");
     expect(spy).not.toHaveBeenCalled();
   });
