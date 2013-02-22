@@ -33,9 +33,10 @@ class Collection extends Spine.Module
   select: (cb) ->
     @model.select (rec) =>
       @associated(rec) and cb(rec)
-
-  refresh: (values) ->
-    delete @model.records[record.id] for record in @all()
+    
+  refresh: (values, options = {}) ->
+    if options.clear
+      delete @model.records[record.id] for record in @all()
     records = @model.fromJSON(values)
 
     records = [records] unless isArray(records)
@@ -66,8 +67,8 @@ class Instance extends Spine.Module
 
   update: (value) ->
     unless value instanceof @model
-      value = new @model(value)
-    value.save() if value.isNew()
+      value = @model.fromJSON(value)
+    value.save(@saveOptions) if value.isNew()
     @record[@fkey] = value and value.id
 
 class Singleton extends Spine.Module
@@ -83,7 +84,7 @@ class Singleton extends Spine.Module
       value = @model.fromJSON(value)
 
     value[@fkey] = @record.id
-    value.save()
+    value.save(@saveOptions)
 
 singularize = (str) ->
   str.replace(/s$/, '')
@@ -111,7 +112,7 @@ Spine.Model.extend
       association(@).refresh(value) if value?
       association(@)
 
-  belongsTo: (name, model, fkey) ->
+  belongsTo: (name, model, fkey, saveOptions) ->
     fkey ?= "#{singularize(name)}_id"
 
     association = (record) ->
@@ -119,7 +120,8 @@ Spine.Model.extend
 
       new Instance(
         name: name, model: model,
-        record: record, fkey: fkey
+        record: record, fkey: fkey,
+        saveOptions: saveOptions
       )
 
     @::[name] = (value) ->
@@ -128,7 +130,7 @@ Spine.Model.extend
 
     @attributes.push(fkey)
 
-  hasOne: (name, model, fkey) ->
+  hasOne: (name, model, fkey, saveOptions) ->
     fkey ?= "#{underscore(@className)}_id"
 
     association = (record) ->
@@ -136,7 +138,8 @@ Spine.Model.extend
 
       new Singleton(
         name: name, model: model,
-        record: record, fkey: fkey
+        record: record, fkey: fkey,
+        saveOptions: saveOptions
       )
 
     @::[name] = (value) ->
