@@ -400,6 +400,17 @@ class Model extends Module
   trigger: (args...) ->
     args.splice(1, 0, this)
     @constructor.trigger(args...)
+  
+  listenTo: (obj, events, callback) ->
+    obj.bind events, callback
+  
+  listenToOnce: (obj, events, callback) ->
+    obj.bind events, =>
+      obj.unbind(events, arguments.callee)
+      callback.apply(obj, arguments)
+  
+  stopListening: (obj, events, callback) ->
+    obj.unbind events, callback
 
   unbind: (events, callback) ->
     if events
