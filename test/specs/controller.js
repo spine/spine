@@ -43,51 +43,46 @@ describe("Controller", function(){
     users.release();
     expect(parent.children().length).toBe(0);
   });
-
-  describe("with spy", function(){
-    var spy;
-
-    beforeEach(function(){
-      var noop = {spy: function(){}};
-      spyOn(noop, "spy");
-      spy = noop.spy;
-    });
-
-    it("can add events", function(){
-      Users.include({
-        events: {"click": "wasClicked"},
-
-        // Context change confuses Spy
-        wasClicked: $.proxy(spy, jasmine)
-      });
-
-      var users = new Users({el: element});
-      element.click();
-      expect(spy).toHaveBeenCalled();
-    });
-
-    it("can delegate events", function(){
-      Users.include({
-        events: {"click .foo": "wasClicked"},
-
-        wasClicked: $.proxy(spy, jasmine)
-      });
-
-      var child = $("<div />").addClass("foo");
-      element.append(child);
-
-      var users = new Users({el: element});
-      child.click();
-      expect(spy).toHaveBeenCalled();
-    });
-  });
-
+  
   it("can set attributes on el", function(){
     Users.include({
       attributes: {"style": "width: 100%"}
     });
     var users = new Users();
     expect(users.el.attr("style")).toEqual("width: 100%");
+  });
+
+  describe("can bind DOM events", function(){
+    var spy;
+    
+    beforeEach(function(){
+      var noop = {spy: function(){}};
+      spyOn(noop, "spy");
+      spy = noop.spy;
+    });
+    
+    it("can add events", function(){
+      Users.include({
+        events: {"click": "wasClicked"},
+        // Context change confuses Spy
+        wasClicked: $.proxy(spy, jasmine)
+      });
+      var users = new Users({el: element});
+      element.click();
+      expect(spy).toHaveBeenCalled();
+    });
+    
+    it("can delegate events", function(){
+      Users.include({
+        events: {"click .foo": "wasClicked"},
+        wasClicked: $.proxy(spy, jasmine)
+      });
+      var child = $("<div />").addClass("foo");
+      element.append(child);
+      var users = new Users({el: element});
+      child.click();
+      expect(spy).toHaveBeenCalled();
+    });
   });
   
   describe("Events listeners methods", function(){
@@ -109,6 +104,15 @@ describe("Controller", function(){
       users.listenTo(asset, 'event1', spy);
       asset.trigger("event1");
       expect(spy).toHaveBeenCalled();
+    });
+    
+    it("wont listen to events of the same name on unlistened to model instances", function(){
+      users.listenTo(asset, 'event1', spy);
+      var asset2 = Asset.create({name: "scooby.pdf"});
+      var asset3 = Asset.create({name: "shaggy.pdf"});
+      asset3.trigger("event1");
+      asset2.trigger("evemt1")
+      expect(spy).not.toHaveBeenCalled();
     });
     
     it("can listen to many events on a model instance", function(){
