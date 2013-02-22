@@ -88,14 +88,14 @@ class Module
 class Model extends Module
   @extend Events
 
-  @records: {}
+  @records: []
+  @irecords: {}
   @crecords: {}
   @attributes: []
 
   @configure: (name, attributes...) ->
-    @className  = name
-    @records    = {}
-    @crecords   = {}
+    @className = name
+    @deleteAll()
     @attributes = attributes if attributes.length
     @attributes and= makeArray(@attributes)
     @attributes or=  []
@@ -105,7 +105,7 @@ class Model extends Module
   @toString: -> "#{@className}(#{@attributes.join(", ")})"
 
   @find: (id) ->
-    record = @records[id]
+    record = @irecords[id]
     if !record and ("#{id}").match(/c-\d+/)
       return @findCID(id)
     throw new Error("\"#{@className}\" model could not find a record for the ID \"#{id}\"") unless record
@@ -124,26 +124,28 @@ class Model extends Module
 
   @refresh: (values, options = {}) ->
     if options.clear
-      @records  = {}
-      @crecords = {}
+      @deleteAll()
 
     records = @fromJSON(values)
     records = [records] unless isArray(records)
 
     for record in records
-      record.id           or= record.cid
-      @records[record.id]   = record
+      record.id or= record.cid
+      @records.push(record)
+      @irecords[record.id]  = record
       @crecords[record.cid] = record
 
+    @sort()
+
+    result = @cloneArray(records)
     @trigger('refresh', @cloneArray(records))
-    this
+    result
 
   @select: (callback) ->
-    result = (record for id, record of @records when callback(record))
-    @cloneArray(result)
+    (record.clone() for record in @records when callback(record))
 
   @findByAttribute: (name, value) ->
-    for id, record of @records
+    for record in @records
       if record[name] is value
         return record.clone()
     null
@@ -153,31 +155,27 @@ class Model extends Module
       item[name] is value
 
   @each: (callback) ->
-    for key, value of @records
-      callback(value.clone())
+    callback(record.clone()) for record in @records
 
   @all: ->
-    @cloneArray(@recordsValues())
+    @cloneArray(@records)
 
   @first: ->
-    record = @recordsValues()[0]
-    record?.clone()
+    @records[0]?.clone()
 
   @last: ->
-    values = @recordsValues()
-    record = values[values.length - 1]
-    record?.clone()
+    @records[@records.length - 1]?.clone()
 
   @count: ->
-    @recordsValues().length
+    @records.length
 
   @deleteAll: ->
-    for key, value of @records
-      delete @records[key]
+    @records  = []
+    @irecords = {}
+    @crecords = {}
 
   @destroyAll: (options) ->
-    for key, value of @records
-      @records[key].destroy(options)
+    record.destroy(options) for record in @records
 
   @update: (id, atts, options) ->
     @find(id).updateAttributes(atts, options)
@@ -202,7 +200,7 @@ class Model extends Module
       @trigger('fetch', callbackOrParams)
 
   @toJSON: ->
-    @recordsValues()
+    @records
 
   @fromJSON: (objects) ->
     return unless objects
@@ -216,13 +214,12 @@ class Model extends Module
   @fromForm: ->
     (new this).fromForm(arguments...)
 
-  # Private
+  @sort: ->
+    if @comparator
+      @records.sort @comparator
+    @records
 
-  @recordsValues: ->
-    result = []
-    for key, value of @records
-      result.push(value)
-    result
+  # Private
 
   @cloneArray: (array) ->
     (value.clone() for value in array)
@@ -300,21 +297,11 @@ class Model extends Module
     @save(options)
 
   changeID: (id) ->
-    records = @constructor.records
+    records = @constructor.irecords
     records[id] = records[@id]
     delete records[@id]
     @id = id
     @save()
-
-  destroy: (options = {}) ->
-    @trigger('beforeDestroy', options)
-    delete @constructor.records[@id]
-    delete @constructor.crecords[@cid]
-    @destroyed = true
-    @trigger('destroy', options)
-    @trigger('change', 'destroy', options)
-    @unbind()
-    this
 
   dup: (newRecord) ->
     result = new @constructor(@attributes())
@@ -346,14 +333,38 @@ class Model extends Module
     @load(result)
 
   exists: ->
-    @id && @id of @constructor.records
+    @id && @id of @constructor.irecords
+
+  destroy: (options = {}) ->
+    @trigger('beforeDestroy', options)
+
+    # Remove record from model
+    records = @constructor.records.slice(0)
+    for record, i in records when @eql(record)
+      records.splice(i, 1)
+      break
+    @constructor.records = records
+    
+    # Remove the ID and CID
+    delete @constructor.irecords[@id]
+    delete @constructor.crecords[@cid]
+
+    @destroyed = true
+    @trigger('destroy', options)
+    @trigger('change','destroy', options)
+    @unbind()
+    this
 
   # Private
 
   update: (options) ->
     @trigger('beforeUpdate', options)
-    records = @constructor.records
+
+    records = @constructor.irecords
     records[@id].load @attributes()
+
+    @constructor.sort()
+
     clone = records[@id].clone()
     clone.trigger('update', options)
     clone.trigger('change', 'update', options)
@@ -364,9 +375,12 @@ class Model extends Module
     @id          = @cid unless @id
 
     record       = @dup(false)
-    @constructor.records[@id]   = record
+    @constructor.records.push(record)
+    @constructor.irecords[@id]  = record
     @constructor.crecords[@cid] = record
 
+    @constructor.sort()
+  
     clone        = record.clone()
     clone.trigger('create', options)
     clone.trigger('change', 'create', options)

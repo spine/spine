@@ -85,7 +85,7 @@ describe("Model", function(){
     Asset.create({name: "test.pdf"});
 
     var findOne = Asset.findByAttribute("name", "foo.pdf");
-    expect(findOne).toEqual(asset);
+    expect(findOne.name).toEqual(asset.name);
 
     var findAll = Asset.findAllByAttribute("name", "foo.pdf");
     expect(findAll).toEqual([asset]);
@@ -321,6 +321,25 @@ describe("Model", function(){
       expect(ref2.name).toEqual(ref1.name);
   });
 
+  it("should return records in the same order they were created", function(){
+    ref1 = Asset.create({name: "Bob", id: "1"});
+    ref2 = Asset.create({name: "Jan", id: "some long string id"});
+    ref3 = Asset.create({name: "Pat", id: "33"});
+    ref4 = Asset.create({name: "Joe", id: 444});
+    expect(Asset.last().id).toEqual(ref4.id);
+    expect(Asset.first().id).toEqual(ref1.id);
+  });
+
+  it("should return records in the in the order defined by the @comparator", function() {
+    Asset.comparator = function(a,b) { return a.id - b.id };
+    ref1 = Asset.create({name: "Bob", id: 3});
+    ref2 = Asset.create({name: "Jan", id: 1});
+    ref3 = Asset.create({name: "Pat", id: 8});
+    ref4 = Asset.create({name: "Joe", id: 4});
+    expect(Asset.last().id).toEqual(ref3.id)
+    expect(Asset.first().id).toEqual(ref2.id)
+  });
+
   describe("with spy", function(){
     var spy;
 
@@ -373,7 +392,7 @@ describe("Model", function(){
 
     it("can fire destroy events when destroy all record with options", function(){
       Asset.bind("destroy", spy);
-      var asset = Asset.create({name: "cartoon world.png"});
+      var asset = Asset.create({name: "screaming goats.png"});
       Asset.destroyAll({ajax: false});
       expect(spy).toHaveBeenCalledWith(asset, {ajax: false});
     });
