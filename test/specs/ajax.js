@@ -103,7 +103,7 @@ describe("Ajax", function(){
       processData: false,
       type:        'DELETE',
       url:         '/users/IDD'
-    })
+    });
   });
 
   it("can update record after PUT/POST", function(){
@@ -148,7 +148,7 @@ describe("Ajax", function(){
 
     expect(jQuery.ajax).toHaveBeenCalled();
 
-    jQuery.ajax.reset()
+    jQuery.ajax.reset();
 
     User.create({first: "Second"});
 
@@ -234,7 +234,20 @@ describe("Ajax", function(){
     expect(Spine.Ajax.defaults).toBeDefined();
   });
 
+  it("can have a url property", function(){
+    User.url = "/people";
+    expect(Spine.Ajax.getURL(User)).toBe('/people');
+
+    var user = new User({id: 1});
+    expect(user.url()).toBe('/people/1');
+    expect(user.url('custom')).toBe('/people/1/custom');
+
+    Spine.Model.host = 'http://example.com';
+    expect(user.url()).toBe('http://example.com/people/1');
+  });
+
   it("should have a url function", function(){
+    Spine.Model.host = '';
     expect(User.url()).toBe('/users');
     expect(User.url('search')).toBe('/users/search');
 
@@ -247,4 +260,58 @@ describe("Ajax", function(){
     expect(user.url()).toBe('http://example.com/users/1');
   });
 
+  it("should scope by admin url in collection level", function(){
+    Spine.Model.host = '';
+    User.scope = "admin";
+    expect(User.url()).toBe('/admin/users');
+    expect(User.url('custom')).toBe('/admin/users/custom');
+
+    var user = new User({id: 1});
+    expect(user.url()).toBe('/admin/users/1');
+
+    User.scope = function() { return "/roots/1"; };
+    expect(User.url()).toBe('/roots/1/users');
+    expect(user.url()).toBe('/roots/1/users/1');
+    expect(user.url('custom')).toBe('/roots/1/users/1/custom');
+
+    Spine.Model.host = 'http://example.com';
+    expect(User.url()).toBe('http://example.com/roots/1/users');
+    expect(user.url()).toBe('http://example.com/roots/1/users/1');
+  });
+
+  it("should scope by admin url in model level", function(){
+    Spine.Model.host = '';
+
+    expect(User.url()).toBe('/users');
+
+    var user = new User({id: 1});
+    user.scope = "admin";
+    expect(user.url()).toBe('/admin/users/1');
+
+    user.scope = function() { return "/roots/1"; };
+    expect(User.url()).toBe('/users');
+    expect(user.url()).toBe('/roots/1/users/1');
+    expect(user.url('custom')).toBe('/roots/1/users/1/custom');
+
+    Spine.Model.host = 'http://example.com';
+    expect(User.url()).toBe('http://example.com/users');
+    expect(user.url()).toBe('http://example.com/roots/1/users/1');
+  });
+
+  it("should scope by admin url in both collection and model level", function(){
+    Spine.Model.host = '';
+    User.scope = "admin";
+    expect(User.url()).toBe('/admin/users');
+
+    var user = new User({id: 1});
+    expect(user.url()).toBe('/admin/users/1');
+
+    user.scope = function() { return "/roots/1"; };
+    expect(User.url()).toBe('/admin/users');
+    expect(user.url()).toBe('/roots/1/users/1');
+
+    Spine.Model.host = 'http://example.com';
+    expect(User.url()).toBe('http://example.com/admin/users');
+    expect(user.url()).toBe('http://example.com/roots/1/users/1');
+  });
 });
