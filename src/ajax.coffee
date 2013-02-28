@@ -89,6 +89,7 @@ class Collection extends Base
       url:  Ajax.getURL(@model)
     ).done(@recordsResponse)
      .fail(@failResponse)
+     .always(@alwaysResponse)
 
   fetch: (params = {}, options = {}) ->
     if id = params.id
@@ -101,51 +102,58 @@ class Collection extends Base
 
   # Private
 
-  recordsResponse: (data, status, xhr) =>
-    @model.trigger('ajaxSuccess', null, status, xhr)
+  recordsResponse: (options = {}) =>
+    (data, status, xhr) =>
+      @model.trigger('ajaxSuccess', null, status, xhr)
+      options.success?.apply(@model) # Deprecated
+      options.done?.apply(@model)
 
-  failResponse: (xhr, statusText, error) =>
-    @model.trigger('ajaxError', null, xhr, statusText, error)
+  failResponse: (options = {}) =>
+    (xhr, statusText, error) =>
+      @model.trigger('ajaxError', null, xhr, statusText, error)
+      options.error?.apply(@model) # Deprecated
+      options.fail?.apply(@model)
+
+  alwaysResponse: (options = {}) =>
+    options.always?.apply(@model)
 
 class Singleton extends Base
   constructor: (@record) ->
     @model = @record.constructor
 
+  ajaxSend: (params, settings, options) ->
+    @ajaxQueue(params, settings)
+    .done(@recordResponse(options))
+    .fail(@failResponse(options))
+    .always(@alwaysResponse(options))
+
   reload: (params, options) ->
-    @ajaxQueue(
-      params,
-      type: 'GET'
-      url:  Ajax.getURL(@record)
-    ).done(@recordResponse(options))
-     .fail(@failResponse(options))
+    settings =
+      type : 'GET'
+      url  : Ajax.getURL(@record)
+    @ajaxSend(params, settings, options)
 
   create: (params, options) ->
-    @ajaxQueue(
-      params,
-      type: 'POST'
-      contentType: 'application/json'
-      data: JSON.stringify(@record)
-      url:  Ajax.getURL(@model)
-    ).done(@recordResponse(options))
-     .fail(@failResponse(options))
+    settings =
+      type        : 'POST'
+      contentType : 'application/json'
+      data        : JSON.stringify(@record)
+      url         : Ajax.getURL(@model)
+    @ajaxSend(params, settings, options)
 
   update: (params, options) ->
-    @ajaxQueue(
-      params,
-      type: 'PUT'
-      contentType: 'application/json'
-      data: JSON.stringify(@record)
-      url:  Ajax.getURL(@record)
-    ).done(@recordResponse(options))
-     .fail(@failResponse(options))
+    settings = 
+      type        : 'PUT'
+      contentType : 'application/json'
+      data        : JSON.stringify(@record)
+      url         : Ajax.getURL(@record)
+    @ajaxSend(params, settings, options)
 
   destroy: (params, options) ->
-    @ajaxQueue(
-      params,
-      type: 'DELETE'
-      url:  Ajax.getURL(@record)
-    ).done(@recordResponse(options))
-     .fail(@failResponse(options))
+    settings = 
+      type : 'DELETE'
+      url  : Ajax.getURL(@record)
+    @ajaxSend(params, settings, options)
 
   # Private
 
@@ -174,6 +182,9 @@ class Singleton extends Base
       @record.trigger('ajaxError', xhr, statusText, error)
       options.error?.apply(@record) # Deprecated
       options.fail?.apply(@record)
+
+  alwaysResponse: (options = {}) =>
+    options.always?.apply(@record)
 
 # Ajax endpoint
 Model.host = ''
@@ -213,6 +224,8 @@ Model.Ajax =
     return if options.ajax is false
     record.ajax()[type](options.ajax, options)
 
+
+
 Model.Ajax.Methods =
   extended: ->
     @extend Extend
@@ -222,3 +235,4 @@ Model.Ajax.Methods =
 Ajax.defaults   = Base::defaults
 Spine.Ajax      = Ajax
 module?.exports = Ajax
+
