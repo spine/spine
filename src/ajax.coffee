@@ -29,7 +29,6 @@ Ajax =
 
 class Base
   defaults:
-    contentType: 'application/json'
     dataType: 'json'
     processData: false
     headers: {'X-Requested-With': 'XMLHttpRequest'}
@@ -124,6 +123,7 @@ class Singleton extends Base
     @ajaxQueue(
       params,
       type: 'POST'
+      contentType: 'application/json'
       data: JSON.stringify(@record)
       url:  Ajax.getURL(@model)
     ).done(@recordResponse(options))
@@ -133,6 +133,7 @@ class Singleton extends Base
     @ajaxQueue(
       params,
       type: 'PUT'
+      contentType: 'application/json'
       data: JSON.stringify(@record)
       url:  Ajax.getURL(@record)
     ).done(@recordResponse(options))
