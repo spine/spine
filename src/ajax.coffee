@@ -102,7 +102,7 @@ class Collection extends Base
   # Private
 
   recordsResponse: (data, status, xhr) =>
-    @model.trigger('ajaxSuccess', null, status, xhr)
+    @model.trigger('ajaxSuccess', data, status, xhr)
 
   failResponse: (xhr, statusText, error) =>
     @model.trigger('ajaxError', null, xhr, statusText, error)
