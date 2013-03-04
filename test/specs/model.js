@@ -519,6 +519,15 @@ describe("Model", function(){
       expect(spy.calls.length).toEqual(0);
     });
 
+    it("should not unbind class-level callbacks", function(){
+      Asset.bind('customEvent1', spy);
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.bind('customEvent2', function() {});
+      asset.trigger('unbind');
+      Asset.trigger('customEvent1');
+      expect(spy.calls.length).toEqual(1);
+    });
+
     it("should unbind events on instance destroy", function(){
       var asset = Asset.create({name: "cartoon world.png"});
 
