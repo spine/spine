@@ -81,6 +81,7 @@ class Collection extends Base
       url:  Ajax.getURL(record)
     ).done(@recordsResponse)
      .fail(@failResponse)
+     .always(@alwaysResponse)
 
   all: (params) ->
     @ajaxQueue(
@@ -115,7 +116,9 @@ class Collection extends Base
       options.fail?.apply(@model)
 
   alwaysResponse: (options = {}) =>
-    options.always?.apply(@model)
+    (xhr, statusText) =>
+      options.complete?.apply(@model) # Deprecated
+      options.always?.apply(@model)
 
 class Singleton extends Base
   constructor: (@record) ->
@@ -184,7 +187,9 @@ class Singleton extends Base
       options.fail?.apply(@record)
 
   alwaysResponse: (options = {}) =>
-    options.always?.apply(@record)
+    (xhr, statusText) =>
+      options.complete?.apply(@record) # Deprecated
+      options.always?.apply(@record)
 
 # Ajax endpoint
 Model.host = ''
@@ -223,8 +228,6 @@ Model.Ajax =
   ajaxChange: (record, type, options = {}) ->
     return if options.ajax is false
     record.ajax()[type](options.ajax, options)
-
-
 
 Model.Ajax.Methods =
   extended: ->
