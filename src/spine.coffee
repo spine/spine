@@ -105,22 +105,12 @@ class Model extends Module
   @toString: -> "#{@className}(#{@attributes.join(", ")})"
 
   @find: (id) ->
-    record = @records[id]
-    if !record and ("#{id}").match(/c-\d+/)
-      return @findCID(id)
-    throw new Error("\"#{@className}\" model could not find a record for the ID \"#{id}\"") unless record
-    record.clone()
-
-  @findCID: (cid) ->
-    record = @crecords[cid]
-    throw new Error("\"#{@className}\" model could not find a record for the ID \"#{id}\"") unless record
+    throw new Error("\"#{@className}\" model could not find a record for the ID \"#{id}\"") unless @exists(id)
+    record = @records[id] or @crecords[id]
     record.clone()
 
   @exists: (id) ->
-    try
-      return @find(id)
-    catch e
-      return false
+    id of @records or id of @crecords
 
   @refresh: (values, options = {}) ->
     if options.clear
@@ -346,7 +336,7 @@ class Model extends Module
     @load(result)
 
   exists: ->
-    @id && @id of @constructor.records
+    @constructor.exists(@id)
 
   # Private
 
