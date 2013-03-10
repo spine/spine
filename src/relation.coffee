@@ -61,8 +61,11 @@ class Instance extends Spine.Module
     for key, value of options
       @[key] = value
 
+  find: ->
+    @model.find(@record[@fkey])
+
   exists: ->
-    @record[@fkey] and @model.exists(@record[@fkey])
+    @fkey of @record and @model.exists(@record[@fkey])
 
   update: (value) ->
     unless value instanceof @model
@@ -124,7 +127,7 @@ Spine.Model.extend
 
     @::[name] = (value) ->
       association(@).update(value) if value?
-      association(@).exists()
+      association(@).find()
 
     @attributes.push(fkey)
 
