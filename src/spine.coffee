@@ -388,7 +388,7 @@ class Model extends Module
           if record && @eql(record)
             return if event and event isnt singleEvent
             return if cb and cb isnt callback
-            @constructor.unbind(event, binder)
+            @constructor.unbind(singleEvent, binder)
             @constructor.unbind("unbind", unbinder)
     this
 
