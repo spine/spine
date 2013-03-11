@@ -85,9 +85,13 @@ describe("Controller", function(){
     });
   });
   
+  /*
+    tests related to .listenTo(), .listenToOnce(), and .stopListening()
+  */
+  
   describe("Events listeners methods", function(){
     var spy, spy2, Asset, Users, asset, users;
-
+    
     beforeEach(function(){
       Asset = Spine.Model.setup("Asset", ["name"]);
       asset = Asset.create({name: "test.pdf"});
@@ -99,7 +103,7 @@ describe("Controller", function(){
       spy = noop.spy;
       spy2 = noop.spy2;
     });
-  
+    
     it("can listen to one event on a model instance", function(){
       users.listenTo(asset, 'event1', spy);
       asset.trigger("event1");
@@ -173,6 +177,18 @@ describe("Controller", function(){
       asset.trigger("event1");
       expect(spy).not.toHaveBeenCalled();
       expect(spy2).toHaveBeenCalled();
+    });
+    
+    // this is the major benefit of the listeners. helps manage cleanup of obsolete binders
+    
+    it("will stop listening if the controller is released", function(){
+      users.listenTo(asset, 'event1', spy);
+      asset.trigger("event1");
+      expect(spy).toHaveBeenCalled();
+      spy.reset();
+      users.release();
+      asset.trigger("event1");
+      expect(spy).not.toHaveBeenCalled();
     });
   });
 });

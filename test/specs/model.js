@@ -543,26 +543,26 @@ describe("Model", function(){
     })
   });
   
+  /*
+    tests related to .listenTo(), .listenToOnce(), and .stopListening()
+  */
+  
   describe("Events listeners methods", function(){
     var spy, spy2, Asset, asset, asset2, asset3;
-
+    
     beforeEach(function(){
       Asset = Spine.Model.sub();
       Asset.configure("Asset", "name");
-      //console.log('Asset: ', Asset);
       asset = Asset.create({name: "test.pdf"});
       asset2 = Asset.create({name: "scooby.pdf"});
       asset3 = Asset.create({name: "shaggy.pdf"});
-      //console.log('asset: ', asset)
-      //console.log('asset2: ', asset2)
-      //console.log('asset:3 ', asset3)
       var noop = {spy: function(){}, spy2: function(){}};
       spyOn(noop, "spy");
       spyOn(noop, "spy2");
       spy = noop.spy;
       spy2 = noop.spy2;
     });
-  
+    
     it("can listen to one event on a model instance", function(){
       asset2.listenTo(asset, 'event1', spy);
       asset.trigger("event1");
@@ -634,6 +634,18 @@ describe("Model", function(){
       asset.trigger("event1");
       expect(spy).not.toHaveBeenCalled();
       expect(spy2).toHaveBeenCalled();
+    });
+    
+    // this is the major benefit of the listeners. helps manage cleanup of obsolete binders
+    
+    it("will stop listening if the listener is destroyed", function(){
+      asset2.listenTo(asset, 'event1', spy);
+      asset.trigger("event1");
+      expect(spy).toHaveBeenCalled();
+      spy.reset();
+      asset2.destroy();
+      asset.trigger("event1");
+      expect(spy).not.toHaveBeenCalled();
     });
   });
 });
