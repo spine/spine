@@ -34,6 +34,7 @@ describe("Model.Relation", function(){
 
     expect( photo.album() ).toBeTruthy();
     expect( photo.album().name ).toBe("First Album");
+    expect( photo.album().exists() ).toEqual(true);
   });
 
   it("should load nested Singleton record", function(){

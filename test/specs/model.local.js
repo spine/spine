@@ -12,6 +12,7 @@ describe("Model.Local", function(){
 
     expect(User.first()).toBeTruthy();
     expect(User.first().name).toEqual("Bob");
+    expect(User.first().exists()).toEqual(true);
   });
 
   it("should work with cIDs", function(){
