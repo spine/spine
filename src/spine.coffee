@@ -439,6 +439,9 @@ class Model extends Module
     else
       @trigger('unbind')
 
+Model::on = Model::bind
+Model::off = Model::unbind
+
 class Controller extends Module
   @include Events
   @include Log
