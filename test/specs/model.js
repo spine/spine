@@ -630,7 +630,7 @@ describe("Model", function(){
       expect(spy2).toHaveBeenCalled();
       spy.reset();
       spy2.reset();
-      asset.stopListening(asset, 'event1');
+      asset2.stopListening(asset, 'event1');
       asset.trigger("event1");
       expect(spy).not.toHaveBeenCalled();
       expect(spy2).toHaveBeenCalled();

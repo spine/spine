@@ -23,6 +23,8 @@ Events =
   
   listenTo: (obj, ev, callback) ->
     obj.bind(ev, callback)
+    @listeningTo or= []
+    @listeningTo.push obj
     this
   
   listenToOnce: (obj, ev, callback) ->
@@ -30,7 +32,14 @@ Events =
     this
     
   stopListening: (obj, ev, callback) ->
-    obj.unbind(ev, callback)
+    if obj
+      obj.unbind(ev, callback)
+      idx = @listeningTo.indexOf(obj)
+      @listeningTo.splice(idx, 1) unless idx is -1
+    else
+      for obj in @listeningTo
+        obj.unbind()
+      @listeningTo = undefined
   
   unbind: (ev, callback) ->
     unless ev
@@ -318,6 +327,8 @@ class Model extends Module
     @destroyed = true
     @trigger('destroy', options)
     @trigger('change', 'destroy', options)
+    if @listeningTo
+      @stopListening()
     @unbind()
     this
 
@@ -403,6 +414,8 @@ class Model extends Module
   
   listenTo: (obj, events, callback) ->
     obj.bind events, callback
+    @listeningTo or= []
+    @listeningTo.push(obj)
   
   listenToOnce: (obj, events, callback) ->
     obj.bind events, =>
@@ -410,7 +423,14 @@ class Model extends Module
       callback.apply(obj, arguments)
   
   stopListening: (obj, events, callback) ->
-    obj.unbind events, callback
+    if obj
+      obj.unbind events, callback
+      idx = @listeningTo.indexOf(obj)
+      @listeningTo.splice(idx, 1) unless idx is -1
+    else
+      for obj in @listeningTo
+        obj.unbind()
+      @listeningTo = undefined
 
   unbind: (events, callback) ->
     if events
@@ -451,6 +471,8 @@ class Controller extends Module
     @trigger 'release'
     @el.remove()
     @unbind()
+    if @listeningTo
+      @stopListening()
 
   $: (selector) -> $(selector, @el)
 
