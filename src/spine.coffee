@@ -417,6 +417,10 @@ class Controller extends Module
     @events = @constructor.events unless @events
     @elements = @constructor.elements unless @elements
 
+    if parent_prototype = @constructor.prototype.__proto__
+      @events = $.extend({}, parent_prototype.events, @events) if parent_prototype.events
+      @elements = $.extend({}, parent_prototype.elements, @elements) if parent_prototype.elements
+
     @delegateEvents(@events) if @events
     @refreshElements() if @elements
 
