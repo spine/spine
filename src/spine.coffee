@@ -254,7 +254,7 @@ class Model extends Module
   validate: ->
 
   load: (atts) ->
-    for key, value of atts
+    for own key, value of atts
       if typeof @[key] is 'function'
         @[key](value)
       else
