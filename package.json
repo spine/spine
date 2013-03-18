@@ -6,7 +6,7 @@
   "keywords": ["spine", "coffeescript", "MVC"],
   "contributors": ["maccman", "aeischeid", "cengebretson"],
   "devDependencies": {
-  	"coffee-script": "~1.6"
+  	"coffee-script": ">=1.6.2"
   },
   "licenses":
     [{
