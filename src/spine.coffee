@@ -255,7 +255,7 @@ class Model extends Module
 
   load: (atts) ->
     if atts.id then @id = atts.id
-    for key, value of atts
+    for own key, value of atts
       if typeof @[key] is 'function'
         @[key](value)
       else
