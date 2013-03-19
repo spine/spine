@@ -31,8 +31,10 @@ describe("Model.Relation", function(){
 
     var album = Album.create({name: "First Album"});
     var photo = Photo.create({album: album});
+    var photo2 = Photo.create({});
 
     expect( photo.album() ).toBeTruthy();
+    expect( photo2.album() ).toBeFalsy();
     expect( photo.album().name ).toBe("First Album");
     expect( photo.album().exists() ).toEqual(true);
   });
