@@ -90,4 +90,39 @@ describe("Controller", function(){
     var users = new Users();
     expect(users.el.attr("style")).toEqual("width: 100%");
   });
+
+  describe("inheritance", function() {
+    beforeEach(function() {
+      element = $('<div/>').html('<div class="parent"></div><div class="child"></div>');
+      Users.include({
+        events: {"click .parent": "parentEventHandler"},
+        elements: {".parent": "el1"},
+        parentEventHandler: function() {}
+      });
+
+      ChildUser = Users.sub({
+        el: element,
+        events: {"click .child": "childEventHandler"},
+        elements: {".child": "el2"},
+        childEventHandler: function() {}
+      });
+
+      childUser = new ChildUser();
+    });
+
+    it("should inherit elements from parent controller", function(){
+      expect(childUser.el1).toBeDefined();
+      expect(childUser.el2).toBeDefined();
+    });
+
+    it("should inherit events from parent controller", function(){
+      spyOn(childUser, 'parentEventHandler');
+      spyOn(childUser, 'childEventHandler');
+      childUser.el.find('.parent').click();
+      childUser.el.find('.child').click();
+
+      expect(childUser.parentEventHandler).toHaveBeenCalled();
+      expect(childUser.childEventHandler).toHaveBeenCalled();
+    });
+  });
 });
