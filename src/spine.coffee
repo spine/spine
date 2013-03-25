@@ -119,12 +119,12 @@ class Model extends Module
   @toString: -> "#{@className}(#{@attributes.join(", ")})"
 
   @find: (id) ->
-    throw new Error("\"#{@className}\" model could not find a record for the ID \"#{id}\"") unless @exists(id)
-    record = @records[id] or @crecords[id]
-    record.clone()
+    record = @exists(id) 
+    throw new Error("\"#{@className}\" model could not find a record for the ID \"#{id}\"") unless record
+    return record
 
   @exists: (id) ->
-    id of @records or id of @crecords
+    (@records[id] ? @crecords[id])?.clone()
 
   @refresh: (values, options = {}) ->
     if options.clear
