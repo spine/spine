@@ -194,36 +194,47 @@ describe("Controller", function(){
 
   describe("inheritance", function() {
     beforeEach(function() {
-      element = $('<div/>').html('<div class="parent"></div><div class="child"></div>');
-      Users.include({
-        events: {"click .parent": "parentEventHandler"},
-        elements: {".parent": "el1"},
-        parentEventHandler: function() {}
+      element = $('<div/>').html('<div class="a-el"></div><div class="b-el"></div><div class="c-el"></div>');
+      A = Spine.Controller.sub({
+        events: {"click .a-el": "aEventHandler"},
+        elements: {".a-el": "elA"},
+        aEventHandler: function() {}
       });
 
-      ChildUser = Users.sub({
+      B = A.sub({
         el: element,
-        events: {"click .child": "childEventHandler"},
-        elements: {".child": "el2"},
-        childEventHandler: function() {}
+        events: {"click .b-el": "bEventHandler"},
+        elements: {".b-el": "elB"},
+        bEventHandler: function() {}
       });
 
-      childUser = new ChildUser();
+      C = B.sub({
+        el: element,
+        events: {"click .c-el": "cEventHandler"},
+        elements: {".c-el": "elC"},
+        cEventHandler: function() {}
+      });
+
+      c = new C();
     });
 
-    it("should inherit elements from parent controller", function(){
-      expect(childUser.el1).toBeDefined();
-      expect(childUser.el2).toBeDefined();
+    it("should inherit elements from parent controllers", function(){
+      expect(c.elA).toBeDefined();
+      expect(c.elB).toBeDefined();
+      expect(c.elC).toBeDefined();
     });
 
-    it("should inherit events from parent controller", function(){
-      spyOn(childUser, 'parentEventHandler');
-      spyOn(childUser, 'childEventHandler');
-      childUser.el.find('.parent').click();
-      childUser.el.find('.child').click();
+    it("should inherit events from parent controllers", function(){
+      spyOn(c, 'aEventHandler');
+      spyOn(c, 'bEventHandler');
+      spyOn(c, 'cEventHandler');
+      c.el.find('.a-el').click();
+      c.el.find('.b-el').click();
+      c.el.find('.c-el').click();
 
-      expect(childUser.parentEventHandler).toHaveBeenCalled();
-      expect(childUser.childEventHandler).toHaveBeenCalled();
+      expect(c.aEventHandler).toHaveBeenCalled();
+      expect(c.bEventHandler).toHaveBeenCalled();
+      expect(c.cEventHandler).toHaveBeenCalled();
     });
   });
 });
