@@ -164,7 +164,7 @@ page.open(system.args[1], function (status) {
 
             function printSpecs(root, level) {
                 level || (level = 0);
-                $(root).find('.specSummary').each(function (i, el) {
+                $(root).find('> .specSummary').each(function (i, el) {
                     var output = format(el, level);
                     if (output) {
                       window.callPhantom(output);
