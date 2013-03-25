@@ -286,6 +286,15 @@ describe("Model", function(){
     expect(asset.id).toBeTruthy();
   });
 
+  it("can generate UUID if enabled", function(){
+    Asset.uuid = function(){ return 'fc0942b0-956f-11e2-9c95-9b0af2c6635d' };
+    var asset = new Asset({name: "who's in the house?"});
+    expect(asset.id).toBeTruthy();
+    expect(asset.id).toEqual(Asset.uuid());
+    expect(asset.id).toEqual(asset.cid);
+    delete Asset.uuid
+  });
+
   it("can be duplicated", function(){
     var asset = Asset.create({name: "who's your daddy?"});
     expect(asset.dup().__proto__).toBe(Asset.prototype);
