@@ -6,12 +6,12 @@ Events =
       calls[name] or= []
       calls[name].push(callback)
     this
-  
+
   one: (ev, callback) ->
     @bind ev, ->
       @unbind(ev, arguments.callee)
       callback.apply(this, arguments)
-  
+
   trigger: (args...) ->
     ev = args.shift()
     list = @hasOwnProperty('_callbacks') and @_callbacks?[ev]
@@ -20,17 +20,17 @@ Events =
       if callback.apply(this, args) is false
         break
     true
-  
+
   listenTo: (obj, ev, callback) ->
     obj.bind(ev, callback)
     @listeningTo or= []
     @listeningTo.push obj
     this
-  
+
   listenToOnce: (obj, ev, callback) ->
     obj.one(ev, callback)
     this
-    
+
   stopListening: (obj, ev, callback) ->
     if obj
       obj.unbind(ev, callback)
@@ -40,7 +40,7 @@ Events =
       for obj in @listeningTo
         obj.unbind()
       @listeningTo = undefined
-  
+
   unbind: (ev, callback) ->
     unless ev
       @_callbacks = {}
@@ -119,7 +119,7 @@ class Model extends Module
   @toString: -> "#{@className}(#{@attributes.join(", ")})"
 
   @find: (id) ->
-    record = @exists(id) 
+    record = @exists(id)
     throw new Error("\"#{@className}\" model could not find a record for the ID \"#{id}\"") unless record
     return record
 
@@ -242,8 +242,12 @@ class Model extends Module
 
   constructor: (atts) ->
     super
+    if @constructor.uuid? and typeof @constructor.uuid is 'function'
+      @cid = @constructor.uuid()
+      @id = @cid unless @id
+    else
+      @cid = @constructor.uid 'c-'
     @load atts if atts
-    @cid = @constructor.uid('c-')
 
   isNew: ->
     not @exists()
@@ -383,8 +387,8 @@ class Model extends Module
     @constructor.bind events, binder = (record) =>
       if record && @eql(record)
         callback.apply(this, arguments)
-    # create a wrapper function to be called with 'unbind' for each event 
-    for singleEvent in events.split(' ') 
+    # create a wrapper function to be called with 'unbind' for each event
+    for singleEvent in events.split(' ')
       do (singleEvent) =>
         @constructor.bind "unbind", unbinder = (record, event, cb) =>
           if record && @eql(record)
@@ -402,17 +406,17 @@ class Model extends Module
   trigger: (args...) ->
     args.splice(1, 0, this)
     @constructor.trigger(args...)
-  
+
   listenTo: (obj, events, callback) ->
     obj.bind events, callback
     @listeningTo or= []
     @listeningTo.push(obj)
-  
+
   listenToOnce: (obj, events, callback) ->
     obj.bind events, =>
       obj.unbind(events, arguments.callee)
       callback.apply(obj, arguments)
-  
+
   stopListening: (obj, events, callback) ->
     if obj
       obj.unbind events, callback
@@ -425,7 +429,7 @@ class Model extends Module
 
   unbind: (events, callback) ->
     if events
-      for event in events.split(' ') 
+      for event in events.split(' ')
         @trigger('unbind', event, callback)
     else
       @trigger('unbind')
