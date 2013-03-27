@@ -255,8 +255,8 @@ class Model extends Module
 
   load: (atts) ->
     if atts.id then @id = atts.id
-    for own key, value of atts
-      if typeof @[key] is 'function'
+    for key, value of atts
+      if atts.hasOwnProperty(key) and typeof @[key] is 'function'
         @[key](value)
       else
         @[key] = value
