@@ -115,6 +115,66 @@ describe("Model.Relation", function(){
     expect( album.photos().last().name ).toBe("Beautiful photo 2");
   });
 
+  it("should add unassociated records to an existing Collection", function(){
+    Album.hasMany("photos", Photo);
+    Photo.belongsTo("album", Album);
+
+    var album = Album.create({
+      photos: [{
+        id: "1",
+        name: "Beautiful photo 1"
+      }],
+      name: "Beautiful album",
+      id: "1"
+    });
+
+    var photo2 = Photo.create({
+      id: "2",
+      name: "Beautiful photo 2"
+    });
+
+    expect( album.photos() ).toBeTruthy();
+    expect( album.photos().all().length ).toBe(1);
+
+    album.photos().add(photo2);
+
+    expect( album.photos().all().length ).toBe(2);
+    expect( album.photos().first().album_id ).toBe("1");
+    expect( album.photos().last().album_id ).toBe("1");
+    expect( album.photos().first().name ).toBe("Beautiful photo 1");
+    expect( album.photos().last().name ).toBe("Beautiful photo 2");
+  });
+
+  it("should remove records from a Collection", function(){
+    Album.hasMany("photos", Photo);
+    Photo.belongsTo("album", Album);
+
+    var album = Album.create({
+      photos: [{
+        id: "1",
+        name: "Beautiful photo 1"
+      }],
+      name: "Beautiful album",
+      id: "1"
+    });
+
+    var photo2 = Photo.create({
+      id: "2",
+      name: "Beautiful photo 2"
+    });
+
+    album.photos().add(photo2);
+
+    expect( album.photos() ).toBeTruthy();
+    expect( album.photos().all().length ).toBe(2);
+    expect( album.photos().last().name ).toBe("Beautiful photo 2");
+
+    album.photos().remove(photo2);
+
+    expect( album.photos().all().length ).toBe(1);
+    expect( album.photos().last().name ).toBe("Beautiful photo 1");
+  });
+
   it("should create new related Collection records", function(){
     Album.hasMany("photos", Photo);
     Photo.belongsTo("album", Album);

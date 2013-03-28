@@ -51,6 +51,12 @@ class Collection extends Spine.Module
     record[@fkey] = @record.id
     @model.create(record, options)
 
+  add: (record, options) ->
+    record.updateAttribute @fkey, @record.id, options
+
+  remove: (record, options) ->
+    record.updateAttribute @fkey, null, options
+
   # Private
 
   associated: (record) ->
@@ -142,7 +148,7 @@ Spine.Model.extend
     @::[name] = (value) ->
       association(@).update(value) if value?
       association(@).find()
-	  
+
 Spine.Collection = Collection
 Spine.Singleton = Singleton
 Spine.Instance = Instance
