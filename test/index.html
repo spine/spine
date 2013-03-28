@@ -34,11 +34,16 @@
       <label for="jq">Select a jQuery version: </label>
       <select name="jq" id="jq">
         <option value="1.8.3">chose one...</option>
-        <option>1.6.4</option>
-        <option>1.7.2</option>
-        <option>1.8.3</option>
-        <option>1.9.1</option>
-        <option>2.0.0</option>
+        <optgroup label="jQuery">
+          <option>1.6.4</option>
+          <option>1.7.2</option>
+          <option>1.8.3</option>
+          <option>1.9.1</option>
+          <option>2.0.0</option>
+        </optgroup>
+        <optgroup label="Zepto">
+          <option value="zepto">1.0</option>
+        </optgroup>
       </select>
       <input type="submit" value="Run" />
     </form>
@@ -54,7 +59,7 @@
     };
 
     jasmine.getEnv().execute();
-    document.getElementById('usedJquerysrc').innerHTML = window.jquerySrc;
+    document.getElementById('usedJquerysrc').innerHTML = window.dependencySrc;
   </script>
 </body>
 </html>
