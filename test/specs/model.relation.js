@@ -45,14 +45,11 @@ describe("Model.Relation", function(){
     Album.hasOne("photo", Photo);
     Photo.belongsTo("album", Album);
 
-    var album = new Album();
-    album.load({
+    var album = Album.create({
       id: "1",
       name: "Beautiful album",
     });
-
-    var photo = new Photo();
-    photo.load({
+    var photo = Photo.create({
       id: "2",
       name: "Beautiful photo"
     });
@@ -68,8 +65,7 @@ describe("Model.Relation", function(){
     Album.hasOne("photo", Photo);
     Photo.belongsTo("album", Album);
 
-    var album = new Album();
-    album.load({
+    var album = Album.create({
       name: "Beautiful album",
       photo: {
         name: "Beautiful photo"
@@ -82,30 +78,35 @@ describe("Model.Relation", function(){
     expect( album.photo().name ).toBe("Beautiful photo");
   });
 
-  it("should associate existing Collection records", function(){
+  it("should associate existing records into a Collection", function(){
     Album.hasMany("photos", Photo);
     Photo.belongsTo("album", Album);
 
-    var album = new Album();
-    album.load({
+    var album = Album.create({
       name: "Beautiful album",
+      photos: [{
+        id: "3",
+        name: "This record should be removed"
+      }],
       id: "1"
     });
 
-    var photo1 = new Photo();
-    photo1.load({
+    expect( Photo.count() ).toBe(1);
+    expect( album.photos().all().length ).toBe(1);
+    expect( album.photos().first().id ).toBe("3");
+
+    var photo1 = Photo.create({
       id: "1",
       name: "Beautiful photo 1"
     });
-
-    var photo2 = new Photo();
-    photo2.load({
+    var photo2 = Photo.create({
       id: "2",
       name: "Beautiful photo 2"
     });
 
     album.photos([ photo1, photo2 ]);
 
+    expect( Photo.count() ).toBe(2);
     expect( album.photos() ).toBeTruthy();
     expect( album.photos().all().length ).toBe(2);
     expect( album.photos().first().album_id ).toBe("1");
@@ -118,8 +119,7 @@ describe("Model.Relation", function(){
     Album.hasMany("photos", Photo);
     Photo.belongsTo("album", Album);
 
-    var album = new Album();
-    album.load({
+    var album = Album.create({
       name: "Beautiful album",
       photos: [{
         id: "1",
