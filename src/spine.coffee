@@ -468,7 +468,7 @@ class Controller extends Module
     super
 
   release: =>
-    @trigger 'release'
+    @trigger 'release', this
     @el.remove()
     @unbind()
     if @listeningTo
