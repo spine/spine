@@ -17,6 +17,9 @@ class Collection extends Spine.Module
     values = @all()
     values[values.length - 1]
 
+  count: ->
+    @all().length
+
   find: (id) ->
     records = @select (rec) =>
       "#{rec.id}" is "#{id}"
@@ -142,7 +145,7 @@ Spine.Model.extend
     @::[name] = (value) ->
       association(@).update(value) if value?
       association(@).find()
-	  
+
 Spine.Collection = Collection
 Spine.Singleton = Singleton
 Spine.Instance = Instance
