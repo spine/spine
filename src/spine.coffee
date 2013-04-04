@@ -2,43 +2,57 @@ Events =
   bind: (ev, callback) ->
     evs   = ev.split(' ')
     calls = @hasOwnProperty('_callbacks') and @_callbacks or= {}
-
     for name in evs
       calls[name] or= []
       calls[name].push(callback)
     this
-
+  
   one: (ev, callback) ->
     @bind ev, ->
       @unbind(ev, arguments.callee)
       callback.apply(this, arguments)
-
+  
   trigger: (args...) ->
     ev = args.shift()
-
     list = @hasOwnProperty('_callbacks') and @_callbacks?[ev]
     return unless list
-
     for callback in list
       if callback.apply(this, args) is false
         break
     true
-
+  
+  listenTo: (obj, ev, callback) ->
+    obj.bind(ev, callback)
+    @listeningTo or= []
+    @listeningTo.push obj
+    this
+  
+  listenToOnce: (obj, ev, callback) ->
+    obj.one(ev, callback)
+    this
+    
+  stopListening: (obj, ev, callback) ->
+    if obj
+      obj.unbind(ev, callback)
+      idx = @listeningTo.indexOf(obj)
+      @listeningTo.splice(idx, 1) unless idx is -1
+    else
+      for obj in @listeningTo
+        obj.unbind()
+      @listeningTo = undefined
+  
   unbind: (ev, callback) ->
     unless ev
       @_callbacks = {}
       return this
-
     evs  = ev.split(' ')
     for name in evs
       list = @_callbacks?[name]
       continue unless list
-
       unless callback
         delete @_callbacks[name]
         continue
-
-      for cb, i in list when cb is callback
+      for cb, i in list when (cb is callback)
         list = list.slice()
         list.splice(i, 1)
         @_callbacks[name] = list
@@ -105,22 +119,12 @@ class Model extends Module
   @toString: -> "#{@className}(#{@attributes.join(", ")})"
 
   @find: (id) ->
-    record = @irecords[id]
-    if !record and ("#{id}").match(/c-\d+/)
-      return @findCID(id)
+    record = @exists(id) 
     throw new Error("\"#{@className}\" model could not find a record for the ID \"#{id}\"") unless record
-    record.clone()
-
-  @findCID: (cid) ->
-    record = @crecords[cid]
-    throw new Error("\"#{@className}\" model could not find a record for the ID \"#{id}\"") unless record
-    record.clone()
+    return record
 
   @exists: (id) ->
-    try
-      return @find(id)
-    catch e
-      return false
+    (@records[id] ? @irecords[id])?.clone()
 
   @refresh: (values, options = {}) ->
     if options.clear
@@ -247,8 +251,9 @@ class Model extends Module
   validate: ->
 
   load: (atts) ->
+    if atts.id then @id = atts.id
     for key, value of atts
-      if typeof @[key] is 'function'
+      if atts.hasOwnProperty(key) and typeof @[key] is 'function'
         @[key](value)
       else
         @[key] = value
@@ -303,6 +308,28 @@ class Model extends Module
     @id = id
     @save()
 
+  destroy: (options = {}) ->
+    @trigger('beforeDestroy', options)
+
+    # Remove record from model
+    records = @constructor.records.slice(0)
+    for record, i in records when @eql(record)
+      records.splice(i, 1)
+      break
+    @constructor.records = records
+    
+    # Remove the ID and CID
+    delete @constructor.irecords[@id]
+    delete @constructor.crecords[@cid]
+
+    @destroyed = true
+    @trigger('destroy', options)
+    @trigger('change', 'destroy', options)
+    if @listeningTo
+      @stopListening()
+    @unbind()
+    this
+
   dup: (newRecord) ->
     result = new @constructor(@attributes())
     if newRecord is false
@@ -333,27 +360,7 @@ class Model extends Module
     @load(result)
 
   exists: ->
-    @id && @id of @constructor.irecords
-
-  destroy: (options = {}) ->
-    @trigger('beforeDestroy', options)
-
-    # Remove record from model
-    records = @constructor.records.slice(0)
-    for record, i in records when @eql(record)
-      records.splice(i, 1)
-      break
-    @constructor.records = records
-    
-    # Remove the ID and CID
-    delete @constructor.irecords[@id]
-    delete @constructor.crecords[@cid]
-
-    @destroyed = true
-    @trigger('destroy', options)
-    @trigger('change','destroy', options)
-    @unbind()
-    this
+    @constructor.exists(@id)
 
   # Private
 
@@ -390,23 +397,55 @@ class Model extends Module
     @constructor.bind events, binder = (record) =>
       if record && @eql(record)
         callback.apply(this, arguments)
-    @constructor.bind 'unbind', unbinder = (record) =>
-      if record && @eql(record)
-        @constructor.unbind(events, binder)
-        @constructor.unbind('unbind', unbinder)
-    binder
+    # create a wrapper function to be called with 'unbind' for each event 
+    for singleEvent in events.split(' ') 
+      do (singleEvent) =>
+        @constructor.bind "unbind", unbinder = (record, event, cb) =>
+          if record && @eql(record)
+            return if event and event isnt singleEvent
+            return if cb and cb isnt callback
+            @constructor.unbind(singleEvent, binder)
+            @constructor.unbind("unbind", unbinder)
+    this
 
   one: (events, callback) ->
-    binder = @bind events, =>
-      @constructor.unbind(events, binder)
+    @bind events, =>
+      @unbind(events, arguments.callee)
       callback.apply(this, arguments)
 
   trigger: (args...) ->
     args.splice(1, 0, this)
     @constructor.trigger(args...)
+  
+  listenTo: (obj, events, callback) ->
+    obj.bind events, callback
+    @listeningTo or= []
+    @listeningTo.push(obj)
+  
+  listenToOnce: (obj, events, callback) ->
+    obj.bind events, =>
+      obj.unbind(events, arguments.callee)
+      callback.apply(obj, arguments)
+  
+  stopListening: (obj, events, callback) ->
+    if obj
+      obj.unbind events, callback
+      idx = @listeningTo.indexOf(obj)
+      @listeningTo.splice(idx, 1) unless idx is -1
+    else
+      for obj in @listeningTo
+        obj.unbind()
+      @listeningTo = undefined
 
-  unbind: ->
-    @trigger('unbind')
+  unbind: (events, callback) ->
+    if events
+      for event in events.split(' ') 
+        @trigger('unbind', event, callback)
+    else
+      @trigger('unbind')
+
+Model::on = Model::bind
+Model::off = Model::unbind
 
 class Controller extends Module
   @include Events
@@ -431,15 +470,23 @@ class Controller extends Module
     @events = @constructor.events unless @events
     @elements = @constructor.elements unless @elements
 
+    context = @
+    while parent_prototype = context.constructor.__super__
+      @events = $.extend({}, parent_prototype.events, @events) if parent_prototype.events
+      @elements = $.extend({}, parent_prototype.elements, @elements) if parent_prototype.elements
+      context = parent_prototype
+
     @delegateEvents(@events) if @events
     @refreshElements() if @elements
 
     super
 
   release: =>
-    @trigger 'release'
+    @trigger 'release', this
     @el.remove()
     @unbind()
+    if @listeningTo
+      @stopListening()
 
   $: (selector) -> $(selector, @el)
 

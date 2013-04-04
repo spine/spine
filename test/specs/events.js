@@ -1,11 +1,11 @@
 describe("Events", function(){
   var EventTest;
+  var ListenTest;
   var spy;
 
   beforeEach(function(){
     EventTest = Spine.Class.create();
     EventTest.extend(Spine.Events);
-
     var noop = {spy: function(){}};
     spyOn(noop, "spy");
     spy = noop.spy;
@@ -13,6 +13,14 @@ describe("Events", function(){
 
   it("can bind/trigger events", function(){
     EventTest.bind("daddyo", spy);
+    EventTest.trigger("daddyo");
+    expect(spy).toHaveBeenCalled();
+  });
+  
+  it("can listen for events on other objects", function(){
+    ListenTest = Spine.Class.create();
+    ListenTest.extend(Spine.Events);
+    ListenTest.listenTo(EventTest, "daddyo", spy);
     EventTest.trigger("daddyo");
     expect(spy).toHaveBeenCalled();
   });
@@ -25,6 +33,14 @@ describe("Events", function(){
 
   it("can bind/trigger multiple events", function(){
     EventTest.bind("house car windows", spy);
+    EventTest.trigger("car");
+    expect(spy).toHaveBeenCalled();
+  });
+  
+  it("can listen for multiple events on other objects", function(){
+    ListenTest = Spine.Class.create();
+    ListenTest.extend(Spine.Events);
+    ListenTest.listenTo(EventTest, "house car windows", spy);
     EventTest.trigger("car");
     expect(spy).toHaveBeenCalled();
   });
@@ -41,6 +57,18 @@ describe("Events", function(){
     EventTest.trigger("daddyo");
     expect(spy).not.toHaveBeenCalled();
   });
+  
+  it("can stop listening to events", function(){
+    ListenTest = Spine.Class.create();
+    ListenTest.extend(Spine.Events);
+    ListenTest.listenTo(EventTest, "daddyo", spy);
+    EventTest.trigger("daddyo");
+    expect(spy).toHaveBeenCalled();
+    spy.reset();
+    ListenTest.stopListening(EventTest, "daddyo");
+    EventTest.trigger("daddyo");
+    expect(spy).not.toHaveBeenCalled();
+  });
 
   it("can unbind one event", function(){
     EventTest.bind("house car windows", spy);
@@ -51,12 +79,34 @@ describe("Events", function(){
     EventTest.trigger("house");
     expect(spy).toHaveBeenCalled();
   });
-
-  it("can bind to a single event", function(){
+  
+  it("can stopListening to one event", function(){
+    ListenTest = Spine.Class.create();
+    ListenTest.extend(Spine.Events);
+    ListenTest.listenTo(EventTest, "house car windows", spy)
+    ListenTest.stopListening(EventTest, "car windows");
+    EventTest.trigger("car");
+    EventTest.trigger("windows");
+    expect(spy).not.toHaveBeenCalled();
+    EventTest.trigger("house");
+    expect(spy).toHaveBeenCalled();
+  });
+  
+  it("can bind to an event only once", function(){
     EventTest.one("indahouse", spy);
     EventTest.trigger("indahouse");
     expect(spy).toHaveBeenCalled();
-
+    spy.reset();
+    EventTest.trigger("indahouse");
+    expect(spy).not.toHaveBeenCalled();
+  });
+  
+  it("can listen to to a event only once", function(){
+    ListenTest = Spine.Class.create();
+    ListenTest.extend(Spine.Events);
+    ListenTest.listenToOnce(EventTest, 'indahouse', spy)
+    EventTest.trigger("indahouse");
+    expect(spy).toHaveBeenCalled();
     spy.reset();
     EventTest.trigger("indahouse");
     expect(spy).not.toHaveBeenCalled();
@@ -90,7 +140,6 @@ describe("Events", function(){
   it("can cancel propogation", function(){
     EventTest.bind("motherio", function(){ return false; });
     EventTest.bind("motherio", spy);
-
     EventTest.trigger("motherio");
     expect(spy).not.toHaveBeenCalled();
   });

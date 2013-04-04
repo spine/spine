@@ -153,18 +153,18 @@ page.open(system.args[1], function (status) {
             function printSuites(root, level) {
                 level || (level = 0);
                 $(root).find('div.suite').each(function (i, el) {
-                    var output = format(el, level, true)
-                    if (output) {
+                    var output = "\n" + format(el, level, true)
+                    if (output && $(el).parents('div.suite').length == level) {
                       window.callPhantom(output);
+                      printSpecs(el, level + 1);
                     }
-                    printSpecs(el, level + 1);
                     printSuites(el, level + 1);
                 });
             }
 
             function printSpecs(root, level) {
                 level || (level = 0);
-                $(root).find('.specSummary').each(function (i, el) {
+                $(root).find('> .specSummary').each(function (i, el) {
                     var output = format(el, level);
                     if (output) {
                       window.callPhantom(output);

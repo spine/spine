@@ -31,7 +31,6 @@ describe("Ajax", function(){
     expect(jQuery.ajax).toHaveBeenCalledWith({
       type:         'GET',
       headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
-      contentType:  'application/json',
       dataType:     'json',
       url:          '/users',
       processData:  false
@@ -48,7 +47,6 @@ describe("Ajax", function(){
     expect(jQuery.ajax).toHaveBeenCalledWith({
       type:         'GET',
       headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
-      contentType:  'application/json',
       dataType:     'json',
       url:          '/users/IDD',
       processData:  false
@@ -97,7 +95,6 @@ describe("Ajax", function(){
     User.first().destroy();
 
     expect(jQuery.ajax).toHaveBeenCalledWith({
-      contentType: 'application/json',
       headers:     { 'X-Requested-With' : 'XMLHttpRequest' },
       dataType:   'json',
       processData: false,

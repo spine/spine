@@ -472,22 +472,82 @@ describe("Model", function(){
       asset.updateAttributes({name: "lonely heart.png"});
     });
 
-    it("should be able to unbind instance events", function(){
+    it("should be able to unbind all instance events", function(){
       var asset = Asset.create({name: "cartoon world.png"});
-
       asset.bind("save", spy);
       asset.unbind();
       asset.save();
-
       expect(spy).not.toHaveBeenCalled();
+    });
+    
+    it("should be able to unbind individual instance events", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.bind("save", spy);
+      asset.bind("customEvent", spy);
+      asset.unbind('save');
+      asset.save();
+      expect(spy).not.toHaveBeenCalled();
+      asset.trigger('customEvent');
+      expect(spy).toHaveBeenCalled();
+    });
+    
+    it("should be able to unbind individual callbacks to individual instance events", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+      var noop2 = {spy2: function(){}};
+      spyOn(noop2, "spy2");
+      var spy2 = noop2.spy2;
+      asset.bind("customEvent", spy);
+      asset.bind("customEvent", spy2);
+      asset.trigger("customEvent");
+      expect(spy).toHaveBeenCalled();
+      expect(spy2).toHaveBeenCalled();
+      spy.reset();
+      spy2.reset();
+      asset.unbind("customEvent", spy2);
+      asset.trigger('customEvent');
+      expect(spy).toHaveBeenCalled();
+      expect(spy2).not.toHaveBeenCalled();
+    });
+
+    it("should be able to unbind a single event that uses a callback another event is bind to.", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.bind("customEvent1 customEvent2", spy);
+      asset.trigger("customEvent1");
+      asset.trigger("customEvent2");
+      expect(spy.calls.length).toEqual(2);
+      spy.reset();
+      asset.unbind("customEvent1");
+      asset.trigger("customEvent1");
+      asset.trigger("customEvent2");
+      expect(spy.calls.length).toEqual(1);
+    });
+
+    it("should be able to bind and unbind multiple events with a single call.", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.bind("customEvent1 customEvent2", spy)
+      asset.trigger("customEvent1");
+      asset.trigger("customEvent2");
+      expect(spy.calls.length).toEqual(2);
+      spy.reset();
+      asset.unbind("customEvent1 customEvent2")
+      asset.trigger("customEvent1");
+      asset.trigger("customEvent2");
+      expect(spy.calls.length).toEqual(0);
+    });
+
+    it("should not unbind class-level callbacks", function(){
+      Asset.bind('customEvent1', spy);
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.bind('customEvent2', function() {});
+      asset.trigger('unbind');
+      Asset.trigger('customEvent1');
+      expect(spy.calls.length).toEqual(1);
     });
 
     it("should unbind events on instance destroy", function(){
       var asset = Asset.create({name: "cartoon world.png"});
-
       asset.bind("save", spy);
       asset.destroy();
-
       asset.trigger("save", asset);
       expect(spy).not.toHaveBeenCalled();
     });
@@ -496,10 +556,115 @@ describe("Model", function(){
       var asset = Asset.create({name: "hotel california", id: "bar"});
       asset.bind("test", spy);
       asset.changeID("foo");
-
       asset = Asset.find("foo");
       asset.trigger("test", asset);
       expect(spy).toHaveBeenCalled();
     })
+  });
+  
+  /*
+    tests related to .listenTo(), .listenToOnce(), and .stopListening()
+  */
+  
+  describe("Events listeners methods", function(){
+    var spy, spy2, Asset, asset, asset2, asset3;
+    
+    beforeEach(function(){
+      Asset = Spine.Model.sub();
+      Asset.configure("Asset", "name");
+      asset = Asset.create({name: "test.pdf"});
+      asset2 = Asset.create({name: "scooby.pdf"});
+      asset3 = Asset.create({name: "shaggy.pdf"});
+      var noop = {spy: function(){}, spy2: function(){}};
+      spyOn(noop, "spy");
+      spyOn(noop, "spy2");
+      spy = noop.spy;
+      spy2 = noop.spy2;
+    });
+    
+    it("can listen to one event on a model instance", function(){
+      asset2.listenTo(asset, 'event1', spy);
+      asset.trigger("event1");
+      expect(spy).toHaveBeenCalled();
+    });
+    
+    it("wont listen to events of the same name on unlistened to model instances", function(){
+      asset2.listenTo(asset, 'event1', spy);
+      asset3.trigger("event1");
+      asset2.trigger("evemt1")
+      expect(spy).not.toHaveBeenCalled();
+    });
+    
+    it("can listen to many events on a model instance", function(){
+      asset2.listenTo(asset, 'event1 event2 event3', spy);
+      asset.trigger("event1");
+      asset.trigger("event2");
+      asset.trigger("event3");
+      expect(spy).toHaveBeenCalled();
+      expect(spy.callCount).toBe(3);
+    });
+    
+    it("can listen once for an event on a model instance", function(){
+      asset2.listenToOnce(asset, 'event1', spy);
+      asset.trigger("event1");
+      expect(spy).toHaveBeenCalled();
+      spy.reset();
+      asset.trigger("event1");
+      expect(spy).not.toHaveBeenCalled();
+    });
+    
+    it("can stop listening to a specific event on a model instance while maintaining listeners on other events", function(){
+      asset2.listenTo(asset, 'event1 event2 event3', spy);
+      asset.trigger("event1");
+      expect(spy).toHaveBeenCalled();
+      spy.reset();
+      asset2.stopListening(asset, 'event1');
+      asset.trigger("event1");
+      expect(spy).not.toHaveBeenCalled();
+      spy.reset();
+      asset.trigger("event2");
+      expect(spy).toHaveBeenCalled();
+      spy.reset();
+      asset.trigger("event3");
+      expect(spy).toHaveBeenCalled();
+    });
+    
+    it("can stop listening to all events on a model instance", function(){
+      asset2.listenTo(asset, 'event1 event2 event3', spy);
+      asset.trigger("event2");
+      expect(spy).toHaveBeenCalled();
+      spy.reset();
+      asset2.stopListening(asset);
+      asset.trigger("event1");
+      asset.trigger("event2");
+      asset.trigger("event3");
+      expect(spy).not.toHaveBeenCalled();
+    });
+    
+    it("can stop listening to events on a model instance, without canceling out other binders on that model instance", function(){
+      Asset.bind('event1', spy2)
+      asset2.listenTo(asset, 'event1', spy);
+      asset.trigger("event1");
+      expect(spy).toHaveBeenCalled();
+      expect(spy2).toHaveBeenCalled();
+      spy.reset();
+      spy2.reset();
+      asset2.stopListening(asset, 'event1');
+      asset.trigger("event1");
+      expect(spy).not.toHaveBeenCalled();
+      expect(spy2).toHaveBeenCalled();
+    });
+    
+    // this is the major benefit of the listeners. helps manage cleanup of obsolete binders
+    
+    it("will stop listening if the listener is destroyed", function(){
+      asset2.listenTo(asset, 'event1', spy);
+      asset.trigger("event1");
+      expect(spy).toHaveBeenCalled();
+      spy.reset();
+      asset2.destroy();
+      asset.trigger("event1");
+      expect(spy).not.toHaveBeenCalled();
+    });
   });
 });
