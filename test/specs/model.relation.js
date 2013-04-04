@@ -41,6 +41,27 @@ describe("Model.Relation", function(){
     expect( photo.album().name ).toBe("First Album");
   });
 
+  it("can count Collection records", function(){
+    Album.hasMany("photos", Photo);
+    Photo.belongsTo("album", Album);
+
+    var album = Album.create({
+      name: "Beautiful album",
+      photos: [{
+        id: "1",
+        name: "Beautiful photo 1"
+      },
+      {
+        id: "2",
+        name: "Beautiful photo 2"
+      }],
+      id: "1"
+    });
+
+    expect( album.photos().count ).toBeDefined()
+    expect( album.photos().count() ).toEqual(2)
+  });
+
   it("should associate an existing Singleton record", function(){
     Album.hasOne("photo", Photo);
     Photo.belongsTo("album", Album);
