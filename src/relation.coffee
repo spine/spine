@@ -39,6 +39,8 @@ class Collection extends Spine.Module
         delete @model.irecords[record.id]
         for match, i in @model.records when match.id is record.id
           @model.records.splice(i, 1)
+          #temp = @model.records.splice(i, 1)
+          #console.log('are we doin this?', temp)
           break
 
     records = @model.fromJSON(values)

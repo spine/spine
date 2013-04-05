@@ -103,11 +103,24 @@ describe("Model.Relation", function(){
       id: "2",
       name: "Beautiful photo 2"
     });
+    
+    expect( Photo.count() ).toBe(3);
+    console.log('before calling album.photos([...]) there should be 3 photo instances')
+    console.log("rec[] : ", Photo.records);
+    console.log("irec{} : ", Photo.irecords);
+    console.log("crec{} : ", Photo.crecords);
 
     album.photos([ photo1, photo2 ]);
-
+    
+    console.log('after calling album.photos([...]) the original photo gets deleted and 2 newly associted ones remain')
+    console.log("rec[] : ", Photo.records);
+    console.log("irec{} : ", Photo.irecords);
+    console.log("crec{} : ", Photo.crecords);
+    //the following line fails...
     expect( Photo.count() ).toBe(2);
+    
     expect( album.photos() ).toBeTruthy();
+    console.log(album.photos().all()); 
     expect( album.photos().all().length ).toBe(2);
     expect( album.photos().first().album_id ).toBe("1");
     expect( album.photos().last().album_id ).toBe("1");
