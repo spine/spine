@@ -204,13 +204,13 @@ class Model extends Module
     if typeof callbackOrParams is 'function'
       @bind('change', callbackOrParams)
     else
-      @trigger('change', callbackOrParams)
+      @trigger('change', arguments...)
 
   @fetch: (callbackOrParams) ->
     if typeof callbackOrParams is 'function'
       @bind('fetch', callbackOrParams)
     else
-      @trigger('fetch', callbackOrParams)
+      @trigger('fetch', arguments...)
 
   @toJSON: ->
     @recordsValues()
