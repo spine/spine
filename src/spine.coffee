@@ -29,6 +29,8 @@ Events =
   
   listenToOnce: (obj, ev, callback) ->
     obj.one(ev, callback)
+    @listeningTo or = []
+    @listeningTo.push obj
     this
     
   stopListening: (obj, ev, callback) ->
