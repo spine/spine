@@ -17,6 +17,9 @@ class Collection extends Spine.Module
     values = @all()
     values[values.length - 1]
 
+  count: ->
+    @all().length
+
   find: (id) ->
     records = @select (rec) =>
       "#{rec.id}" is "#{id}"
