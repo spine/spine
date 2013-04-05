@@ -44,9 +44,14 @@ Events =
         idx = listeningTo.indexOf(obj)
         listeningTo.splice(idx, 1) unless idx is -1
     else
-      for obj in @listeningTo
-        obj.unbind()
+      retain = []
+      for listeningTo in [@listeningTo, @listeningToOnce]
+        continue unless listeningTo
+        for obj in listeningTo when not (obj in retain)
+          obj.unbind()
+          retain.push(obj)
       @listeningTo = undefined
+      @listeningToOnce = undefined
 
   unbind: (ev, callback) ->
     unless ev

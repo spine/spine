@@ -121,6 +121,18 @@ describe("Events", function(){
     expect(spy).not.toHaveBeenCalled();
   });
 
+  it("can stopListening with any arguments to all events", function(){
+    ListenTest = Spine.Class.create();
+    ListenTest.extend(Spine.Events);
+    ListenTest.listenTo(EventTest, "house", spy);
+    ListenTest.listenToOnce(EventTest, "indahouse", spy);
+    ListenTest.stopListening();
+    EventTest.trigger("house");
+    expect(spy).not.toHaveBeenCalled();
+    spy.reset();
+    EventTest.trigger("indahouse");
+    expect(spy).not.toHaveBeenCalled();
+  });
 
   it("should allow a callback unbind itself", function(){
     var a = jasmine.createSpy("a");
