@@ -329,6 +329,22 @@ describe("Model", function(){
     expect(Asset.last().id).toEqual(ref4.id);
     expect(Asset.first().id).toEqual(ref1.id);
   });
+  
+  it("should preserve relative order of records when instances created or destroyed", function(){
+    ref1 = Asset.create({name: "Bob", id: "1"});
+    ref2 = Asset.create({name: "Jan", id: "some long string id"});
+    expect(Asset.last().id).toEqual(ref2.id);
+    ref3 = Asset.create({name: "Pat", id: "33"});
+    ref4 = Asset.create({name: "Joe", id: 444});
+    expect(Asset.last().id).toEqual(ref4.id);
+    expect(Asset.first().id).toEqual(ref1.id);
+    ref4.destroy();
+    expect(Asset.last().id).toEqual(ref3.id);
+    expect(Asset.first().id).toEqual(ref1.id);
+    ref1.destroy();
+    expect(Asset.last().id).toEqual(ref3.id);
+    expect(Asset.first().id).toEqual(ref2.id);
+  });
 
   it("should return records in the in the order defined by the @comparator", function() {
     Asset.comparator = function(a,b) { return a.id - b.id };
@@ -336,8 +352,15 @@ describe("Model", function(){
     ref2 = Asset.create({name: "Jan", id: 1});
     ref3 = Asset.create({name: "Pat", id: 8});
     ref4 = Asset.create({name: "Joe", id: 4});
-    expect(Asset.last().id).toEqual(ref3.id)
-    expect(Asset.first().id).toEqual(ref2.id)
+    expect(Asset.last().id).toEqual(ref3.id);
+    expect(Asset.first().id).toEqual(ref2.id);
+    // after adding or removing items comparator should still work 
+    ref5 = Asset.create({name: "Bob", id: 6});
+    expect(Asset.last().id).toEqual(ref3.id);
+    ref6 = Asset.create({name: "Jan", id: 11});
+    expect(Asset.last().id).toEqual(ref6.id);
+    ref2.destroy()
+    expect(Asset.first().id).toEqual(ref1.id);
   });
 
   describe("with spy", function(){
