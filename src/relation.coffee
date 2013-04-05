@@ -121,7 +121,7 @@ Spine.Model.extend
       association(@)
 
   belongsTo: (name, model, fkey) ->
-    fkey ?= "#{singularize(name)}_id"
+    fkey ?= "#{underscore(singularize(name))}_id"
 
     association = (record) ->
       model = require(model) if typeof model is 'string'
