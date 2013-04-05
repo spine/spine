@@ -37,14 +37,7 @@ Events =
     this
 
   stopListening: (obj, ev, callback) ->
-    if arguments.length >= 1
-      if obj
-        obj.unbind(ev, callback)
-        for listeningTo in [@listeningTo, @listeningToOnce]
-          continue unless listeningTo
-          idx = listeningTo.indexOf(obj)
-          listeningTo.splice(idx, 1) unless idx is -1
-    else
+    if arguments.length is 0
       retain = []
       for listeningTo in [@listeningTo, @listeningToOnce]
         continue unless listeningTo
@@ -53,6 +46,12 @@ Events =
           retain.push(obj)
       @listeningTo = undefined
       @listeningToOnce = undefined
+    else if obj
+      obj.unbind(ev, callback)
+      for listeningTo in [@listeningTo, @listeningToOnce]
+        continue unless listeningTo
+        idx = listeningTo.indexOf(obj)
+        listeningTo.splice(idx, 1) unless idx is -1
 
   unbind: (ev, callback) ->
     if arguments.length is 0
