@@ -28,14 +28,21 @@ Events =
     this
   
   listenToOnce: (obj, ev, callback) ->
-    obj.one(ev, callback)
+    listeningToOnce = @listeningToOnce or = []
+    listeningToOnce.push obj
+    obj.one ev, ->
+      idx = listeningToOnce.indexOf(obj)
+      listeningToOnce.splice(idx, 1) unless idx is -1
+      callback.apply(this, arguments)
     this
     
   stopListening: (obj, ev, callback) ->
     if obj
       obj.unbind(ev, callback)
-      idx = @listeningTo.indexOf(obj)
-      @listeningTo.splice(idx, 1) unless idx is -1
+      for listeningTo in [@listeningTo, @listeningToOnce]
+        continue unless listeningTo
+        idx = listeningTo.indexOf(obj)
+        listeningTo.splice(idx, 1) unless idx is -1
     else
       for obj in @listeningTo
         obj.unbind()
