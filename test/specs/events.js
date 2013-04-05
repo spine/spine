@@ -57,6 +57,16 @@ describe("Events", function(){
     EventTest.trigger("daddyo");
     expect(spy).not.toHaveBeenCalled();
   });
+
+  it("can unbind all events if any arguments", function() {
+    EventTest.bind("yoyo daddyo", spy);
+    EventTest.unbind();
+    EventTest.trigger("yoyo");
+    expect(spy).not.toHaveBeenCalled();
+    spy.reset()
+    EventTest.trigger("daddyo");
+    expect(spy).not.toHaveBeenCalled();
+  });
   
   it("can stop listening to events", function(){
     ListenTest = Spine.Class.create();
@@ -121,6 +131,19 @@ describe("Events", function(){
     expect(spy).not.toHaveBeenCalled();
   });
 
+  it("can stopListening to all events if any arguments", function(){
+    ListenTest = Spine.Class.create();
+    ListenTest.extend(Spine.Events);
+    ListenTest.listenTo(EventTest, "house", spy);
+    ListenTest.listenToOnce(EventTest, "indahouse", spy);
+    ListenTest.stopListening();
+    EventTest.trigger("house");
+    expect(spy).not.toHaveBeenCalled();
+    spy.reset();
+    EventTest.trigger("indahouse");
+    expect(spy).not.toHaveBeenCalled();
+  });
+
 
   it("should allow a callback to unbind itself", function(){
     var a = jasmine.createSpy("a");
@@ -159,5 +182,22 @@ describe("Events", function(){
     var Sub = EventTest.sub();
     Sub.trigger("yoyo");
     expect(spy).not.toHaveBeenCalled();
+  });
+
+
+  it("should safety unbind", function() {
+    EventTest.bind("daddyo", spy);
+    EventTest.unbind(undefined);
+    EventTest.trigger("daddyo");
+    expect(spy).toHaveBeenCalled();
+  });
+
+  it("should safety stopListening", function() {
+    ListenTest = Spine.Class.create();
+    ListenTest.extend(Spine.Events);
+    ListenTest.listenTo(EventTest, "house", spy);
+    ListenTest.stopListening(undefined);
+    EventTest.trigger("house");
+    expect(spy).toHaveBeenCalled();
   });
 });
