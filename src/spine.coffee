@@ -58,7 +58,7 @@ Events =
     if arguments.length is 0
       @_callbacks = {}
       return this
-    return unless ev
+    return this unless ev
     evs  = ev.split(' ')
     for name in evs
       list = @_callbacks?[name]
