@@ -37,22 +37,28 @@ Events =
     this
 
   stopListening: (obj, ev, callback) ->
-    if obj
+    if arguments.length is 0
+      retain = []
+      for listeningTo in [@listeningTo, @listeningToOnce]
+        continue unless listeningTo
+        for obj in listeningTo when not (obj in retain)
+          obj.unbind()
+          retain.push(obj)
+      @listeningTo = undefined
+      @listeningToOnce = undefined
+    else if obj
       obj.unbind(ev, callback)
       for listeningTo in [@listeningTo, @listeningToOnce]
         continue unless listeningTo
         idx = listeningTo.indexOf(obj)
         listeningTo.splice(idx, 1) unless idx is -1
-    else
-      for obj in @listeningTo
-        obj.unbind()
-      @listeningTo = undefined
   
   unbind: (ev, callback) ->
-    unless ev
+    if arguments.length is 0
       @_callbacks = {}
       return this
-    evs  = ev.split(' ')
+    return this unless ev
+    evs = ev.split(' ')
     for name in evs
       list = @_callbacks?[name]
       continue unless list
