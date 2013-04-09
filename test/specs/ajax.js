@@ -123,7 +123,7 @@ describe("Ajax", function(){
     jqXHR.resolve(newAtts);
 
     expect(User.first().id).toEqual("IDD2");
-    expect(User.records["IDD2"]).toEqual(User.first());
+    expect(User.irecords["IDD2"]).toEqual(User.first());
   });
 
   it("should not recreate records after DELETE", function() {
