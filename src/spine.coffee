@@ -6,12 +6,12 @@ Events =
       calls[name] or= []
       calls[name].push(callback)
     this
-  
+
   one: (ev, callback) ->
     @bind ev, ->
       @unbind(ev, arguments.callee)
       callback.apply(this, arguments)
-  
+
   trigger: (args...) ->
     ev = args.shift()
     list = @hasOwnProperty('_callbacks') and @_callbacks?[ev]
@@ -20,22 +20,29 @@ Events =
       if callback.apply(this, args) is false
         break
     true
-  
+
   listenTo: (obj, ev, callback) ->
     obj.bind(ev, callback)
     @listeningTo or= []
     @listeningTo.push obj
     this
-  
+
   listenToOnce: (obj, ev, callback) ->
-    obj.one(ev, callback)
+    listeningToOnce = @listeningToOnce or = []
+    listeningToOnce.push obj
+    obj.one ev, ->
+      idx = listeningToOnce.indexOf(obj)
+      listeningToOnce.splice(idx, 1) unless idx is -1
+      callback.apply(this, arguments)
     this
-    
+
   stopListening: (obj, ev, callback) ->
     if obj
       obj.unbind(ev, callback)
-      idx = @listeningTo.indexOf(obj)
-      @listeningTo.splice(idx, 1) unless idx is -1
+      for listeningTo in [@listeningTo, @listeningToOnce]
+        continue unless listeningTo
+        idx = listeningTo.indexOf(obj)
+        listeningTo.splice(idx, 1) unless idx is -1
     else
       for obj in @listeningTo
         obj.unbind()
@@ -119,7 +126,7 @@ class Model extends Module
   @toString: -> "#{@className}(#{@attributes.join(", ")})"
 
   @find: (id) ->
-    record = @exists(id) 
+    record = @exists(id)
     throw new Error("\"#{@className}\" model could not find a record for the ID \"#{id}\"") unless record
     return record
 
@@ -195,13 +202,13 @@ class Model extends Module
     if typeof callbackOrParams is 'function'
       @bind('change', callbackOrParams)
     else
-      @trigger('change', callbackOrParams)
+      @trigger('change', arguments...)
 
   @fetch: (callbackOrParams) ->
     if typeof callbackOrParams is 'function'
       @bind('fetch', callbackOrParams)
     else
-      @trigger('fetch', callbackOrParams)
+      @trigger('fetch', arguments...)
 
   @toJSON: ->
     @records
@@ -397,8 +404,8 @@ class Model extends Module
     @constructor.bind events, binder = (record) =>
       if record && @eql(record)
         callback.apply(this, arguments)
-    # create a wrapper function to be called with 'unbind' for each event 
-    for singleEvent in events.split(' ') 
+    # create a wrapper function to be called with 'unbind' for each event
+    for singleEvent in events.split(' ')
       do (singleEvent) =>
         @constructor.bind "unbind", unbinder = (record, event, cb) =>
           if record && @eql(record)
@@ -416,17 +423,17 @@ class Model extends Module
   trigger: (args...) ->
     args.splice(1, 0, this)
     @constructor.trigger(args...)
-  
+
   listenTo: (obj, events, callback) ->
     obj.bind events, callback
     @listeningTo or= []
     @listeningTo.push(obj)
-  
+
   listenToOnce: (obj, events, callback) ->
     obj.bind events, =>
       obj.unbind(events, arguments.callee)
       callback.apply(obj, arguments)
-  
+
   stopListening: (obj, events, callback) ->
     if obj
       obj.unbind events, callback
@@ -439,7 +446,7 @@ class Model extends Module
 
   unbind: (events, callback) ->
     if events
-      for event in events.split(' ') 
+      for event in events.split(' ')
         @trigger('unbind', event, callback)
     else
       @trigger('unbind')

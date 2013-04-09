@@ -41,6 +41,27 @@ describe("Model.Relation", function(){
     expect( photo.album().name ).toBe("First Album");
   });
 
+  it("can count Collection records", function(){
+    Album.hasMany("photos", Photo);
+    Photo.belongsTo("album", Album);
+
+    var album = Album.create({
+      name: "Beautiful album",
+      photos: [{
+        id: "1",
+        name: "Beautiful photo 1"
+      },
+      {
+        id: "2",
+        name: "Beautiful photo 2"
+      }],
+      id: "1"
+    });
+
+    expect( album.photos().count ).toBeDefined()
+    expect( album.photos().count() ).toEqual(2)
+  });
+
   it("should associate an existing Singleton record", function(){
     Album.hasOne("photo", Photo);
     Photo.belongsTo("album", Album);
@@ -103,7 +124,7 @@ describe("Model.Relation", function(){
       id: "2",
       name: "Beautiful photo 2"
     });
-    
+
     expect( Photo.count() ).toBe(3);
     console.log('before calling album.photos([...]) there should be 3 photo instances')
     console.log("rec[] : ", Photo.records);
@@ -111,7 +132,7 @@ describe("Model.Relation", function(){
     console.log("crec{} : ", Photo.crecords);
 
     album.photos([ photo1, photo2 ]);
-    
+
     console.log('after calling album.photos([...]) the original photo gets deleted and 2 newly associted ones remain')
     console.log("rec[] : ", Photo.records);
     console.log("irec{} : ", Photo.irecords);
