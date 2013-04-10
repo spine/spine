@@ -46,8 +46,10 @@ Events =
           retain.push(obj)
       @listeningTo = undefined
       @listeningToOnce = undefined
+      
     else if obj
-      obj.unbind(ev, callback)
+      obj.unbind(ev, callback) if ev
+      obj.unbind() unless ev
       for listeningTo in [@listeningTo, @listeningToOnce]
         continue unless listeningTo
         idx = listeningTo.indexOf(obj)
@@ -436,26 +438,40 @@ class Model extends Module
     @listeningTo.push(obj)
 
   listenToOnce: (obj, events, callback) ->
+    listeningToOnce = @listeningToOnce or= []
+    listeningToOnce.push obj
     obj.bind events, =>
+      idx = listeningToOnce.indexOf(obj)
+      listeningToOnce.splice(idx, 1) unless idx is -1
       obj.unbind(events, arguments.callee)
       callback.apply(obj, arguments)
 
   stopListening: (obj, events, callback) ->
-    if obj
-      obj.unbind events, callback
-      idx = @listeningTo.indexOf(obj)
-      @listeningTo.splice(idx, 1) unless idx is -1
-    else
-      for obj in @listeningTo
-        obj.unbind()
+    if arguments.length is 0
+      retain = []
+      for listeningTo in [@listeningTo, @listeningToOnce]
+        continue unless listeningTo
+        for obj in @listeningTo when not (obj in retain)
+          obj.unbind()
+          retain.push(obj)
       @listeningTo = undefined
+      @listeningToOnce = undefined
+      return
+
+    if obj
+      obj.unbind() unless events
+      obj.unbind(events, callback) if events
+      for listeningTo in [@listeningTo, @listeningToOnce]
+        continue unless listeningTo
+        idx = listeningTo.indexOf(obj)
+        listeningTo.splice(idx, 1) unless idx is -1
 
   unbind: (events, callback) ->
-    if events
+    if arguments.length is 0
+      @trigger('unbind')
+    else if events
       for event in events.split(' ')
         @trigger('unbind', event, callback)
-    else
-      @trigger('unbind')
 
 Model::on = Model::bind
 Model::off = Model::unbind
