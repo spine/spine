@@ -18,7 +18,7 @@ describe("Routing", function () {
     }).promise();
   };
 
-  // Set (default REset) document's URL
+  // Set (default Reset) document's URL
   var setUrl = (function () {
     var originalTitle,
         originalPath = window.location.pathname + window.location.search;
@@ -48,7 +48,7 @@ describe("Routing", function () {
     });
   });
   
-  it("should be able to get the host", function() {
+  it("can get the host", function() {
     host = Route.getHost();
     expect(host).not.toBeNull();
     //console.log('result of getHost()', host)
@@ -60,47 +60,36 @@ describe("Routing", function () {
       Route.setup({shim: true});
     });
 
-
     it("should not have bound any hashchange|popstate event to window", function () {
       var events = $(window).data('events') || {};
-
       expect('hashchange' in events || 'popstate' in events).toBe(false);
     });
 
-
     it("can set its path", function () {
       expect(Route.path).toBeUndefined()
-
       Route.change();
 
       // Don't check the path is valid but just set to something -> check this for hashes and history
       expect(Route.path).toBeDefined();
     });
 
-
     it("can add a single route", function () {
       Route.add('/foo');
-
       expect(Route.routes.length).toBe(1);
     });
-
 
     it("can add a bunch of routes", function () {
       Route.add({
         '/foo': function () {},
         '/bar': function () {}
       });
-
       expect(Route.routes.length).toBe(2);
     });
 
-
     it("can add regex route", function () {
       Route.add(/\/users\/(\d+)/);
-
       expect(Route.routes.length).toBe(1);
     });
-
 
     it("should trigger 'change' when a route matches", function () {
       var changed = 0;
@@ -115,7 +104,6 @@ describe("Routing", function () {
       })
     });
 
-
     it("can navigate to path", function () {
       Route.add("/users", function () {});
 
@@ -123,7 +111,6 @@ describe("Routing", function () {
         expect(Route.path).toBe("/users");
       });
     });
-
 
     it("can navigate to a path splitted into several arguments", function () {
       Route.add("/users/1/2", function () {});
@@ -133,14 +120,12 @@ describe("Routing", function () {
       });
     });
 
-
-    describe('With spy', function () {
+    describe('When route changes happen', function () {
       beforeEach(function () {
         var noop = {spy: function () {}};
         spyOn(noop, "spy");
         spy = noop.spy;
       });
-
 
       it("should trigger 'navigate' when navigating", function () {
         Route.one('navigate', spy);
@@ -150,7 +135,6 @@ describe("Routing", function () {
 
         expect(spy).toHaveBeenCalled();
       });
-
 
       it("should not navigate to the same path as the current", function () {
         Route.one('navigate', spy);
@@ -164,7 +148,7 @@ describe("Routing", function () {
       });
 
 
-      it("can call routes when navigating", function () {
+      it("should call routes when navigating", function () {
         Route.add("/foo", spy);
 
         navigate('/foo').done(function () {
@@ -187,7 +171,6 @@ describe("Routing", function () {
         });
       });
 
-
       it("can call routes with glob", function () {
         Route.add({"/page/*stuff": spy});
 
@@ -201,7 +184,6 @@ describe("Routing", function () {
           }]));
         });
       });
-
 
       it("can override trigger behavior when navigating", function () {
         expect(Route.options.trigger).toBe(true);
@@ -217,9 +199,7 @@ describe("Routing", function () {
           expect(spy).not.toHaveBeenCalled();
         });
       });
-
     });
-
   });
 
 
@@ -315,7 +295,5 @@ describe("Routing", function () {
         expect(window.location.pathname).toBe("/users/1");
       });
     });
-
   });
-
 });

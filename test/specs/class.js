@@ -25,13 +25,13 @@ describe("Class", function(){
     expect(Bob.instanceProperty).toBeTruthy();
   });
 
-  it("can be extendable", function(){
+  it("should be extendable", function(){
     User.extend({classProperty: true});
 
     expect(User.classProperty).toBeTruthy();
   });
 
-  it("can be includable", function(){
+  it("should be includable", function(){
     User.include({instanceProperty: true});
 
     expect(User.prototype.instanceProperty).toBeTruthy();

@@ -138,7 +138,7 @@ describe("Model.Relation", function(){
     expect( album.photos().last().name ).toBe("Beautiful photo 2");
   });
 
-  it("should add unassociated records to an existing Collection", function(){
+  it("can add unassociated records to an existing Collection", function(){
     Album.hasMany("photos", Photo);
     Photo.belongsTo("album", Album);
 
@@ -168,7 +168,7 @@ describe("Model.Relation", function(){
     expect( album.photos().last().name ).toBe("Beautiful photo 2");
   });
 
-  it("should remove records from a Collection", function(){
+  it("can remove records from a Collection", function(){
     Album.hasMany("photos", Photo);
     Photo.belongsTo("album", Album);
 
@@ -198,7 +198,7 @@ describe("Model.Relation", function(){
     expect( album.photos().last().name ).toBe("Beautiful photo 1");
   });
 
-  it("should create new related Collection records", function(){
+  it("can create new related Collection records", function(){
     Album.hasMany("photos", Photo);
     Photo.belongsTo("album", Album);
 

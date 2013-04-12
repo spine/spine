@@ -50,7 +50,7 @@ describe("Manager", function(){
     expect(manager.controllers).toEqual([groups]);
   });
 
-  describe("with spy", function(){
+  describe("When moving through the stack", function(){
     var spy;
 
     beforeEach(function(){
@@ -59,13 +59,13 @@ describe("Manager", function(){
       spy = noop.spy;
     });
 
-    it("should fire active event on controller", function(){
+    it("should fire 'active' event on new active controller", function(){
       users.active(spy);
       users.active();
       expect(spy).toHaveBeenCalled();
     });
 
-    it("should fire change event on manager", function(){
+    it("should fire 'change' event on manager", function(){
       var manager = new Spine.Manager(users, groups);
       manager.bind('change', spy);
 
@@ -73,14 +73,14 @@ describe("Manager", function(){
       expect(spy).toHaveBeenCalledWith(users);
     });
 
-    it("should call activate on controller", function(){
+    it("should call activate on new controller", function(){
       new Spine.Manager(users, groups);
       users.activate = spy;
       users.active(1, 2, 3);
       expect(users.activate).toHaveBeenCalledWith(1, 2, 3);
     });
 
-    it("should call deactivate on controller", function(){
+    it("should call deactivate on previous controller", function(){
       new Spine.Manager(users, groups);
       users.deactivate = spy;
       groups.active(1, 2, 3);

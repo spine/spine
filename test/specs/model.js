@@ -154,7 +154,7 @@ describe("Model", function(){
     expect(new Asset({name: "Yo big dog"}).isValid()).toBeTruthy();
   });
 
-  it("validation can be disabled", function(){
+  it("can have validation disabled", function(){
     Asset.include({
       validate: function(){
         if ( !this.name )
@@ -167,7 +167,7 @@ describe("Model", function(){
     expect(asset.save({validate: false})).toBeTruthy();
   });
 
-  it("has attribute hash", function(){
+  it("should have an attribute hash", function(){
     var asset = new Asset({name: "wazzzup!"});
     expect(asset.attributes()).toEqual({name: "wazzzup!"});
   });
@@ -199,7 +199,7 @@ describe("Model", function(){
     expect(asset.last_name).toEqual("MacCaw");
   });
 
-  it("attributes() respecting getters/setters", function(){
+  it("attributes() respects getters/setters", function(){
     Asset.include({
       name: function(){
         return "Bob";
@@ -300,25 +300,25 @@ describe("Model", function(){
   });
 
   it("should generate unique cIDs", function(){
-      Asset.refresh({name: "Bob", id: 3});
-      Asset.refresh({name: "Bob", id: 2});
-      Asset.refresh({name: "Bob", id: 1});
-      expect(Asset.find(2).eql(Asset.find(1))).not.toBeTruthy();
+    Asset.refresh({name: "Bob", id: 3});
+    Asset.refresh({name: "Bob", id: 2});
+    Asset.refresh({name: "Bob", id: 1});
+    expect(Asset.find(2).eql(Asset.find(1))).not.toBeTruthy();
   });
 
   it("should handle more than 10 cIDs correctly", function(){
-      for (i=0; i < 12; i++) {
-        Asset.refresh({name: "Bob", id: i});    
-      }
-      expect(Asset.idCounter).toEqual(12);
+    for (i=0; i < 12; i++) {
+      Asset.refresh({name: "Bob", id: i});    
+    }
+    expect(Asset.idCounter).toEqual(12);
   });
 
   it("should keep model references in sync", function(){
-      ref1 = Asset.create({name: "Bob"});
-      ref2 = Asset.all()[0]
-      ref1.updateAttribute("name", "Jack");
-      ref2.updateAttribute("name", "Smith");
-      expect(ref2.name).toEqual(ref1.name);
+    ref1 = Asset.create({name: "Bob"});
+    ref2 = Asset.all()[0]
+    ref1.updateAttribute("name", "Jack");
+    ref2.updateAttribute("name", "Smith");
+    expect(ref2.name).toEqual(ref1.name);
   });
 
   it("should return records in the same order they were created", function(){
@@ -615,7 +615,7 @@ describe("Model", function(){
     tests related to .listenTo(), .listenToOnce(), and .stopListening()
   */
   
-  describe("Events listeners methods", function(){
+  describe("When using event listener methods", function(){
     var spy, spy2, Asset, asset, asset2, asset3;
     
     beforeEach(function(){

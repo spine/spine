@@ -53,7 +53,7 @@ describe("Ajax", function(){
     });
   });
 
-  it("can send POST on create", function(){
+  it("should send POST on create", function(){
     spyOn(jQuery, "ajax").andReturn(jqXHR);
 
     User.create({first: "Hans", last: "Zimmer", id: "IDD"});
@@ -69,7 +69,7 @@ describe("Ajax", function(){
     });
   });
 
-  it("can send PUT on update", function(){
+  it("should send PUT on update", function(){
     User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
 
     spyOn(jQuery, "ajax").andReturn(jqXHR);
@@ -87,7 +87,7 @@ describe("Ajax", function(){
     });
   });
 
-  it("can send DELETE on destroy", function(){
+  it("should send DELETE on destroy", function(){
     User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
 
     spyOn(jQuery, "ajax").andReturn(jqXHR);
@@ -103,7 +103,7 @@ describe("Ajax", function(){
     });
   });
 
-  it("can update record after PUT/POST", function(){
+  it("should update record after PUT/POST", function(){
     spyOn(jQuery, "ajax").andReturn(jqXHR);
 
     User.create({first: "Hans", last: "Zimmer", id: "IDD"});
@@ -114,7 +114,7 @@ describe("Ajax", function(){
     expect(User.first().attributes()).toEqual(newAtts);
   });
 
-  it("can change record ID after PUT/POST", function(){
+  it("should change record ID after PUT/POST", function(){
     spyOn(jQuery, "ajax").andReturn(jqXHR);
 
     User.create({id: "IDD"});
@@ -219,7 +219,7 @@ describe("Ajax", function(){
     expect(spy).toHaveBeenCalled();
   });
 
-  it("can cancel ajax on change", function() {
+  it("should cancel ajax on change", function() {
     spyOn(jQuery, "ajax").andReturn(jqXHR);
 
     User.create({first: "Second"}, {ajax: false});
@@ -295,7 +295,7 @@ describe("Ajax", function(){
     expect(user.url()).toBe('http://example.com/roots/1/users/1');
   });
 
-  it("can allow the scope for url on model to be superseeded by an instance", function(){
+  it("should allow the scope for url on model to be superseeded by an instance", function(){
     Spine.Model.host = '';
     User.scope = "admin";
     expect(User.url()).toBe('/admin/users');

@@ -21,7 +21,7 @@ describe("Controller", function(){
     expect(users.el).toBeTruthy();
   });
 
-  it("can populate elements", function(){
+  it("should populate elements", function(){
     Users.include({
       elements: {".foo": "foo"}
     });
@@ -33,7 +33,7 @@ describe("Controller", function(){
     expect(users.foo.hasClass("foo")).toBeTruthy();
   });
 
-  it("can remove element upon release event", function(){
+  it("should remove element upon release event", function(){
     var parent = $('<div />');
     parent.append(element);
 
@@ -44,7 +44,7 @@ describe("Controller", function(){
     expect(parent.children().length).toBe(0);
   });
   
-  it("can set attributes on el", function(){
+  it("should set attributes on el", function(){
     Users.include({
       attributes: {"style": "width: 100%"}
     });
@@ -52,7 +52,7 @@ describe("Controller", function(){
     expect(users.el.attr("style")).toEqual("width: 100%");
   });
 
-  describe("can bind DOM events", function(){
+  describe("When binding DOM events", function(){
     var spy;
     
     beforeEach(function(){
@@ -61,7 +61,7 @@ describe("Controller", function(){
       spy = noop.spy;
     });
     
-    it("can add events", function(){
+    it("should add events", function(){
       Users.include({
         events: {"click": "wasClicked"},
         // Context change confuses Spy
@@ -72,7 +72,7 @@ describe("Controller", function(){
       expect(spy).toHaveBeenCalled();
     });
     
-    it("can delegate events", function(){
+    it("should delegate events", function(){
       Users.include({
         events: {"click .foo": "wasClicked"},
         wasClicked: $.proxy(spy, jasmine)
@@ -89,7 +89,7 @@ describe("Controller", function(){
     tests related to .listenTo(), .listenToOnce(), and .stopListening()
   */
   
-  describe("Events listeners methods", function(){
+  describe("When using event listener methods", function(){
     var spy, spy2, Asset, Users, asset, users;
     
     beforeEach(function(){
@@ -165,7 +165,7 @@ describe("Controller", function(){
       expect(spy).not.toHaveBeenCalled();
     });
     
-    it("can stop listening to events on a model instance, without canceling out other binders on that model instance", function(){
+    it("should stop listening to events on a model instance, without canceling out other binders on that model instance", function(){
       Asset.bind('event1', spy2)
       users.listenTo(asset, 'event1', spy);
       asset.trigger("event1");
@@ -181,7 +181,7 @@ describe("Controller", function(){
     
     // this is the major benefit of the listeners. helps manage cleanup of obsolete binders
     
-    it("will stop listening if the controller is released", function(){
+    it("should stop listening if the controller is released", function(){
       users.listenTo(asset, 'event1', spy);
       asset.trigger("event1");
       expect(spy).toHaveBeenCalled();
@@ -192,7 +192,7 @@ describe("Controller", function(){
     });
   });
 
-  describe("inheritance", function() {
+  describe("When using inheritance", function() {
     beforeEach(function() {
       element = $('<div/>').html('<div class="a-el"></div><div class="b-el"></div><div class="c-el"></div>');
       A = Spine.Controller.sub({
