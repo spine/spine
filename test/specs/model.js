@@ -85,7 +85,7 @@ describe("Model", function(){
     Asset.create({name: "test.pdf"});
 
     var findOne = Asset.findByAttribute("name", "foo.pdf");
-    expect(findOne).toEqual(asset);
+    expect(findOne.name).toEqual(asset.name);
 
     var findAll = Asset.findAllByAttribute("name", "foo.pdf");
     expect(findAll).toEqual([asset]);
@@ -321,6 +321,48 @@ describe("Model", function(){
       expect(ref2.name).toEqual(ref1.name);
   });
 
+  it("should return records in the same order they were created", function(){
+    ref1 = Asset.create({name: "Bob", id: "1"});
+    ref2 = Asset.create({name: "Jan", id: "some long string id"});
+    ref3 = Asset.create({name: "Pat", id: "33"});
+    ref4 = Asset.create({name: "Joe", id: 444});
+    expect(Asset.last().id).toEqual(ref4.id);
+    expect(Asset.first().id).toEqual(ref1.id);
+  });
+  
+  it("should preserve relative order of records when instances created or destroyed", function(){
+    ref1 = Asset.create({name: "Bob", id: "1"});
+    ref2 = Asset.create({name: "Jan", id: "some long string id"});
+    expect(Asset.last().id).toEqual(ref2.id);
+    ref3 = Asset.create({name: "Pat", id: "33"});
+    ref4 = Asset.create({name: "Joe", id: 444});
+    expect(Asset.last().id).toEqual(ref4.id);
+    expect(Asset.first().id).toEqual(ref1.id);
+    ref4.destroy();
+    expect(Asset.last().id).toEqual(ref3.id);
+    expect(Asset.first().id).toEqual(ref1.id);
+    ref1.destroy();
+    expect(Asset.last().id).toEqual(ref3.id);
+    expect(Asset.first().id).toEqual(ref2.id);
+  });
+
+  it("should return records in the in the order defined by the @comparator", function() {
+    Asset.comparator = function(a,b) { return a.id - b.id };
+    ref1 = Asset.create({name: "Bob", id: 3});
+    ref2 = Asset.create({name: "Jan", id: 1});
+    ref3 = Asset.create({name: "Pat", id: 8});
+    ref4 = Asset.create({name: "Joe", id: 4});
+    expect(Asset.last().id).toEqual(ref3.id);
+    expect(Asset.first().id).toEqual(ref2.id);
+    // after adding or removing items comparator should still work 
+    ref5 = Asset.create({name: "Bob", id: 6});
+    expect(Asset.last().id).toEqual(ref3.id);
+    ref6 = Asset.create({name: "Jan", id: 11});
+    expect(Asset.last().id).toEqual(ref6.id);
+    ref2.destroy()
+    expect(Asset.first().id).toEqual(ref1.id);
+  });
+
   describe("with spy", function(){
     var spy;
 
@@ -373,7 +415,7 @@ describe("Model", function(){
 
     it("can fire destroy events when destroy all record with options", function(){
       Asset.bind("destroy", spy);
-      var asset = Asset.create({name: "cartoon world.png"});
+      var asset = Asset.create({name: "screaming goats.png"});
       Asset.destroyAll({ajax: false});
       expect(spy).toHaveBeenCalledWith(asset, {ajax: false});
     });
@@ -516,6 +558,32 @@ describe("Model", function(){
       expect(spy.calls.length).toEqual(0);
     });
 
+    it("should be able to unbind all events if no arguments given", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.bind("customEvent1 customEvent2", spy)
+      asset.trigger("customEvent1");
+      asset.trigger("customEvent2");
+      expect(spy.calls.length).toEqual(2);
+      spy.reset();
+      asset.unbind();
+      asset.trigger("customEvent1");
+      asset.trigger("customEvent2");
+      expect(spy.calls.length).toEqual(0);
+    });
+
+    it("should not be able to unbind all events if given and undefined object", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.bind("customEvent1 customEvent2", spy)
+      asset.trigger("customEvent1");
+      asset.trigger("customEvent2");
+      expect(spy.calls.length).toEqual(2);
+      spy.reset();
+      asset.unbind(undefined);
+      asset.trigger("customEvent1");
+      asset.trigger("customEvent2");
+      expect(spy.calls.length).toEqual(2);
+    });
+
     it("should not unbind class-level callbacks", function(){
       Asset.bind('customEvent1', spy);
       var asset = Asset.create({name: "cartoon world.png"});
@@ -635,6 +703,29 @@ describe("Model", function(){
       expect(spy).not.toHaveBeenCalled();
       expect(spy2).toHaveBeenCalled();
     });
+
+
+    it("can stop listening to all events on a model instance, those are being listened to once", function(){
+      asset2.listenToOnce(asset, 'event1', spy);
+      asset2.listenToOnce(asset, 'event2', spy);
+      asset2.stopListening(asset);
+      asset.trigger("event1");
+      expect(spy).not.toHaveBeenCalled();
+      spy.reset();
+      asset.trigger("event2");
+      expect(spy).not.toHaveBeenCalled();
+    });
+
+    it("can stop listening to all events on a model instance if no arguments given", function(){
+      asset2.listenTo(asset, 'event1', spy);
+      asset2.listenToOnce(asset, 'event2', spy);
+      asset2.stopListening();
+      asset.trigger("event1");
+      expect(spy).not.toHaveBeenCalled();
+      spy.reset();
+      asset.trigger("event2");
+      expect(spy).not.toHaveBeenCalled();
+    });
     
     // this is the major benefit of the listeners. helps manage cleanup of obsolete binders
     
@@ -646,6 +737,17 @@ describe("Model", function(){
       asset2.destroy();
       asset.trigger("event1");
       expect(spy).not.toHaveBeenCalled();
+    });
+
+    it("should not stop listening to all events on model instance if given and undefined object", function(){
+      asset2.listenTo(asset, 'event1', spy);
+      asset2.listenToOnce(asset, 'event2', spy);
+      asset2.stopListening(undefined);
+      asset.trigger("event1");
+      expect(spy).toHaveBeenCalled();
+      spy.reset();
+      asset.trigger("event2");
+      expect(spy).toHaveBeenCalled();
     });
   });
 });

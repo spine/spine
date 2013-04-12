@@ -32,13 +32,34 @@ describe("Model.Relation", function(){
     var album = Album.create({name: "First Album"});
     var photo = Photo.create({album: album});
     var photo2 = Photo.create({});
-    console.log('1: ', photo);
-    console.log('1: ', photo.album());
-    console.log('2: ', photo2);
-    console.log('2: ', photo2.album());
+    //console.log('1: ', photo);
+    //console.log('1: ', photo.album());
+    //console.log('2: ', photo2);
+    //console.log('2: ', photo2.album());
     expect( photo.album() ).toBeTruthy();
     expect( photo2.album() ).toBeFalsy();
     expect( photo.album().name ).toBe("First Album");
+  });
+
+  it("can count Collection records", function(){
+    Album.hasMany("photos", Photo);
+    Photo.belongsTo("album", Album);
+
+    var album = Album.create({
+      name: "Beautiful album",
+      photos: [{
+        id: "1",
+        name: "Beautiful photo 1"
+      },
+      {
+        id: "2",
+        name: "Beautiful photo 2"
+      }],
+      id: "1"
+    });
+
+    expect( album.photos().count ).toBeDefined()
+    expect( album.photos().count() ).toEqual(2)
   });
 
   it("should associate an existing Singleton record", function(){
@@ -104,9 +125,11 @@ describe("Model.Relation", function(){
       name: "Beautiful photo 2"
     });
 
-    album.photos([ photo1, photo2 ]);
+    expect( Photo.count() ).toBe(3);
 
+    album.photos([ photo1, photo2 ]);
     expect( Photo.count() ).toBe(2);
+    
     expect( album.photos() ).toBeTruthy();
     expect( album.photos().all().length ).toBe(2);
     expect( album.photos().first().album_id ).toBe("1");

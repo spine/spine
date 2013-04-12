@@ -7,6 +7,29 @@ Ajax =
   getURL: (object) ->
     object and object.url?() or object.url
 
+  getScope: (object) ->
+    scope = object and object.scope?() or object.scope
+    if scope? and scope.charAt(0) is '/'
+      scope = scope.substring(1)
+    scope
+
+  generateURL: (object, args...) ->
+    if object.className
+      collection = object.className.toLowerCase() + 's'
+      scope = Ajax.getScope(object)
+    else
+      if typeof object.constructor.url is 'string'
+        collection = object.constructor.url
+        collection = collection.substring(1) if collection.charAt(0) is '/'
+      else
+        collection = object.constructor.className.toLowerCase() + 's'
+      scope = Ajax.getScope(object) or Ajax.getScope(object.constructor)
+    args.unshift(collection)
+    if scope?
+      args.unshift(scope)
+    args.unshift(Model.host)
+    args.join('/')
+
   enabled: true
 
   disable: (callback) ->
@@ -41,10 +64,8 @@ class Base
   ajaxQueue: (params, defaults) ->
     jqXHR    = null
     deferred = $.Deferred()
-
     promise  = deferred.promise()
     return promise unless Ajax.enabled
-
     settings = @ajaxSettings(params, defaults)
 
     request = (next) ->
@@ -57,7 +78,6 @@ class Base
       return jqXHR.abort(statusText) if jqXHR
       index = $.inArray(request, @queue())
       @queue().splice(index, 1) if index > -1
-
       deferred.rejectWith(
         settings.context or settings,
         [promise, statusText, '']
@@ -161,7 +181,6 @@ class Singleton extends Base
           # ID change, need to do some shifting
           if data.id and @record.id isnt data.id
             @record.changeID(data.id)
-
           # Update with latest data
           @record.updateAttributes(data.attributes())
 
@@ -182,25 +201,19 @@ Include =
   ajax: -> new Singleton(this)
 
   url: (args...) ->
-    url = Ajax.getURL(@constructor)
-    url += '/' unless url.charAt(url.length - 1) is '/'
-    url += encodeURIComponent(@id)
-    args.unshift(url)
-    args.join('/')
+    args.unshift(encodeURIComponent(@id))
+    Ajax.generateURL(@, args...)
 
 Extend =
   ajax: -> new Collection(this)
 
   url: (args...) ->
-    args.unshift(@className.toLowerCase() + 's')
-    args.unshift(Model.host)
-    args.join('/')
+    Ajax.generateURL(@, args...)
 
 Model.Ajax =
   extended: ->
     @fetch @ajaxFetch
     @change @ajaxChange
-
     @extend Extend
     @include Include
 
