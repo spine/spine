@@ -514,8 +514,7 @@ class Controller extends Module
     @trigger 'release', this
     @el.remove()
     @unbind()
-    if @listeningTo
-      @stopListening()
+    @stopListening()
 
   $: (selector) -> $(selector, @el)
 
