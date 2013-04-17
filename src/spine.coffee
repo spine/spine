@@ -46,7 +46,7 @@ Events =
           retain.push(obj)
       @listeningTo = undefined
       @listeningToOnce = undefined
-      
+
     else if obj
       obj.unbind(ev, callback) if ev
       obj.unbind() unless ev
@@ -54,7 +54,7 @@ Events =
         continue unless listeningTo
         idx = listeningTo.indexOf(obj)
         listeningTo.splice(idx, 1) unless idx is -1
-  
+
   unbind: (ev, callback) ->
     if arguments.length is 0
       @_callbacks = {}
@@ -332,7 +332,7 @@ class Model extends Module
       records.splice(i, 1)
       break
     @constructor.records = records
-    
+
     # Remove the ID and CID
     delete @constructor.irecords[@id]
     delete @constructor.crecords[@cid]
@@ -402,7 +402,7 @@ class Model extends Module
     @constructor.crecords[@cid] = record
 
     @constructor.sort()
-  
+
     clone        = record.clone()
     clone.trigger('create', options)
     clone.trigger('change', 'create', options)
