@@ -8,8 +8,8 @@ Events =
     this
 
   one: (ev, callback) ->
-    @bind ev, handler = ->
-      @unbind(ev, handler)
+    @bind ev, ->
+      @unbind(ev, arguments.callee)
       callback.apply(this, arguments)
 
   trigger: (args...) ->
@@ -424,8 +424,8 @@ class Model extends Module
     this
 
   one: (events, callback) ->
-    @bind events, handler = =>
-      @unbind(events, handler)
+    @bind events, =>
+      @unbind(events, arguments.callee)
       callback.apply(this, arguments)
 
   trigger: (args...) ->
@@ -440,10 +440,10 @@ class Model extends Module
   listenToOnce: (obj, events, callback) ->
     listeningToOnce = @listeningToOnce or= []
     listeningToOnce.push obj
-    obj.bind events, handler = =>
+    obj.bind events, =>
       idx = listeningToOnce.indexOf(obj)
       listeningToOnce.splice(idx, 1) unless idx is -1
-      obj.unbind(events, handler)
+      obj.unbind(events, arguments.callee)
       callback.apply(obj, arguments)
 
   stopListening: (obj, events, callback) ->
