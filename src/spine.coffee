@@ -149,8 +149,11 @@ class Model extends Module
     records = [records] unless isArray(records)
 
     for record in records
-      record.id or= record.cid
-      @records.push(record)
+    	if record.id and @irecords[record.id]
+    		@records[@records.indexOf(@irecords[record.id])] = record
+    	else
+	      record.id or= record.cid
+	      @records.push(record)
       @irecords[record.id]  = record
       @crecords[record.cid] = record
 
