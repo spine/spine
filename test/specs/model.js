@@ -21,6 +21,20 @@ describe("Model", function(){
     expect(Asset.first().name).toEqual("wem.pdf");
   });
 
+  it("can refresh existing records", function(){
+    var asset = Asset.create({name: "test.pdf"});
+
+    expect(Asset.first().name).toEqual("test.pdf");
+
+    var changedAsset = asset.toJSON();
+    changedAsset.name = "wem.pdf";
+
+    Asset.refresh(changedAsset);
+
+    expect(Asset.count()).toEqual(1);
+    expect(Asset.first().name).toEqual("wem.pdf");
+  });
+
   it("can destroy records", function(){
     var asset = Asset.create({name: "test.pdf"});
 
