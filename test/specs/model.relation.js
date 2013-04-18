@@ -159,6 +159,7 @@ describe("Model.Relation", function(){
 
     expect( Photo.count() ).toBe(3);
     expect( Photo.first().id ).toBe("3");
+    expect( Photo.first().name ).toBe("This record should NOT be removed");
     expect( album.photos().count() ).toBe(2);
     expect( album.photos().first().album_id ).toBe("2");
     expect( album.photos().last().album_id ).toBe("2");

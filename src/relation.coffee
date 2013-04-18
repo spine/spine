@@ -44,12 +44,11 @@ class Collection extends Spine.Module
       for match, i in @model.records when match.id is record.id
         @model.records.splice(i, 1)
         break
-    records = @model.fromJSON(values)
-    records = [records] unless isArray(records)
-    for record in records
+    values = [values] unless isArray(values)
+    for record in values
       record.newRecord = false
       record[@fkey] = @record.id
-    @model.refresh @model.cloneArray(records)
+    @model.refresh values
     this
 
   create: (record, options) ->
