@@ -40,18 +40,16 @@ class Collection extends Spine.Module
   refresh: (values) ->
     return this unless values?
     for record in @all()
-        delete @model.irecords[record.id]
-        for match, i in @model.records when match.id is record.id
-          @model.records.splice(i, 1)
-          break
+      delete @model.irecords[record.id]
+      for match, i in @model.records when match.id is record.id
+        @model.records.splice(i, 1)
+        break
     records = @model.fromJSON(values)
     records = [records] unless isArray(records)
-    @model.records = records
     for record in records
       record.newRecord = false
       record[@fkey] = @record.id
-      @model.irecords[record.id] = record
-    @model.trigger('refresh', @model.cloneArray(records))
+    @model.refresh @model.cloneArray(records)
     this
 
   create: (record, options) ->
