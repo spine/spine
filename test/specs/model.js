@@ -54,15 +54,17 @@ describe("Model", function(){
   });
 
   it("can check existence", function(){
-    var asset = Asset.create({name: "test.pdf"});
+    var asset1 = Asset.create({id: 1, name: "test.pdf"});
+    var asset2 = Asset.create({id: 2, name: "wem.pdf"});
 
-    expect(asset.exists()).toBeTruthy();
-    expect(Asset.exists(asset.id)).toBeTruthy();
+    expect(asset1.exists()).toBeTruthy();
+    expect(Asset.exists(asset1.id)).toBeTruthy();
+    expect(Asset.exists(asset1.id).name).toEqual("test.pdf");
 
-    asset.destroy();
+    asset1.destroy();
 
-    expect(asset.exists()).toBeFalsy();
-    expect(Asset.exists(asset.id)).toBeFalsy();
+    expect(asset1.exists()).toBeFalsy();
+    expect(Asset.exists(asset1.id)).toBeFalsy();
   });
 
   it("can reload", function(){
