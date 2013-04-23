@@ -139,7 +139,7 @@ class Model extends Module
     return record
 
   @exists: (id) ->
-    (@records[id] ? @irecords[id])?.clone()
+    (@irecords[id] ? @crecords[id])?.clone()
 
   @refresh: (values, options = {}) ->
     if options.clear
