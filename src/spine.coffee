@@ -117,10 +117,9 @@ class Module
 class Model extends Module
   @extend Events
 
-  @records: []
-  @irecords: {}
-  @crecords: {}
-  @attributes: []
+  @records    : []
+  @irecords   : {}
+  @attributes : []
 
   @configure: (name, attributes...) ->
     @className = name
@@ -139,7 +138,7 @@ class Model extends Module
     return record
 
   @exists: (id) ->
-    (@irecords[id] ? @crecords[id])?.clone()
+    @irecords[id]?.clone()
 
   @refresh: (values, options = {}) ->
     if options.clear
@@ -149,18 +148,18 @@ class Model extends Module
     records = [records] unless isArray(records)
 
     for record in records
-    	if record.id and @irecords[record.id]
-    		@records[@records.indexOf(@irecords[record.id])] = record
-    	else
-	      record.id or= record.cid
-	      @records.push(record)
+      if record.id and @irecords[record.id]
+        @records[@records.indexOf(@irecords[record.id])] = record
+      else
+        record.id or= record.cid
+        @records.push(record)
       @irecords[record.id]  = record
-      @crecords[record.cid] = record
+      @irecords[record.cid] = record
 
     @sort()
 
     result = @cloneArray(records)
-    @trigger('refresh', @cloneArray(records), options)
+    @trigger('refresh', result)
     result
 
   @select: (callback) ->
@@ -194,7 +193,6 @@ class Model extends Module
   @deleteAll: ->
     @records  = []
     @irecords = {}
-    @crecords = {}
 
   @destroyAll: (options) ->
     record.destroy(options) for record in @records
@@ -258,7 +256,7 @@ class Model extends Module
   constructor: (atts) ->
     super
     @load atts if atts
-    @cid = @constructor.uid('c-')
+    @cid = atts?.cid or @constructor.uid('c-')
 
   isNew: ->
     not @exists()
@@ -320,6 +318,7 @@ class Model extends Module
     @save(options)
 
   changeID: (id) ->
+    return if id is @id
     records = @constructor.irecords
     records[id] = records[@id]
     delete records[@id]
@@ -338,7 +337,7 @@ class Model extends Module
 
     # Remove the ID and CID
     delete @constructor.irecords[@id]
-    delete @constructor.crecords[@cid]
+    delete @constructor.irecords[@cid]
 
     @destroyed = true
     @trigger('destroy', options)
@@ -348,13 +347,13 @@ class Model extends Module
     @unbind()
     this
 
-  dup: (newRecord) ->
-    result = new @constructor(@attributes())
-    if newRecord is false
-      result.cid = @cid
+  dup: (newRecord = true) ->
+    atts = @attributes()
+    if newRecord 
+      delete atts.id
     else
-      delete result.id
-    result
+      atts.cid = @cid
+    new @constructor(atts)
 
   clone: ->
     createObject(this)
@@ -412,7 +411,7 @@ class Model extends Module
     record       = @dup(false)
     @constructor.records.push(record)
     @constructor.irecords[@id]  = record
-    @constructor.crecords[@cid] = record
+    @constructor.irecords[@cid] = record
 
     @constructor.sort()
 
