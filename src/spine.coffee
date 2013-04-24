@@ -140,22 +140,21 @@ class Model extends Module
   @exists: (id) ->
     @irecords[id]?.clone()
 
+  @addRecord: (record) ->
+    if record.id and @irecords[record.id]
+      @irecords[record.id].remove()
+    
+    record.id or= record.cid
+    @records.push(record)
+    @irecords[record.id]  = record
+    @irecords[record.cid] = record
+
   @refresh: (values, options = {}) ->
-    if options.clear
-      @deleteAll()
+    @deleteAll() if options.clear
 
     records = @fromJSON(values)
     records = [records] unless isArray(records)
-
-    for record in records
-      if record.id and @irecords[record.id]
-        @records[@records.indexOf(@irecords[record.id])] = record
-      else
-        record.id or= record.cid
-        @records.push(record)
-      @irecords[record.id]  = record
-      @irecords[record.cid] = record
-
+    @addRecord(record) for record in records
     @sort()
 
     result = @cloneArray(records)
@@ -237,7 +236,7 @@ class Model extends Module
   @sort: ->
     if @comparator
       @records.sort @comparator
-    @records
+    this
 
   # Private
 
@@ -325,21 +324,22 @@ class Model extends Module
     @id = id
     @save()
 
-  destroy: (options = {}) ->
-    @trigger('beforeDestroy', options)
-
+  remove: ->
     # Remove record from model
     records = @constructor.records.slice(0)
     for record, i in records when @eql(record)
       records.splice(i, 1)
       break
     @constructor.records = records
-
     # Remove the ID and CID
     delete @constructor.irecords[@id]
     delete @constructor.irecords[@cid]
 
+  destroy: (options = {}) ->
+    @trigger('beforeDestroy', options)
+    @remove()
     @destroyed = true
+    # handle events
     @trigger('destroy', options)
     @trigger('change', 'destroy', options)
     if @listeningTo
@@ -396,7 +396,6 @@ class Model extends Module
 
     records = @constructor.irecords
     records[@id].load @attributes()
-
     @constructor.sort()
 
     clone = records[@id].clone()
@@ -406,13 +405,10 @@ class Model extends Module
 
   create: (options) ->
     @trigger('beforeCreate', options)
-    @id          = @cid unless @id
-
-    record       = @dup(false)
-    @constructor.records.push(record)
-    @constructor.irecords[@id]  = record
-    @constructor.irecords[@cid] = record
-
+    @id or= @cid
+    
+    record = @dup(false)
+    @constructor.addRecord(record)
     @constructor.sort()
 
     clone        = record.clone()
