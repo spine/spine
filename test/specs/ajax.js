@@ -132,7 +132,7 @@ describe("Ajax", function(){
     spyOn(jQuery, "ajax").andReturn(jqXHR);
 
     User.first().destroy();
-    
+
     expect(User.count()).toEqual(0);
     jqXHR.resolve({id: "MYID", name: "Phillip", last: "Fry"});
     expect(User.count()).toEqual(0);
@@ -310,5 +310,18 @@ describe("Ajax", function(){
     Spine.Model.host = 'http://example.com';
     expect(User.url()).toBe('http://example.com/admin/users');
     expect(user.url()).toBe('http://example.com/roots/1/users/1');
+  });
+
+  it("should get the collection url from the model instance", function(){
+    Spine.Model.host = '';
+    User.scope = "admin";
+    var user = new User({id: 1});
+    expect(Spine.Ajax.getCollectionURL(user)).toBe('/admin/users');
+
+    user.scope = "/root";
+    expect(Spine.Ajax.getCollectionURL(user)).toBe('/root/users');
+
+    user.scope = function() { return "/roots/" + this.id; };
+    expect(Spine.Ajax.getCollectionURL(user)).toBe('/roots/1/users');
   });
 });
