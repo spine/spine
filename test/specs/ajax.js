@@ -311,4 +311,12 @@ describe("Ajax", function(){
     expect(User.url()).toBe('http://example.com/admin/users');
     expect(user.url()).toBe('http://example.com/roots/1/users/1');
   });
+
+  it("should work with relative urls", function() {
+    User.url = '../api/user';
+    expect(Spine.Ajax.getURL(User)).toBe('../api/user');
+
+    var user = new User({id: 1});
+    expect(Spine.Ajax.getURL(user)).toBe('../api/user/1');
+  });
 });
