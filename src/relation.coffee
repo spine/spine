@@ -10,6 +10,11 @@ class Collection extends Spine.Module
   all: ->
     @model.select (rec) => @associated(rec)
 
+  fetch: (params, options = {})->
+    return Error('Both related models must extend Spine.Ajax') unless @record.constructor.ajax? and @model.ajax?
+    options.url ?= "#{ Spine.Ajax.getURL(@record) }#{ Spine.Ajax.getURL(@model) }"
+    @model.fetch params, options
+
   first: ->
     @all()[0]
 
@@ -51,8 +56,9 @@ class Collection extends Spine.Module
     @model.refresh values
     this
 
-  create: (record, options) ->
+  create: (record, options = {}) ->
     record[@fkey] = @record.id
+    options.url ?= "#{ Spine.Ajax.getURL(@record) }#{ Spine.Ajax.getURL(@model) }" if @record.constructor.ajax? and @model.ajax?
     @model.create(record, options)
 
   add: (record, options) ->

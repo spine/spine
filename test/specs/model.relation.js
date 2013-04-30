@@ -252,4 +252,87 @@ describe("Model.Relation", function(){
     expect( album.photos().last().name ).toBe("Beautiful photo 2");
   });
 
+  it("should return an Error when fetching models that don't use Spine.Ajax", function(){
+    Album.hasMany("photos", Photo);
+    Photo.belongsTo("album", Album);
+
+    var album = Album.create();
+    expect( album.photos().fetch() ).toBeTruthy();
+    expect( album.photos().fetch() instanceof Error ).toBeTruthy();
+  });
+
+  it("can fetch related records via ajax if both models use Spine.Ajax", function(){
+    Spine.Ajax.clearQueue();
+
+    Album.extend(Spine.Model.Ajax);
+    Album.hasMany("photos", Photo);
+    Photo.extend(Spine.Model.Ajax);
+    Photo.belongsTo("album", Album);
+
+    jqXHR = $.Deferred();
+    $.extend(jqXHR, {
+      readyState: 0,
+      setRequestHeader: function() { return this; },
+      getAllResponseHeaders: function() {},
+      getResponseHeader: function() {},
+      overrideMimeType: function() { return this; },
+      abort: function() { this.reject(arguments); return this; },
+      success: jqXHR.done,
+      error: jqXHR.fail,
+      complete: jqXHR.done
+    });
+
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+
+    var album = Album.create({ id: '123' }, { ajax: false });
+    album.photos().fetch()
+
+    expect(jQuery.ajax).toHaveBeenCalledWith({
+      type:         'GET',
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      dataType:     'json',
+      url:          '/albums/123/photos',
+      processData:  false
+    });
+
+  });
+
+  it("can create related record via ajax if both models use Spine.Ajax", function(){
+    Spine.Ajax.clearQueue();
+
+    Album.extend(Spine.Model.Ajax);
+    Album.hasMany("photos", Photo);
+    Photo.extend(Spine.Model.Ajax);
+    Photo.belongsTo("album", Album);
+
+    jqXHR = $.Deferred();
+    $.extend(jqXHR, {
+      readyState: 0,
+      setRequestHeader: function() { return this; },
+      getAllResponseHeaders: function() {},
+      getResponseHeader: function() {},
+      overrideMimeType: function() { return this; },
+      abort: function() { this.reject(arguments); return this; },
+      success: jqXHR.done,
+      error: jqXHR.fail,
+      complete: jqXHR.done
+    });
+
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+
+    var album = Album.create({ id: '123' }, { ajax: false });
+    album.photos().create({ id: '234' })
+
+    expect(jQuery.ajax).toHaveBeenCalledWith({
+      type:         'POST',
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      contentType:  'application/json',
+      dataType:     'json',
+      data:         '{"album_id":"123","id":"234"}',
+      url:          '/albums/123/photos',
+      processData:  false
+    });
+
+  });
+
 });
