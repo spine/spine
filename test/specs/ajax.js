@@ -243,6 +243,64 @@ describe("Ajax", function(){
     expect(user.url()).toBe('http://example.com/people/1');
   });
 
+  it("can override POST url with options on create", function(){
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+
+    User.create({ first: 'Adam', id: '123' }, { url: '/people' });
+    expect(jQuery.ajax).toHaveBeenCalledWith({
+      type:         'POST',
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      dataType:     'json',
+      data:         '{"first":"Adam","id":"123"}',
+      contentType:  'application/json',
+      url:          '/people',
+      processData:  false
+    });
+  });
+
+  it("can override GET url with options on fetch", function(){
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+
+    User.fetch({ url: '/people' });
+    expect(jQuery.ajax).toHaveBeenCalledWith({
+      type:         'GET',
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      dataType:     'json',
+      url:          '/people',
+      processData:  false
+    });
+  });
+
+  it("can override PUT url with options on update", function(){
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+
+    user = User.create({ first: 'Adam', id: '123' }, { ajax: false });
+    user.updateAttributes({ first: 'Odam' }, { url: '/people' });
+    expect(jQuery.ajax).toHaveBeenCalledWith({
+      type:         'PUT',
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      dataType:     'json',
+      data:         '{"first":"Odam","id":"123"}',
+      contentType:  'application/json',
+      url:          '/people',
+      processData:  false
+    });
+  });
+
+  it("can override DELETE url with options on destroy", function(){
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+
+    user = User.create({ first: 'Adam', id: '123' }, { ajax: false });
+    user.destroy({ url: '/people' });
+    expect(jQuery.ajax).toHaveBeenCalledWith({
+      type:         'DELETE',
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      dataType:     'json',
+      url:          '/people',
+      processData:  false
+    });
+  });
+
   it("should have a url function", function(){
     Spine.Model.host = '';
     expect(User.url()).toBe('/users');
