@@ -7,6 +7,13 @@ Ajax =
   getURL: (object) ->
     object.url?() or object.url
 
+  getCollectionURL: (object) ->
+    if object
+      if typeof object.url is "function"
+        @generateURL(object)
+      else
+        object.url
+
   getScope: (object) ->
     object.scope?() or object.scope
 
@@ -147,7 +154,7 @@ class Singleton extends Base
       type: 'POST'
       contentType: 'application/json'
       data: JSON.stringify(@record)
-      url:  Ajax.getURL(@model)
+      url:  Ajax.getCollectionURL(@record)
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
 
