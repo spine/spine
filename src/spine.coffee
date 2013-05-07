@@ -376,8 +376,8 @@ class Model extends Module
     for key in $(form).serializeArray()
       result[key.name] = key.value
 
-    for checkbox in $(form).find(':checkbox')
-      result[checkbox.name] = $(checkbox).is(':checked')
+    for checkbox in $(form).find('[type=checkbox]')
+      result[checkbox.name] = $(checkbox).prop('checked')
 
     @load(result)
 
