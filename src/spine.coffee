@@ -373,11 +373,16 @@ class Model extends Module
 
   fromForm: (form) ->
     result = {}
-    for key in $(form).serializeArray()
-      result[key.name] = key.value
 
-    for checkbox in $(form).find('[type=checkbox]')
+    for checkbox in $(form).find('[type=checkbox]:not([value])')
       result[checkbox.name] = $(checkbox).prop('checked')
+
+    for checkbox in $(form).find('[type=checkbox][value][checked]')
+      result[checkbox.name] or= []
+      result[checkbox.name].push checkbox.value
+
+    for key in $(form).serializeArray()
+      result[key.name] or= key.value
 
     @load(result)
 

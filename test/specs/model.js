@@ -162,6 +162,16 @@ describe("Model", function(){
     expect(asset.visible).toEqual(true);
   });
 
+  it("can be instantiated from a form with array style checkboxes", function(){
+    var form = $('<form />');
+    form.append('<input type="checkbox" name="contact_method" value="email" checked/>');
+    form.append('<input type="checkbox" name="contact_method" value="phone" />');
+    form.append('<input type="checkbox" name="contact_method" value="sms" checked/>');
+    form.append('<input type="checkbox" name="contact_method" value="mail" />');
+    var asset = Asset.fromForm(form);
+    expect(asset.contact_method).toEqual(['email', 'sms']);
+  });
+
   it("can validate", function(){
     Asset.include({
       validate: function(){
