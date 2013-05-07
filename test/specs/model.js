@@ -2,7 +2,7 @@ describe("Model", function(){
   var Asset;
 
   beforeEach(function(){
-    Asset = Spine.Model.setup("Asset", ["name", "visible"]);
+    Asset = Spine.Model.setup("Asset", ["name", "visible", "contact_methods"]);
   });
 
   it("can create records", function(){
@@ -164,12 +164,12 @@ describe("Model", function(){
 
   it("can be instantiated from a form with array style checkboxes", function(){
     var form = $('<form />');
-    form.append('<input type="checkbox" name="contact_method" value="email" checked/>');
-    form.append('<input type="checkbox" name="contact_method" value="phone" />');
-    form.append('<input type="checkbox" name="contact_method" value="sms" checked/>');
-    form.append('<input type="checkbox" name="contact_method" value="mail" />');
+    form.append('<input type="checkbox" name="contact_methods" value="email" checked/>');
+    form.append('<input type="checkbox" name="contact_methods" value="phone" />');
+    form.append('<input type="checkbox" name="contact_methods" value="sms" checked/>');
+    form.append('<input type="checkbox" name="contact_methods" value="mail" />');
     var asset = Asset.fromForm(form);
-    expect(asset.contact_method).toEqual(['email', 'sms']);
+    expect(asset.contact_methods).toEqual(['email', 'sms']);
   });
 
   it("can validate", function(){
