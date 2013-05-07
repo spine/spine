@@ -20,7 +20,7 @@ doMigration = (modelContext, db, versionChangeEvent) ->
   migration = modelContext.dbMetadata.migrations[db.version]
   migration and migration.call(modelContext, db, versionChangeEvent)
 
-Base =
+class Base
   extended: ->
     @dbMetadata = new DbMetadata(
       name: "default"
@@ -52,7 +52,9 @@ Base =
     dbRequest.onerror = ->
       console.log "Error while creating dbRequest"
 
-Collection =
+class Collection extends Base
+  constructor: (@model) ->
+  
   fetch: ->
     @connect (db) ->
       objectStore = db.transaction(@dbMetadata.objectStoreName).objectStore(@dbMetadata.objectStoreName)
@@ -71,8 +73,11 @@ Collection =
           else
             console.log('Fetched all data')
 
-Singleton =
-  create: (record) ->
+class Singleton extends Base
+  constructor: (@record) ->
+    @model = @record.constructor
+  
+  create: (record, options) ->
     @connect (db) ->
       transaction = db.transaction(@dbMetadata.objectStoreName,IDBTransaction.READ_WRITE)
       transaction.oncomplete = ->
@@ -94,7 +99,7 @@ Singleton =
       writeRequest.onerror = (e) ->
         console.log("Error while creating")
       
-  destroy: (record) ->
+  destroy: (record, options) ->
     @connect (db) ->
       request = db.transaction(@dbMetadata.objectStoreName, IDBTransaction.READ_WRITE)
         .objectStore(@dbMetadata.objectStoreName)
@@ -102,7 +107,7 @@ Singleton =
       request.onsuccess = (e) -> console.log('Data removed')
       request.onerror = -> console.log("Error while removing")
 
-  update: (record) ->
+  update: (record, options) ->
     @connect (db) ->
       transaction = db.transaction(@dbMetadata.objectStoreName,IDBTransaction.READ_WRITE)
       transaction.oncomplete = -> console.log('Transaction complete')
@@ -112,13 +117,24 @@ Singleton =
       writeRequest.onsuccess = (e) -> console.log('Data updated')
       writeRequest.onerror = (e) -> console.log("Error while updating")
 
+Include =
+  indexedDb: -> new Singleton(this)
+
+Extend =
+  indexedDb: -> new Collection(this)
+
 Spine.Model.IndexedDb =
   extended: ->
-    @extend Base
     @change @indexedDbChange
-    @fetch Collection.fetch
-
-  indexedDbChange: (record, type, options) ->
-    Singleton[type].call this, record
+    @fetch @indexedDbFetch
+    @extend Extend
+    @include Include
+  
+  indexedDbFetch: ->
+    @indexedDb.fetch()
+  
+  indexedDbChange: (record, type, options = {}) ->
+    return if options.indexedDb is false
+    record.indexedDb()[type] options
 
 module?.exports = Spine.Model.IndexedDb
