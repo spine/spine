@@ -375,6 +375,10 @@ class Model extends Module
     result = {}
     for key in $(form).serializeArray()
       result[key.name] = key.value
+
+    for checkbox in $(form).find(':checkbox')
+      result[checkbox.name] = $(checkbox).is(':checked')
+
     @load(result)
 
   exists: ->

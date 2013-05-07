@@ -2,7 +2,7 @@ describe("Model", function(){
   var Asset;
 
   beforeEach(function(){
-    Asset = Spine.Model.setup("Asset", ["name"]);
+    Asset = Spine.Model.setup("Asset", ["name", "visible"]);
   });
 
   it("can create records", function(){
@@ -153,6 +153,13 @@ describe("Model", function(){
     form.append('<input name="name" value="bar" />');
     var asset = Asset.fromForm(form);
     expect(asset.name).toEqual("bar");
+  });
+
+  it("can be instantiated from a form with checkboxes", function(){
+    var form = $('<form />');
+    form.append('<input type="checkbox" name="visible" checked/>');
+    var asset = Asset.fromForm(form);
+    expect(asset.visible).toEqual(true);
   });
 
   it("can validate", function(){
