@@ -377,8 +377,10 @@ class Model extends Module
     for checkbox in $(form).find('[type=checkbox]:not([value])')
       result[checkbox.name] = $(checkbox).prop('checked')
 
+    for checkbox in $(form).find('[type=checkbox][value]')
+      result[checkbox.name] = []
+
     for checkbox in $(form).find('[type=checkbox][value][checked]')
-      result[checkbox.name] or= []
       result[checkbox.name].push checkbox.value
 
     for key in $(form).serializeArray()

@@ -172,6 +172,16 @@ describe("Model", function(){
     expect(asset.contact_methods).toEqual(['email', 'sms']);
   });
 
+  it("can be instantiated from a form with array style checkboxes that are all unchecked", function(){
+    var form = $('<form />');
+    form.append('<input type="checkbox" name="contact_methods" value="email" />');
+    form.append('<input type="checkbox" name="contact_methods" value="phone" />');
+    form.append('<input type="checkbox" name="contact_methods" value="sms" />');
+    form.append('<input type="checkbox" name="contact_methods" value="mail" />');
+    var asset = Asset.fromForm(form);
+    expect(asset.contact_methods).toEqual([]);
+  });
+
   it("can validate", function(){
     Asset.include({
       validate: function(){
