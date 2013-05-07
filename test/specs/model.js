@@ -167,7 +167,6 @@ describe("Model", function(){
     form.append('<input type="checkbox" name="contact_methods" value="email" checked/>');
     form.append('<input type="checkbox" name="contact_methods" value="phone" />');
     form.append('<input type="checkbox" name="contact_methods" value="sms" checked/>');
-    form.append('<input type="checkbox" name="contact_methods" value="mail" />');
     var asset = Asset.fromForm(form);
     expect(asset.contact_methods).toEqual(['email', 'sms']);
   });
@@ -176,8 +175,6 @@ describe("Model", function(){
     var form = $('<form />');
     form.append('<input type="checkbox" name="contact_methods" value="email" />');
     form.append('<input type="checkbox" name="contact_methods" value="phone" />');
-    form.append('<input type="checkbox" name="contact_methods" value="sms" />');
-    form.append('<input type="checkbox" name="contact_methods" value="mail" />');
     var asset = Asset.fromForm(form);
     expect(asset.contact_methods).toEqual([]);
   });
