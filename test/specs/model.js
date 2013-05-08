@@ -2,7 +2,7 @@ describe("Model", function(){
   var Asset;
 
   beforeEach(function(){
-    Asset = Spine.Model.setup("Asset", ["name"]);
+    Asset = Spine.Model.setup("Asset", ["name", "visible", "contact_methods"]);
   });
 
   it("can create records", function(){
@@ -154,6 +154,56 @@ describe("Model", function(){
     var asset = Asset.fromForm(form);
     expect(asset.name).toEqual("bar");
   });
+
+  describe ("from a form with unchecked checkboxes", function(){
+    it("can be instantiated with boolean values", function(){
+      var form = $('<form />');
+      form.append('<input type="checkbox" name="visible" />');
+      var asset = Asset.fromForm(form);
+      expect(asset.visible).toEqual(false);
+    });
+
+    it("can be instantiated with array style checkboxes", function(){
+      var form = $('<form />');
+      form.append('<input type="checkbox" name="contact_methods[]" value="email" />');
+      form.append('<input type="checkbox" name="contact_methods[]" value="phone" />');
+      form.append('<input type="checkbox" name="contact_methods[]" value="sms" />');
+      var asset = Asset.fromForm(form);
+      expect(asset.contact_methods).toEqual([]);
+    });
+
+    it("can be instantiated with single style checkboxes", function(){
+      var form = $('<form />');
+      form.append('<input type="checkbox" name="association_id" value="12345" checked/>');
+      var asset = Asset.fromForm(form);
+      expect(asset.association_id).toEqual("12345");
+    });
+  })
+
+  describe ("fromFroms with checked checkboxes", function(){
+    it("can be instantiated with boolean values", function(){
+      var form = $('<form />');
+      form.append('<input type="checkbox" name="visible" />');
+      var asset = Asset.fromForm(form);
+      expect(asset.visible).toEqual(false);
+    });
+
+    it("can be instantiated with array style checkboxes", function(){
+      var form = $('<form />');
+      form.append('<input type="checkbox" name="contact_methods[]" value="email" checked/>');
+      form.append('<input type="checkbox" name="contact_methods[]" value="phone" />');
+      form.append('<input type="checkbox" name="contact_methods[]" value="sms" checked/>');
+      var asset = Asset.fromForm(form);
+      expect(asset.contact_methods).toEqual(['email', 'sms']);
+    });
+
+    it("can be instantiated with single style checkboxes", function(){
+      var form = $('<form />');
+      form.append('<input type="checkbox" name="association_id" value="12345" />');
+      var asset = Asset.fromForm(form);
+      expect(asset.association_id).toEqual(undefined);
+    });
+  })
 
   it("can validate", function(){
     Asset.include({
