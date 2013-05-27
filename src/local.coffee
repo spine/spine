@@ -10,7 +10,7 @@ Spine.Model.Local =
     localStorage[@className] = result
 
   loadLocal: (options = {})->
-    options.clear ||= true
+    options.clear = true unless options.hasOwnProperty('clear')
     result = localStorage[@className]
     @refresh(result or [], options)
 
