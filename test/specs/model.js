@@ -486,6 +486,25 @@ describe("Model", function(){
       expect(spy).toHaveBeenCalledWith(asset, {ajax: false});
     });
 
+    it("can fire refresh events", function(){
+      Asset.bind("refresh", spy);
+
+      var values = JSON.stringify([]);
+      Asset.refresh(values, {refresh: true, clear: true});
+      expect(spy).toHaveBeenCalledWith([], {refresh: true, clear: true});
+
+      var asset = Asset.create({name: "test.pdf"});
+      var values = asset.toJSON();
+      var tmpRecords = Asset.refresh(values, {clear: true});
+      expect(spy).toHaveBeenCalledWith(tmpRecords, {clear: true});
+
+      var asset1 = Asset.create({id: 1, name: "test.pdf"});
+      var asset2 = Asset.create({id: 2, name: "wem.pdf"});
+      var values = JSON.stringify([asset1, asset2]);
+      var tmpRecords = Asset.refresh(values, {clear: true});
+      expect(spy).toHaveBeenCalledWith(tmpRecords, {clear: true});
+    });
+
     it("can fire events on record", function(){
       var asset = Asset.create({name: "cartoon world.png"});
       asset.bind("save", spy);
