@@ -586,8 +586,8 @@ class Controller extends Module
     @el
 
   replace: (element) ->
-    element = element.el or element
-    [previous, @el] = [@el, $($.parseHTML(element) or element)]
+    element = $.trim(element.el or element)
+    [previous, @el] = [@el, $($.parseHTML(element)?[0] or element)]
     previous.replaceWith(@el)
     @delegateEvents(@events)
     @refreshElements()
