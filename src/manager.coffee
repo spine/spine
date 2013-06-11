@@ -26,11 +26,10 @@ class Spine.Manager extends Spine.Module
   # Private
 
   change: (current, args...) ->
-    for cont in @controllers
-      if cont is current
-        cont.activate(args...)
-      else
-        cont.deactivate(args...)
+    for cont in @controllers when cont isnt current
+      cont.deactivate(args...)
+
+    current.activate(args...) if current
 
 Spine.Controller.include
   active: (args...) ->
