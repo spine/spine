@@ -58,9 +58,6 @@ Ajax =
 
   clearQueue: ->
     @queue []
-    
-  stringify: (record) ->
-    JSON.stringify(record)
 
 class Base
   defaults:
@@ -156,7 +153,7 @@ class Singleton extends Base
       params,
       type: 'POST'
       contentType: 'application/json'
-      data: Ajax.stringify(@record)
+      data: JSON.stringify(@record)
       url:  Ajax.getCollectionURL(@record)
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
@@ -166,7 +163,7 @@ class Singleton extends Base
       params,
       type: 'PUT'
       contentType: 'application/json'
-      data: Ajax.stringify(@record)
+      data: JSON.stringify(@record)
       url:  Ajax.getURL(@record)
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
