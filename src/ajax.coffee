@@ -58,6 +58,9 @@ Ajax =
 
   clearQueue: ->
     @queue []
+    
+  stringify: (record) ->
+    JSON.stringify(record)
 
 class Base
   defaults:
@@ -153,7 +156,7 @@ class Singleton extends Base
       params,
       type: 'POST'
       contentType: 'application/json'
-      data: JSON.stringify(@record)
+      data: Ajax.stringify(@record)
       url:  Ajax.getCollectionURL(@record)
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
@@ -163,7 +166,7 @@ class Singleton extends Base
       params,
       type: 'PUT'
       contentType: 'application/json'
-      data: JSON.stringify(@record)
+      data: Ajax.stringify(@record)
       url:  Ajax.getURL(@record)
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
@@ -242,5 +245,8 @@ Model.Ajax.Methods =
 
 # Globals
 Ajax.defaults   = Base::defaults
+Ajax.Base       = Base
+Ajax.Singleton  = Singleton
+Ajax.Collection = Collection
 Spine.Ajax      = Ajax
 module?.exports = Ajax
