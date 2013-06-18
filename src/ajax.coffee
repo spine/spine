@@ -242,5 +242,8 @@ Model.Ajax.Methods =
 
 # Globals
 Ajax.defaults   = Base::defaults
+Ajax.Base       = Base
+Ajax.Singleton  = Singleton
+Ajax.Collection = Collection
 Spine.Ajax      = Ajax
 module?.exports = Ajax
