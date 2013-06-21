@@ -356,6 +356,20 @@ describe("Ajax", function(){
     var user = new User({id: 1})
     expect(Spine.Ajax.getURL(User)).toBe('/foo/bar')
     expect(Spine.Ajax.getURL(user)).toBe('/foo/bar/1')
+    delete User.scope
+    User.url = User.getCollectionURL
+  })
+  
+  it("should allow scope and url to be functions on model instance", function(){
+    Spine.Model.host = ''
+    var user = new User({id: 1})
+    user.scope = function(){
+      return 'one'
+    }
+    user.url = function(){
+      return 'two'
+    }
+    expect(Spine.Ajax.getURL(user)).toBe('/one/two/1')
   })
 
 });
