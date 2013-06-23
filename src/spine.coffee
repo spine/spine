@@ -586,7 +586,8 @@ class Controller extends Module
     @el
 
   replace: (element) ->
-    element = $.trim(element.el or element)
+    element = element.el or element
+    element = $.trim(element) if typeof element is "string"
     [previous, @el] = [@el, $($.parseHTML(element)?[0] or element)]
     previous.replaceWith(@el)
     @delegateEvents(@events)
