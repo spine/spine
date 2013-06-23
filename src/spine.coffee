@@ -445,39 +445,9 @@ class Model extends Module
     args.splice(1, 0, this)
     @constructor.trigger(args...)
 
-  listenTo: (obj, events, callback) ->
-    obj.bind events, callback
-    @listeningTo or= []
-    @listeningTo.push(obj)
-
-  listenToOnce: (obj, events, callback) ->
-    listeningToOnce = @listeningToOnce or= []
-    listeningToOnce.push obj
-    obj.bind events, handler = =>
-      idx = listeningToOnce.indexOf(obj)
-      listeningToOnce.splice(idx, 1) unless idx is -1
-      obj.unbind(events, handler)
-      callback.apply(obj, arguments)
-
-  stopListening: (obj, events, callback) ->
-    if arguments.length is 0
-      retain = []
-      for listeningTo in [@listeningTo, @listeningToOnce]
-        continue unless listeningTo
-        for obj in @listeningTo when not (obj in retain)
-          obj.unbind()
-          retain.push(obj)
-      @listeningTo = undefined
-      @listeningToOnce = undefined
-      return
-
-    if obj
-      obj.unbind() unless events
-      obj.unbind(events, callback) if events
-      for listeningTo in [@listeningTo, @listeningToOnce]
-        continue unless listeningTo
-        idx = listeningTo.indexOf(obj)
-        listeningTo.splice(idx, 1) unless idx is -1
+  listenTo: -> Events.listenTo.apply @, arguments
+  listenToOnce: -> Events.listenToOnce.apply @, arguments
+  stopListening: -> Events.stopListening.apply @, arguments
 
   unbind: (events, callback) ->
     if arguments.length is 0
