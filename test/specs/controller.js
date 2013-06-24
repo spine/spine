@@ -190,6 +190,21 @@ describe("Controller", function(){
       asset.trigger("event1");
       expect(spy).not.toHaveBeenCalled();
     });
+
+    it("should stop listening to events on a model instance if the controller is released, without canceling out other binders on that model instance", function(){
+      asset.bind('event1', spy2)
+      users.listenTo(asset, 'event1', spy);
+      asset.trigger("event1");
+      expect(spy).toHaveBeenCalled();
+      expect(spy2).toHaveBeenCalled();
+      spy.reset();
+      spy2.reset();
+      users.release();
+      asset.trigger("event1");
+      expect(spy).not.toHaveBeenCalled();
+      expect(spy2).toHaveBeenCalled();
+    });
+
   });
 
   describe("When using inheritance", function() {
