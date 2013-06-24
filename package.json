@@ -3,21 +3,35 @@
   "description": "MVC Framework.",
   "version": "1.1.0",
   "author": "maccman",
-  "keywords": ["spine", "coffeescript", "MVC"],
-  "contributors": ["maccman", "aeischeid", "cengebretson", "adambiggs"],
+  "keywords": [
+    "spine",
+    "coffeescript",
+    "MVC"
+  ],
+  "contributors": [
+    "maccman",
+    "aeischeid",
+    "cengebretson",
+    "adambiggs"
+  ],
   "devDependencies": {
-  	"coffee-script": ">=1.6.2"
+    "coffee-script": ">=1.6.2",
+    "grunt": "~0.4.1",
+    "grunt-contrib-coffee": "~0.7.0",
+    "grunt-contrib-watch": "~0.3.1",
+    "grunt-coffeelint": "0.0.6"
   },
-  "licenses":
-    [{
+  "licenses": [
+    {
       "type": "MIT",
       "url": "https://github.com/spine/spine/blob/master/LICENSE"
-    }],
+    }
+  ],
   "repository": {
-    "type" : "git",
+    "type": "git",
     "url": "http://github.com/spine/spine.git"
   },
-  "main" : "./index.js",
+  "main": "./index.js",
   "scripts": {
     "test": "for i in test/*.html; do phantomjs test/lib/run-jasmine.phantom.js file://`pwd`/$i; done"
   }
