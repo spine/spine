@@ -24,36 +24,46 @@ Events =
   listenTo: (obj, ev, callback) ->
     obj.bind(ev, callback)
     @listeningTo or= []
-    @listeningTo.push obj
+    @listeningTo.push {obj, ev, callback}
     this
 
   listenToOnce: (obj, ev, callback) ->
     listeningToOnce = @listeningToOnce or = []
-    listeningToOnce.push obj
-    obj.one ev, ->
-      idx = listeningToOnce.indexOf(obj)
+    obj.bind ev, handler = ->
+      idx = -1
+      for lt, i in listeningToOnce when lt.obj is obj 
+        idx = i if lt.ev is ev and lt.callback is callback
+      obj.unbind(ev, handler)
       listeningToOnce.splice(idx, 1) unless idx is -1
       callback.apply(this, arguments)
+    listeningToOnce.push {obj, ev, callback, handler}
     this
 
-  stopListening: (obj, ev, callback) ->
+  stopListening: (obj, events, callback) ->
     if arguments.length is 0
-      retain = []
       for listeningTo in [@listeningTo, @listeningToOnce]
         continue unless listeningTo
-        for obj in listeningTo when not (obj in retain)
-          obj.unbind()
-          retain.push(obj)
+        for lt in listeningTo
+          lt.obj.unbind(lt.ev, lt.handler or lt.callback)
       @listeningTo = undefined
       @listeningToOnce = undefined
 
     else if obj
-      obj.unbind(ev, callback) if ev
-      obj.unbind() unless ev
       for listeningTo in [@listeningTo, @listeningToOnce]
         continue unless listeningTo
-        idx = listeningTo.indexOf(obj)
-        listeningTo.splice(idx, 1) unless idx is -1
+        events = if events then events.split(' ') else [undefined]
+        for ev in events
+          for idx in [listeningTo.length-1..0]
+            lt = listeningTo[idx]
+            if (not ev) or (ev is lt.ev)
+              lt.obj.unbind(lt.ev, lt.handler or lt.callback)
+              listeningTo.splice(idx, 1) unless idx is -1
+            else if ev 
+              evts = lt.ev.split(' ')
+              if ~(i = evts.indexOf(ev))
+                evts.splice(i, 1)
+                lt.ev = $.trim(evts.join(' '))
+                lt.obj.unbind(ev, lt.handler or lt.callback)
 
   unbind: (ev, callback) ->
     if arguments.length is 0
@@ -149,11 +159,11 @@ class Model extends Module
     records = [records] unless isArray(records)
 
     for record in records
-    	if record.id and @irecords[record.id]
-    		@records[@records.indexOf(@irecords[record.id])] = record
-    	else
-	      record.id or= record.cid
-	      @records.push(record)
+      if record.id and @irecords[record.id]
+        @records[@records.indexOf(@irecords[record.id])] = record
+      else
+        record.id or= record.cid
+        @records.push(record)
       @irecords[record.id]  = record
       @crecords[record.cid] = record
 
