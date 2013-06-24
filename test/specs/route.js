@@ -112,6 +112,18 @@ describe("Routing", function () {
       });
     });
 
+    it("can navigate back to path", function () {
+      Route.add({
+        '/first': function () {},
+        '/second': function () {}
+      });
+      navigate("/first");
+      navigate("/second");
+      navigate("back").done(function () {
+        expect(Route.path).toBe("/first");
+      });
+    });
+
     it("can navigate to a path splitted into several arguments", function () {
       Route.add("/users/1/2", function () {});
 
