@@ -21,6 +21,16 @@ describe("Controller", function(){
     expect(users.el).toBeTruthy();
   });
 
+  it("can replace generated element", function(){
+    element = '<div class="new" />'
+    var users = new Users();
+    users.replace(element);
+    expect(users.el.hasClass("new")).toBeTruthy();
+    element = $('<div class="newer" />');
+    users.replace(element);
+    expect(users.el.hasClass("newer")).toBeTruthy();
+  });
+
   it("should populate elements", function(){
     Users.include({
       elements: {".foo": "foo"}
@@ -43,7 +53,7 @@ describe("Controller", function(){
     users.release();
     expect(parent.children().length).toBe(0);
   });
-  
+
   it("should set attributes on el", function(){
     Users.include({
       attributes: {"style": "width: 100%"}
@@ -54,13 +64,13 @@ describe("Controller", function(){
 
   describe("When binding DOM events", function(){
     var spy;
-    
+
     beforeEach(function(){
       var noop = {spy: function(){}};
       spyOn(noop, "spy");
       spy = noop.spy;
     });
-    
+
     it("should add events", function(){
       Users.include({
         events: {"click": "wasClicked"},
@@ -71,7 +81,7 @@ describe("Controller", function(){
       element.click();
       expect(spy).toHaveBeenCalled();
     });
-    
+
     it("should delegate events", function(){
       Users.include({
         events: {"click .foo": "wasClicked"},
@@ -84,14 +94,14 @@ describe("Controller", function(){
       expect(spy).toHaveBeenCalled();
     });
   });
-  
+
   /*
     tests related to .listenTo(), .listenToOnce(), and .stopListening()
   */
-  
+
   describe("When using event listener methods", function(){
     var spy, spy2, Asset, Users, asset, users;
-    
+
     beforeEach(function(){
       Asset = Spine.Model.setup("Asset", ["name"]);
       asset = Asset.create({name: "test.pdf"});
@@ -103,13 +113,13 @@ describe("Controller", function(){
       spy = noop.spy;
       spy2 = noop.spy2;
     });
-    
+
     it("can listen to one event on a model instance", function(){
       users.listenTo(asset, 'event1', spy);
       asset.trigger("event1");
       expect(spy).toHaveBeenCalled();
     });
-    
+
     it("wont listen to events of the same name on unlistened to model instances", function(){
       users.listenTo(asset, 'event1', spy);
       var asset2 = Asset.create({name: "scooby.pdf"});
@@ -118,7 +128,7 @@ describe("Controller", function(){
       asset2.trigger("evemt1")
       expect(spy).not.toHaveBeenCalled();
     });
-    
+
     it("can listen to many events on a model instance", function(){
       users.listenTo(asset, 'event1 event2 event3', spy);
       asset.trigger("event1");
@@ -127,7 +137,7 @@ describe("Controller", function(){
       expect(spy).toHaveBeenCalled();
       expect(spy.callCount).toBe(3);
     });
-    
+
     it("can listen once for an event on a model instance", function(){
       users.listenToOnce(asset, 'event1', spy);
       asset.trigger("event1");
@@ -136,7 +146,7 @@ describe("Controller", function(){
       asset.trigger("event1");
       expect(spy).not.toHaveBeenCalled();
     });
-    
+
     it("can stop listening to a specific event on a model instance while maintaining listeners on other events", function(){
       users.listenTo(asset, 'event1 event2 event3', spy);
       asset.trigger("event1");
@@ -152,7 +162,7 @@ describe("Controller", function(){
       asset.trigger("event3");
       expect(spy).toHaveBeenCalled();
     });
-    
+
     it("can stop listening to all events on a model instance", function(){
       users.listenTo(asset, 'event1 event2 event3', spy);
       asset.trigger("event2");
@@ -164,7 +174,7 @@ describe("Controller", function(){
       asset.trigger("event3");
       expect(spy).not.toHaveBeenCalled();
     });
-    
+
     it("should stop listening to events on a model instance, without canceling out other binders on that model instance", function(){
       Asset.bind('event1', spy2)
       users.listenTo(asset, 'event1', spy);
@@ -178,9 +188,9 @@ describe("Controller", function(){
       expect(spy).not.toHaveBeenCalled();
       expect(spy2).toHaveBeenCalled();
     });
-    
+
     // this is the major benefit of the listeners. helps manage cleanup of obsolete binders
-    
+
     it("should stop listening if the controller is released", function(){
       users.listenTo(asset, 'event1', spy);
       asset.trigger("event1");
