@@ -47,7 +47,24 @@ describe("Routing", function () {
       replace: false
     });
   });
-  
+
+  it("should clear route set in controller if controller released", function() {
+    var Users = Spine.Controller.sub();
+    var users = new Users;
+    var callback = jasmine.createSpy('callback');
+
+    users.route('/test', callback);
+
+    Spine.Route.navigate('/test');
+    expect(callback).toHaveBeenCalled();
+
+    users.release();
+    callback.reset();
+
+    Spine.Route.navigate('/test');
+    expect(callback).not.toHaveBeenCalled();
+  })
+
   it("can get the host", function() {
     host = Route.getHost();
     expect(host).not.toBeNull();
@@ -240,7 +257,7 @@ describe("Routing", function () {
 
       expect(Route.path).toBe('/foo');
     });
-    
+
     it("can navigate", function () {
       Route.add("/users/1", function () {});
 

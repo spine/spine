@@ -215,7 +215,17 @@ describe("Controller", function(){
       expect(spy2).toHaveBeenCalled();
     });
 
-  });
+    it("should trigger 'released' event on Spine.Route if it exists", function() {
+      // saving old router object to be able to restore it after stub
+      router = Spine.Route;
+
+      Spine.Route = jasmine.createSpyObj('Spine.Route', ['trigger'])
+      users.release();
+      expect(Spine.Route.trigger).toHaveBeenCalledWith('released', users);
+
+      // restoring route object
+      Spine.Route = router;
+    });
 
   describe("When using inheritance", function() {
     beforeEach(function() {

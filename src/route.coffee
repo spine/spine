@@ -120,6 +120,12 @@ class Spine.Route extends Spine.Module
     else
       @route = path
 
+  @bind 'released', (inst) ->
+    return unless inst.setRoutes
+    for route, i in @routes
+      for stroute in inst.setRoutes
+        @routes.splice i, 1 if route and route.route.exec stroute
+
   match: (path, options = {}) ->
     match = @route.exec(path)
     return false unless match
@@ -136,7 +142,10 @@ class Spine.Route extends Spine.Module
 Spine.Route.change = Spine.Route.proxy(Spine.Route.change)
 
 Spine.Controller.include
+
   route: (path, callback) ->
+    @setRoutes ?= []
+    @setRoutes.push path
     Spine.Route.add(path, @proxy(callback))
 
   routes: (routes) ->
