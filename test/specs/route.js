@@ -44,10 +44,11 @@ describe("Routing", function () {
       trigger: true,
       history: false,
       shim: false,
-      replace: false
+      replace: false,
+      redirect: false
     });
   });
-  
+
   it("can get the host", function() {
     host = Route.getHost();
     expect(host).not.toBeNull();
@@ -166,6 +167,7 @@ describe("Routing", function () {
             history: false,
             shim: true,
             replace: false,
+            redirect: false,
             match: ["/users/1/2", "1", "2"], id: "1", id2: "2"
           }]));
         });
@@ -180,6 +182,7 @@ describe("Routing", function () {
             history: false,
             shim: true,
             replace: false,
+            redirect: false,
             match: ["/page/gah", "gah"], stuff: "gah"
           }]));
         });
@@ -240,7 +243,7 @@ describe("Routing", function () {
 
       expect(Route.path).toBe('/foo');
     });
-    
+
     it("can navigate", function () {
       Route.add("/users/1", function () {});
 
@@ -295,5 +298,25 @@ describe("Routing", function () {
         expect(window.location.pathname).toBe("/users/1");
       });
     });
+
   });
+
+  describe('With Redirect', function() {
+
+    beforeEach(function () {
+      Route.setup({redirect: true});
+    });
+
+    afterEach(function () {
+      setUrl();
+    });
+
+    it("bubbles unmatched routes to the browser", function() {
+      spyOn(Route, 'redirect');
+      Route.navigate('/unmatched')
+      expect(Route.redirect).toHaveBeenCalledWith('/unmatched');
+    });
+
+  });
+
 });
