@@ -18,7 +18,10 @@ Ajax =
 
   getCollection: (object) ->
     if object.url isnt object.generateURL
-      object.url?() or object.url
+      if typeof object.url is 'function'
+        object.url()
+      else
+        object.url
     else if object.className?
       object.className.toLowerCase() + 's'
 
