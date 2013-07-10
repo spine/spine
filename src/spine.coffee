@@ -168,7 +168,7 @@ class Model extends Module
     @sort()
 
     result = @cloneArray(records)
-    @trigger('refresh', result)
+    @trigger('refresh', result, options)
     result
 
   @select: (callback) ->
