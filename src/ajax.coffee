@@ -102,30 +102,30 @@ class Base
 class Collection extends Base
   constructor: (@model) ->
 
-  find: (id, params) ->
+  find: (id, params, options = {}) ->
     record = new @model(id: id)
     @ajaxQueue(
       params,
       type: 'GET',
-      url:  Ajax.getURL(record)
+      url: options.url or Ajax.getURL(record)
     ).done(@recordsResponse)
      .fail(@failResponse)
 
-  all: (params) ->
+  all: (params, options = {}) ->
     @ajaxQueue(
       params,
       type: 'GET',
-      url:  Ajax.getURL(@model)
+      url: options.url or Ajax.getURL(@model)
     ).done(@recordsResponse)
      .fail(@failResponse)
 
   fetch: (params = {}, options = {}) ->
     if id = params.id
       delete params.id
-      @find(id, params).done (record) =>
+      @find(id, params, options).done (record) =>
         @model.refresh(record, options)
     else
-      @all(params).done (records) =>
+      @all(params, options).done (records) =>
         @model.refresh(records, options)
 
   # Private
@@ -140,39 +140,39 @@ class Singleton extends Base
   constructor: (@record) ->
     @model = @record.constructor
 
-  reload: (params, options) ->
+  reload: (params, options = {}) ->
     @ajaxQueue(
       params,
       type: 'GET'
-      url:  Ajax.getURL(@record)
+      url: options.url or Ajax.getURL(@record)
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
 
-  create: (params, options) ->
+  create: (params, options = {}) ->
     @ajaxQueue(
       params,
       type: 'POST'
       contentType: 'application/json'
       data: JSON.stringify(@record)
-      url:  Ajax.getCollectionURL(@record)
+      url: options.url or Ajax.getCollectionURL(@record)
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
 
-  update: (params, options) ->
+  update: (params, options = {}) ->
     @ajaxQueue(
       params,
       type: 'PUT'
       contentType: 'application/json'
       data: JSON.stringify(@record)
-      url:  Ajax.getURL(@record)
+      url: options.url or Ajax.getURL(@record)
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
 
-  destroy: (params, options) ->
+  destroy: (params, options = {}) ->
     @ajaxQueue(
       params,
       type: 'DELETE'
-      url:  Ajax.getURL(@record)
+      url: options.url or Ajax.getURL(@record)
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
 
