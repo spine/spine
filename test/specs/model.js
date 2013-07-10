@@ -23,12 +23,10 @@ describe("Model", function(){
 
   it("can refresh existing records", function(){
     var asset = Asset.create({name: "test.pdf"});
-
     expect(Asset.first().name).toEqual("test.pdf");
 
     var changedAsset = asset.toJSON();
     changedAsset.name = "wem.pdf";
-
     Asset.refresh(changedAsset);
 
     expect(Asset.count()).toEqual(1);
