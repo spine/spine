@@ -24,36 +24,46 @@ Events =
   listenTo: (obj, ev, callback) ->
     obj.bind(ev, callback)
     @listeningTo or= []
-    @listeningTo.push obj
+    @listeningTo.push {obj, ev, callback}
     this
 
   listenToOnce: (obj, ev, callback) ->
     listeningToOnce = @listeningToOnce or = []
-    listeningToOnce.push obj
-    obj.one ev, ->
-      idx = listeningToOnce.indexOf(obj)
+    obj.bind ev, handler = ->
+      idx = -1
+      for lt, i in listeningToOnce when lt.obj is obj 
+        idx = i if lt.ev is ev and lt.callback is callback
+      obj.unbind(ev, handler)
       listeningToOnce.splice(idx, 1) unless idx is -1
       callback.apply(this, arguments)
+    listeningToOnce.push {obj, ev, callback, handler}
     this
 
-  stopListening: (obj, ev, callback) ->
+  stopListening: (obj, events, callback) ->
     if arguments.length is 0
-      retain = []
       for listeningTo in [@listeningTo, @listeningToOnce]
         continue unless listeningTo
-        for obj in listeningTo when not (obj in retain)
-          obj.unbind()
-          retain.push(obj)
+        for lt in listeningTo
+          lt.obj.unbind(lt.ev, lt.handler or lt.callback)
       @listeningTo = undefined
       @listeningToOnce = undefined
 
     else if obj
-      obj.unbind(ev, callback) if ev
-      obj.unbind() unless ev
       for listeningTo in [@listeningTo, @listeningToOnce]
         continue unless listeningTo
-        idx = listeningTo.indexOf(obj)
-        listeningTo.splice(idx, 1) unless idx is -1
+        events = if events then events.split(' ') else [undefined]
+        for ev in events
+          for idx in [listeningTo.length-1..0]
+            lt = listeningTo[idx]
+            if (not ev) or (ev is lt.ev)
+              lt.obj.unbind(lt.ev, lt.handler or lt.callback)
+              listeningTo.splice(idx, 1) unless idx is -1
+            else if ev 
+              evts = lt.ev.split(' ')
+              if ~(i = evts.indexOf(ev))
+                evts.splice(i, 1)
+                lt.ev = $.trim(evts.join(' '))
+                lt.obj.unbind(ev, lt.handler or lt.callback)
 
   unbind: (ev, callback) ->
     if arguments.length is 0
@@ -396,6 +406,7 @@ class Model extends Module
 
     records = @constructor.irecords
     records[@id].load @attributes()
+
     @constructor.sort()
 
     clone = records[@id].clone()
@@ -440,39 +451,9 @@ class Model extends Module
     args.splice(1, 0, this)
     @constructor.trigger(args...)
 
-  listenTo: (obj, events, callback) ->
-    obj.bind events, callback
-    @listeningTo or= []
-    @listeningTo.push(obj)
-
-  listenToOnce: (obj, events, callback) ->
-    listeningToOnce = @listeningToOnce or= []
-    listeningToOnce.push obj
-    obj.bind events, handler = =>
-      idx = listeningToOnce.indexOf(obj)
-      listeningToOnce.splice(idx, 1) unless idx is -1
-      obj.unbind(events, handler)
-      callback.apply(obj, arguments)
-
-  stopListening: (obj, events, callback) ->
-    if arguments.length is 0
-      retain = []
-      for listeningTo in [@listeningTo, @listeningToOnce]
-        continue unless listeningTo
-        for obj in @listeningTo when not (obj in retain)
-          obj.unbind()
-          retain.push(obj)
-      @listeningTo = undefined
-      @listeningToOnce = undefined
-      return
-
-    if obj
-      obj.unbind() unless events
-      obj.unbind(events, callback) if events
-      for listeningTo in [@listeningTo, @listeningToOnce]
-        continue unless listeningTo
-        idx = listeningTo.indexOf(obj)
-        listeningTo.splice(idx, 1) unless idx is -1
+  listenTo: -> Events.listenTo.apply @, arguments
+  listenToOnce: -> Events.listenToOnce.apply @, arguments
+  stopListening: -> Events.stopListening.apply @, arguments
 
   unbind: (events, callback) ->
     if arguments.length is 0
@@ -581,7 +562,8 @@ class Controller extends Module
     @el
 
   replace: (element) ->
-    element = $.trim(element.el or element)
+    element = element.el or element
+    element = $.trim(element) if typeof element is "string"
     [previous, @el] = [@el, $($.parseHTML(element)?[0] or element)]
     previous.replaceWith(@el)
     @delegateEvents(@events)
