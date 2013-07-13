@@ -501,6 +501,7 @@ class Controller extends Module
 
   release: =>
     @trigger 'release', this
+    # no need to unDelegateEvents since remove will end up handling that
     @el.remove()
     @unbind()
     @stopListening()
@@ -530,7 +531,7 @@ class Controller extends Module
       if selector is ''
         @el.bind(eventName, method)
       else
-        @el.delegate(selector, eventName, method)
+        @el.on(eventName, selector, method)
 
   refreshElements: ->
     for key, value of @elements
@@ -538,6 +539,8 @@ class Controller extends Module
 
   delay: (func, timeout) ->
     setTimeout(@proxy(func), timeout || 0)
+
+  # keep controllers elements obj in sync with it contents
 
   html: (element) ->
     @el.html(element.el or element)
@@ -564,6 +567,7 @@ class Controller extends Module
   replace: (element) ->
     element = element.el or element
     element = $.trim(element) if typeof element is "string"
+    # parseHTML is incompatible with Zepto
     [previous, @el] = [@el, $($.parseHTML(element)?[0] or element)]
     previous.replaceWith(@el)
     @delegateEvents(@events)
