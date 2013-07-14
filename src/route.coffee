@@ -2,9 +2,9 @@ Spine = @Spine or require('spine')
 $     = Spine.$
 
 hashStrip    = /^#*/
-namedParam   = /:([\w\d]+)/g
+namedParam   = /:([\w\d]+)(?:!([\w\d-]+))*/g
 splatParam   = /\*([\w\d]+)/g
-escapeRegExp = /[-[\]{}()+?.,\\^$|#\s]/g
+escapeRegExp = /[[\]{}()+?.,\\^$|#\s]/g
 
 class Spine.Route extends Spine.Module
   @extend Spine.Events
@@ -24,7 +24,7 @@ class Spine.Route extends Spine.Module
     if (typeof path is 'object' and path not instanceof RegExp)
       @add(key, value) for key, value of path
     else
-      @routes.push(new @(path, callback))
+      @routes.unshift(new @(path, callback))
 
   @setup: (options = {}) ->
     @options = $.extend({}, @options, options)
@@ -65,12 +65,11 @@ class Spine.Route extends Spine.Module
 
     @trigger('navigate', @path)
 
-    route = @matchRoute(@path, options) if options.trigger
+    routes = @matchRoutes(@path, options) if options.trigger
 
     return if options.shim
 
-    if !route and options.redirect
-      @redirect(@path)
+    @redirect(@path) if options.redirect and not routes.length
 
     if @history and options.replace
       history.replaceState({}, document.title, @path)
@@ -97,12 +96,14 @@ class Spine.Route extends Spine.Module
     path = @getPath()
     return if path is @path
     @path = path
-    @matchRoute(@path)
+    @matchRoutes(@path)
 
-  @matchRoute: (path, options) ->
-    for route in @routes when route.match(path, options)
-      @trigger('change', route, path)
-      return route
+  @matchRoutes: (path, options = {}) ->
+    matches = []
+    for route in @routes when route.match(path, $.extend({}, options))
+      matches.push route
+    @trigger('change', matches, path)
+    matches
 
   @redirect: (path) ->
     window.location = path
@@ -119,9 +120,13 @@ class Spine.Route extends Spine.Module
       while (match = splatParam.exec(path)) != null
         @names.push(match[1])
 
+      # Use different regexp if excludes have been defined
+      replaceParams = (match, substrs..., offset, string)->
+        if substrs[1] then "(?!#{ substrs[1] }\\b)([^\/]*)" else '([^\/]*)'
+
       path = path.replace(escapeRegExp, '\\$&')
-                 .replace(namedParam, '([^\/]*)')
-                 .replace(splatParam, '(.*?)')
+      path = path.replace(namedParam, replaceParams)
+      path = path.replace(splatParam, '(.*?)')
 
       @route = new RegExp("^#{path}$")
     else
