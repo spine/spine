@@ -31,7 +31,7 @@ Events =
     listeningToOnce = @listeningToOnce or = []
     obj.bind ev, handler = ->
       idx = -1
-      for lt, i in listeningToOnce when lt.obj is obj 
+      for lt, i in listeningToOnce when lt.obj is obj
         idx = i if lt.ev is ev and lt.callback is callback
       obj.unbind(ev, handler)
       listeningToOnce.splice(idx, 1) unless idx is -1
@@ -58,7 +58,7 @@ Events =
             if (not ev) or (ev is lt.ev)
               lt.obj.unbind(lt.ev, lt.handler or lt.callback)
               listeningTo.splice(idx, 1) unless idx is -1
-            else if ev 
+            else if ev
               evts = lt.ev.split(' ')
               if ~(i = evts.indexOf(ev))
                 evts.splice(i, 1)
@@ -153,7 +153,7 @@ class Model extends Module
   @addRecord: (record) ->
     if record.id and @irecords[record.id]
       @irecords[record.id].remove()
-    
+
     record.id or= record.cid
     @records.push(record)
     @irecords[record.id]  = record
@@ -359,7 +359,7 @@ class Model extends Module
 
   dup: (newRecord = true) ->
     atts = @attributes()
-    if newRecord 
+    if newRecord
       delete atts.id
     else
       atts.cid = @cid
@@ -373,6 +373,13 @@ class Model extends Module
     original = @constructor.find(@id)
     @load(original.attributes())
     original
+
+  refresh: (data) ->
+    # go to the source and load attributes
+    root = @constructor.irecords[@id]
+    root.load(data)
+    @trigger('refresh')
+    root
 
   toJSON: ->
     @attributes()
@@ -417,7 +424,7 @@ class Model extends Module
   create: (options) ->
     @trigger('beforeCreate', options)
     @id or= @cid
-    
+
     record = @dup(false)
     @constructor.addRecord(record)
     @constructor.sort()

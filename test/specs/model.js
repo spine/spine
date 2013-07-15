@@ -78,6 +78,16 @@ describe("Model", function(){
     expect(original.__proto__.__proto__).toEqual(Asset.prototype)
   });
 
+  it("can refresh", function(){
+    var asset = Asset.create({name: 'foo.pdf'});
+    var clone = asset.clone();
+    root = clone.refresh({name: 'bar.pdf'});
+    expect(asset.name).toEqual('bar.pdf');
+
+    // refresh should return the root record
+    expect(root).toEqual(asset);
+  });
+
   it("can select records", function(){
     var asset1 = Asset.create({name: "test.pdf"});
     var asset2 = Asset.create({name: "foo.pdf"});
