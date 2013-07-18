@@ -81,8 +81,8 @@ class Base
       if record?.id?
         # for existing singleton, model id may have been updated
         # after request has been queued
-        settings.url = Ajax.getURL(record) unless settings.url?
-        settings.data.id = record.id if settings.data?
+        settings.url ?= Ajax.getURL(record)
+        settings.data?.id = record.id
 
       settings.data = JSON.stringify(settings.data)
       jqXHR = $.ajax(settings)
