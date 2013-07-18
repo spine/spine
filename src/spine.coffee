@@ -379,7 +379,7 @@ class Model extends Module
     root = @constructor.irecords[@id]
     root.load(data)
     @trigger('refresh')
-    root
+    @
 
   toJSON: ->
     @attributes()

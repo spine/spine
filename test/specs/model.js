@@ -81,11 +81,8 @@ describe("Model", function(){
   it("can refresh", function(){
     var asset = Asset.create({name: 'foo.pdf'});
     var clone = asset.clone();
-    root = clone.refresh({name: 'bar.pdf'});
+    clone.refresh({name: 'bar.pdf'});
     expect(asset.name).toEqual('bar.pdf');
-
-    // refresh should return the root record
-    expect(root).toEqual(asset);
   });
 
   it("can select records", function(){
