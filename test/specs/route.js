@@ -44,10 +44,11 @@ describe("Routing", function () {
       trigger: true,
       history: false,
       shim: false,
-      replace: false
+      replace: false,
+      redirect: false
     });
   });
-  
+
   it("can get the host", function() {
     host = Route.getHost();
     expect(host).not.toBeNull();
@@ -166,6 +167,7 @@ describe("Routing", function () {
             history: false,
             shim: true,
             replace: false,
+            redirect: false,
             match: ["/users/1/2", "1", "2"], id: "1", id2: "2"
           }]));
         });
@@ -180,6 +182,7 @@ describe("Routing", function () {
             history: false,
             shim: true,
             replace: false,
+            redirect: false,
             match: ["/page/gah", "gah"], stuff: "gah"
           }]));
         });
@@ -240,7 +243,7 @@ describe("Routing", function () {
 
       expect(Route.path).toBe('/foo');
     });
-    
+
     it("can navigate", function () {
       Route.add("/users/1", function () {});
 
@@ -295,5 +298,36 @@ describe("Routing", function () {
         expect(window.location.pathname).toBe("/users/1");
       });
     });
+
   });
+
+  describe('With Redirect', function() {
+
+    afterEach(function () {
+      setUrl();
+    });
+
+    it("when true bubbles unmatched routes to the browser", function() {
+      Route.setup({redirect: true});
+      spyOn(Route, 'redirect');
+      Route.navigate('/unmatched')
+      expect(Route.redirect).toHaveBeenCalledWith('/unmatched');
+    });
+
+    it("when function will apply function with path and options arguments", function() {
+      var calledCount = 0;
+      var callback =  function(path, options) {
+        calledCount++;
+        return [path, options.testing];
+      };
+      Route.setup({redirect: callback});
+      //spyOn(callback);
+      var options = {'testing': 123};
+      var unmatchedResult = Route.navigate('/unmatched', options);
+      //expect(callback).toHaveBeenCalled();
+      expect(calledCount).toBe(1)
+      expect(unmatchedResult).toEqual(['/unmatched', options.testing])
+    });
+  });
+
 });

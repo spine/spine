@@ -24,36 +24,46 @@ Events =
   listenTo: (obj, ev, callback) ->
     obj.bind(ev, callback)
     @listeningTo or= []
-    @listeningTo.push obj
+    @listeningTo.push {obj, ev, callback}
     this
 
   listenToOnce: (obj, ev, callback) ->
     listeningToOnce = @listeningToOnce or = []
-    listeningToOnce.push obj
-    obj.one ev, ->
-      idx = listeningToOnce.indexOf(obj)
+    obj.bind ev, handler = ->
+      idx = -1
+      for lt, i in listeningToOnce when lt.obj is obj 
+        idx = i if lt.ev is ev and lt.callback is callback
+      obj.unbind(ev, handler)
       listeningToOnce.splice(idx, 1) unless idx is -1
       callback.apply(this, arguments)
+    listeningToOnce.push {obj, ev, callback, handler}
     this
 
-  stopListening: (obj, ev, callback) ->
+  stopListening: (obj, events, callback) ->
     if arguments.length is 0
-      retain = []
       for listeningTo in [@listeningTo, @listeningToOnce]
         continue unless listeningTo
-        for obj in listeningTo when not (obj in retain)
-          obj.unbind()
-          retain.push(obj)
+        for lt in listeningTo
+          lt.obj.unbind(lt.ev, lt.handler or lt.callback)
       @listeningTo = undefined
       @listeningToOnce = undefined
 
     else if obj
-      obj.unbind(ev, callback) if ev
-      obj.unbind() unless ev
       for listeningTo in [@listeningTo, @listeningToOnce]
         continue unless listeningTo
-        idx = listeningTo.indexOf(obj)
-        listeningTo.splice(idx, 1) unless idx is -1
+        events = if events then events.split(' ') else [undefined]
+        for ev in events
+          for idx in [listeningTo.length-1..0]
+            lt = listeningTo[idx]
+            if (not ev) or (ev is lt.ev)
+              lt.obj.unbind(lt.ev, lt.handler or lt.callback)
+              listeningTo.splice(idx, 1) unless idx is -1
+            else if ev 
+              evts = lt.ev.split(' ')
+              if ~(i = evts.indexOf(ev))
+                evts.splice(i, 1)
+                lt.ev = $.trim(evts.join(' '))
+                lt.obj.unbind(ev, lt.handler or lt.callback)
 
   unbind: (ev, callback) ->
     if arguments.length is 0
@@ -117,10 +127,9 @@ class Module
 class Model extends Module
   @extend Events
 
-  @records: []
-  @irecords: {}
-  @crecords: {}
-  @attributes: []
+  @records    : []
+  @irecords   : {}
+  @attributes : []
 
   @configure: (name, attributes...) ->
     @className = name
@@ -139,28 +148,27 @@ class Model extends Module
     return record
 
   @exists: (id) ->
-    (@irecords[id] ? @crecords[id])?.clone()
+    @irecords[id]?.clone()
+
+  @addRecord: (record) ->
+    if record.id and @irecords[record.id]
+      @irecords[record.id].remove()
+    
+    record.id or= record.cid
+    @records.push(record)
+    @irecords[record.id]  = record
+    @irecords[record.cid] = record
 
   @refresh: (values, options = {}) ->
-    if options.clear
-      @deleteAll()
+    @deleteAll() if options.clear
 
     records = @fromJSON(values)
     records = [records] unless isArray(records)
-
-    for record in records
-    	if record.id and @irecords[record.id]
-    		@records[@records.indexOf(@irecords[record.id])] = record
-    	else
-	      record.id or= record.cid
-	      @records.push(record)
-      @irecords[record.id]  = record
-      @crecords[record.cid] = record
-
+    @addRecord(record) for record in records
     @sort()
 
     result = @cloneArray(records)
-    @trigger('refresh', @cloneArray(records))
+    @trigger('refresh', result, options)
     result
 
   @select: (callback) ->
@@ -194,7 +202,6 @@ class Model extends Module
   @deleteAll: ->
     @records  = []
     @irecords = {}
-    @crecords = {}
 
   @destroyAll: (options) ->
     record.destroy(options) for record in @records
@@ -239,7 +246,7 @@ class Model extends Module
   @sort: ->
     if @comparator
       @records.sort @comparator
-    @records
+    this
 
   # Private
 
@@ -258,7 +265,7 @@ class Model extends Module
   constructor: (atts) ->
     super
     @load atts if atts
-    @cid = @constructor.uid('c-')
+    @cid = atts?.cid or @constructor.uid('c-')
 
   isNew: ->
     not @exists()
@@ -320,27 +327,29 @@ class Model extends Module
     @save(options)
 
   changeID: (id) ->
+    return if id is @id
     records = @constructor.irecords
     records[id] = records[@id]
     delete records[@id]
     @id = id
     @save()
 
-  destroy: (options = {}) ->
-    @trigger('beforeDestroy', options)
-
+  remove: ->
     # Remove record from model
     records = @constructor.records.slice(0)
     for record, i in records when @eql(record)
       records.splice(i, 1)
       break
     @constructor.records = records
-
     # Remove the ID and CID
     delete @constructor.irecords[@id]
-    delete @constructor.crecords[@cid]
+    delete @constructor.irecords[@cid]
 
+  destroy: (options = {}) ->
+    @trigger('beforeDestroy', options)
+    @remove()
     @destroyed = true
+    # handle events
     @trigger('destroy', options)
     @trigger('change', 'destroy', options)
     if @listeningTo
@@ -348,13 +357,13 @@ class Model extends Module
     @unbind()
     this
 
-  dup: (newRecord) ->
-    result = new @constructor(@attributes())
-    if newRecord is false
-      result.cid = @cid
+  dup: (newRecord = true) ->
+    atts = @attributes()
+    if newRecord 
+      delete atts.id
     else
-      delete result.id
-    result
+      atts.cid = @cid
+    new @constructor(atts)
 
   clone: ->
     createObject(this)
@@ -373,8 +382,18 @@ class Model extends Module
 
   fromForm: (form) ->
     result = {}
+
+    for checkbox in $(form).find('[type=checkbox]:not([value])')
+      result[checkbox.name] = $(checkbox).prop('checked')
+
+    for checkbox in $(form).find('[type=checkbox][name$="[]"]')
+      name = checkbox.name.replace(/\[\]$/, '')
+      result[name] or= []
+      result[name].push checkbox.value if $(checkbox).prop('checked')
+
     for key in $(form).serializeArray()
-      result[key.name] = key.value
+      result[key.name] or= key.value
+
     @load(result)
 
   exists: ->
@@ -397,13 +416,10 @@ class Model extends Module
 
   create: (options) ->
     @trigger('beforeCreate', options)
-    @id          = @cid unless @id
-
-    record       = @dup(false)
-    @constructor.records.push(record)
-    @constructor.irecords[@id]  = record
-    @constructor.crecords[@cid] = record
-
+    @id or= @cid
+    
+    record = @dup(false)
+    @constructor.addRecord(record)
     @constructor.sort()
 
     clone        = record.clone()
@@ -435,39 +451,9 @@ class Model extends Module
     args.splice(1, 0, this)
     @constructor.trigger(args...)
 
-  listenTo: (obj, events, callback) ->
-    obj.bind events, callback
-    @listeningTo or= []
-    @listeningTo.push(obj)
-
-  listenToOnce: (obj, events, callback) ->
-    listeningToOnce = @listeningToOnce or= []
-    listeningToOnce.push obj
-    obj.bind events, handler = =>
-      idx = listeningToOnce.indexOf(obj)
-      listeningToOnce.splice(idx, 1) unless idx is -1
-      obj.unbind(events, handler)
-      callback.apply(obj, arguments)
-
-  stopListening: (obj, events, callback) ->
-    if arguments.length is 0
-      retain = []
-      for listeningTo in [@listeningTo, @listeningToOnce]
-        continue unless listeningTo
-        for obj in @listeningTo when not (obj in retain)
-          obj.unbind()
-          retain.push(obj)
-      @listeningTo = undefined
-      @listeningToOnce = undefined
-      return
-
-    if obj
-      obj.unbind() unless events
-      obj.unbind(events, callback) if events
-      for listeningTo in [@listeningTo, @listeningToOnce]
-        continue unless listeningTo
-        idx = listeningTo.indexOf(obj)
-        listeningTo.splice(idx, 1) unless idx is -1
+  listenTo: -> Events.listenTo.apply @, arguments
+  listenToOnce: -> Events.listenToOnce.apply @, arguments
+  stopListening: -> Events.stopListening.apply @, arguments
 
   unbind: (events, callback) ->
     if arguments.length is 0
@@ -515,6 +501,7 @@ class Controller extends Module
 
   release: =>
     @trigger 'release', this
+    # no need to unDelegateEvents since remove will end up handling that
     @el.remove()
     @unbind()
     @stopListening()
@@ -544,7 +531,7 @@ class Controller extends Module
       if selector is ''
         @el.bind(eventName, method)
       else
-        @el.delegate(selector, eventName, method)
+        @el.on(eventName, selector, method)
 
   refreshElements: ->
     for key, value of @elements
@@ -552,6 +539,8 @@ class Controller extends Module
 
   delay: (func, timeout) ->
     setTimeout(@proxy(func), timeout || 0)
+
+  # keep controllers elements obj in sync with it contents
 
   html: (element) ->
     @el.html(element.el or element)
@@ -576,7 +565,10 @@ class Controller extends Module
     @el
 
   replace: (element) ->
-    [previous, @el] = [@el, $(element.el or element)]
+    element = element.el or element
+    element = $.trim(element) if typeof element is "string"
+    # parseHTML is incompatible with Zepto
+    [previous, @el] = [@el, $($.parseHTML(element)?[0] or element)]
     previous.replaceWith(@el)
     @delegateEvents(@events)
     @refreshElements()

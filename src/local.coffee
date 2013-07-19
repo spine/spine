@@ -9,8 +9,9 @@ Spine.Model.Local =
     result = JSON.stringify(@)
     localStorage[@className] = result
 
-  loadLocal: ->
+  loadLocal: (options = {})->
+    options.clear = true unless options.hasOwnProperty('clear')
     result = localStorage[@className]
-    @refresh(result or [], clear: true)
+    @refresh(result or [], options)
 
 module?.exports = Spine.Model.Local

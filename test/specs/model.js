@@ -2,7 +2,7 @@ describe("Model", function(){
   var Asset;
 
   beforeEach(function(){
-    Asset = Spine.Model.setup("Asset", ["name"]);
+    Asset = Spine.Model.setup("Asset", ["name", "visible", "contact_methods"]);
   });
 
   it("can create records", function(){
@@ -23,12 +23,10 @@ describe("Model", function(){
 
   it("can refresh existing records", function(){
     var asset = Asset.create({name: "test.pdf"});
-
     expect(Asset.first().name).toEqual("test.pdf");
 
     var changedAsset = asset.toJSON();
     changedAsset.name = "wem.pdf";
-
     Asset.refresh(changedAsset);
 
     expect(Asset.count()).toEqual(1);
@@ -154,6 +152,56 @@ describe("Model", function(){
     var asset = Asset.fromForm(form);
     expect(asset.name).toEqual("bar");
   });
+
+  describe ("from a form with unchecked checkboxes", function(){
+    it("can be instantiated with boolean values", function(){
+      var form = $('<form />');
+      form.append('<input type="checkbox" name="visible" />');
+      var asset = Asset.fromForm(form);
+      expect(asset.visible).toEqual(false);
+    });
+
+    it("can be instantiated with array style checkboxes", function(){
+      var form = $('<form />');
+      form.append('<input type="checkbox" name="contact_methods[]" value="email" />');
+      form.append('<input type="checkbox" name="contact_methods[]" value="phone" />');
+      form.append('<input type="checkbox" name="contact_methods[]" value="sms" />');
+      var asset = Asset.fromForm(form);
+      expect(asset.contact_methods).toEqual([]);
+    });
+
+    it("can be instantiated with single style checkboxes", function(){
+      var form = $('<form />');
+      form.append('<input type="checkbox" name="association_id" value="12345" checked/>');
+      var asset = Asset.fromForm(form);
+      expect(asset.association_id).toEqual("12345");
+    });
+  })
+
+  describe ("fromFroms with checked checkboxes", function(){
+    it("can be instantiated with boolean values", function(){
+      var form = $('<form />');
+      form.append('<input type="checkbox" name="visible" />');
+      var asset = Asset.fromForm(form);
+      expect(asset.visible).toEqual(false);
+    });
+
+    it("can be instantiated with array style checkboxes", function(){
+      var form = $('<form />');
+      form.append('<input type="checkbox" name="contact_methods[]" value="email" checked/>');
+      form.append('<input type="checkbox" name="contact_methods[]" value="phone" />');
+      form.append('<input type="checkbox" name="contact_methods[]" value="sms" checked/>');
+      var asset = Asset.fromForm(form);
+      expect(asset.contact_methods).toEqual(['email', 'sms']);
+    });
+
+    it("can be instantiated with single style checkboxes", function(){
+      var form = $('<form />');
+      form.append('<input type="checkbox" name="association_id" value="12345" />');
+      var asset = Asset.fromForm(form);
+      expect(asset.association_id).toEqual(undefined);
+    });
+  })
 
   it("can validate", function(){
     Asset.include({
@@ -434,6 +482,25 @@ describe("Model", function(){
       var asset = Asset.create({name: "screaming goats.png"});
       Asset.destroyAll({ajax: false});
       expect(spy).toHaveBeenCalledWith(asset, {ajax: false});
+    });
+
+    it("can fire refresh events", function(){
+      Asset.bind("refresh", spy);
+
+      var values = JSON.stringify([]);
+      Asset.refresh(values, {refresh: true, clear: true});
+      expect(spy).toHaveBeenCalledWith([], {refresh: true, clear: true});
+
+      var asset = Asset.create({name: "test.pdf"});
+      var values = asset.toJSON();
+      var tmpRecords = Asset.refresh(values, {clear: true});
+      expect(spy).toHaveBeenCalledWith(tmpRecords, {clear: true});
+
+      var asset1 = Asset.create({id: 1, name: "test.pdf"});
+      var asset2 = Asset.create({id: 2, name: "wem.pdf"});
+      var values = JSON.stringify([asset1, asset2]);
+      var tmpRecords = Asset.refresh(values, {clear: true});
+      expect(spy).toHaveBeenCalledWith(tmpRecords, {clear: true});
     });
 
     it("can fire events on record", function(){

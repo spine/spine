@@ -7,6 +7,13 @@ Ajax =
   getURL: (object) ->
     object.url?() or object.url
 
+  getCollectionURL: (object) ->
+    if object
+      if typeof object.url is "function"
+        @generateURL(object)
+      else
+        object.url
+
   getScope: (object) ->
     object.scope?() or object.scope
 
@@ -63,7 +70,7 @@ class Base
   ajax: (params, defaults) ->
     $.ajax @ajaxSettings(params, defaults)
 
-  ajaxQueue: (params, defaults) ->
+  ajaxQueue: (params, defaults, record) ->
     jqXHR    = null
     deferred = $.Deferred()
     promise  = deferred.promise()
@@ -71,6 +78,13 @@ class Base
     settings = @ajaxSettings(params, defaults)
 
     request = (next) ->
+      if record?.id?
+        # for existing singleton, model id may have been updated
+        # after request has been queued
+        settings.url ?= Ajax.getURL(record)
+        settings.data?.id = record.id
+
+      settings.data = JSON.stringify(settings.data)
       jqXHR = $.ajax(settings)
                 .done(deferred.resolve)
                 .fail(deferred.reject)
@@ -95,30 +109,30 @@ class Base
 class Collection extends Base
   constructor: (@model) ->
 
-  find: (id, params) ->
+  find: (id, params, options = {}) ->
     record = new @model(id: id)
     @ajaxQueue(
       params,
       type: 'GET',
-      url:  Ajax.getURL(record)
+      url: options.url or Ajax.getURL(record)
     ).done(@recordsResponse)
      .fail(@failResponse)
 
-  all: (params) ->
+  all: (params, options = {}) ->
     @ajaxQueue(
       params,
       type: 'GET',
-      url:  Ajax.getURL(@model)
+      url: options.url or Ajax.getURL(@model)
     ).done(@recordsResponse)
      .fail(@failResponse)
 
   fetch: (params = {}, options = {}) ->
     if id = params.id
       delete params.id
-      @find(id, params).done (record) =>
+      @find(id, params, options).done (record) =>
         @model.refresh(record, options)
     else
-      @all(params).done (records) =>
+      @all(params, options).done (records) =>
         @model.refresh(records, options)
 
   # Private
@@ -133,39 +147,42 @@ class Singleton extends Base
   constructor: (@record) ->
     @model = @record.constructor
 
-  reload: (params, options) ->
+  reload: (params, options = {}) ->
     @ajaxQueue(
-      params,
-      type: 'GET'
-      url:  Ajax.getURL(@record)
+      params, {
+        type: 'GET'
+        url: options.url
+      }, @record
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
 
-  create: (params, options) ->
+  create: (params, options = {}) ->
     @ajaxQueue(
       params,
       type: 'POST'
       contentType: 'application/json'
-      data: JSON.stringify(@record)
-      url:  Ajax.getURL(@model)
+      data: @record.toJSON()
+      url: options.url or Ajax.getCollectionURL(@record)
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
 
-  update: (params, options) ->
+  update: (params, options = {}) ->
     @ajaxQueue(
-      params,
-      type: 'PUT'
-      contentType: 'application/json'
-      data: JSON.stringify(@record)
-      url:  Ajax.getURL(@record)
+      params, {
+        type: 'PUT'
+        contentType: 'application/json'
+        data: @record.toJSON()
+        url: options.url
+      }, @record
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
 
-  destroy: (params, options) ->
+  destroy: (params, options = {}) ->
     @ajaxQueue(
-      params,
-      type: 'DELETE'
-      url:  Ajax.getURL(@record)
+      params, {
+        type: 'DELETE'
+        url: options.url
+      }, @record
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
 
@@ -235,5 +252,8 @@ Model.Ajax.Methods =
 
 # Globals
 Ajax.defaults   = Base::defaults
+Ajax.Base       = Base
+Ajax.Singleton  = Singleton
+Ajax.Collection = Collection
 Spine.Ajax      = Ajax
 module?.exports = Ajax
