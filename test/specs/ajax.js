@@ -126,6 +126,22 @@ describe("Ajax", function(){
     expect(User.irecords["IDD2"]).toEqual(User.first());
   });
 
+  it("can update record IDs for already queued requests", function(){
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+
+    u = User.create();
+    u.first = "Todd";
+    u.last = "Shaw";
+    u.save();
+
+    var newAtts = {id: "IDD"};
+    jqXHR.resolve(newAtts);
+
+
+    updateAjaxRequest = jQuery.ajax.mostRecentCall.args[0]
+    expect(updateAjaxRequest.url).toBe("/users/IDD")
+  });
+
   it("should not recreate records after DELETE", function() {
     User.refresh([{first: "Phillip", last: "Fry", id: "MYID"}]);
 
