@@ -70,7 +70,7 @@ class Base
   ajax: (params, defaults) ->
     $.ajax @ajaxSettings(params, defaults)
 
-  ajaxQueue: (params, defaults) ->
+  ajaxQueue: (params, defaults, record) ->
     jqXHR    = null
     deferred = $.Deferred()
     promise  = deferred.promise()
@@ -78,6 +78,13 @@ class Base
     settings = @ajaxSettings(params, defaults)
 
     request = (next) ->
+      if record?.id?
+        # for existing singleton, model id may have been updated
+        # after request has been queued
+        settings.url ?= Ajax.getURL(record)
+        settings.data?.id = record.id
+
+      settings.data = JSON.stringify(settings.data)
       jqXHR = $.ajax(settings)
                 .done(deferred.resolve)
                 .fail(deferred.reject)
@@ -142,9 +149,10 @@ class Singleton extends Base
 
   reload: (params, options = {}) ->
     @ajaxQueue(
-      params,
-      type: 'GET'
-      url: options.url or Ajax.getURL(@record)
+      params, {
+        type: 'GET'
+        url: options.url
+      }, @record
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
 
@@ -153,26 +161,28 @@ class Singleton extends Base
       params,
       type: 'POST'
       contentType: 'application/json'
-      data: JSON.stringify(@record)
+      data: @record.toJSON()
       url: options.url or Ajax.getCollectionURL(@record)
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
 
   update: (params, options = {}) ->
     @ajaxQueue(
-      params,
-      type: 'PUT'
-      contentType: 'application/json'
-      data: JSON.stringify(@record)
-      url: options.url or Ajax.getURL(@record)
+      params, {
+        type: 'PUT'
+        contentType: 'application/json'
+        data: @record.toJSON()
+        url: options.url
+      }, @record
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
 
   destroy: (params, options = {}) ->
     @ajaxQueue(
-      params,
-      type: 'DELETE'
-      url: options.url or Ajax.getURL(@record)
+      params, {
+        type: 'DELETE'
+        url: options.url
+      }, @record
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
 
