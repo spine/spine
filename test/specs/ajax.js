@@ -53,6 +53,19 @@ describe("Ajax", function(){
     });
   });
 
+  it("allows undeclared attributes from server", function(){
+    User.refresh([{
+      id: "12345",
+      first: "Hans",
+      last: "Zimmer",
+      created_by: "spine_user",
+      created_at: "2013-07-14T14:00:00-04:00",
+      updated_at: "2013-07-14T14:00:00-04:00"
+    }]);
+
+    expect(User.first().created_by).toEqual("spine_user");
+  });
+
   it("should send POST on create", function(){
     spyOn(jQuery, "ajax").andReturn(jqXHR);
 
@@ -112,6 +125,23 @@ describe("Ajax", function(){
     jqXHR.resolve(newAtts);
 
     expect(User.first().attributes()).toEqual(newAtts);
+  });
+
+  it("should update record with undeclared attributes from server", function(){
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+
+    User.create({first: "Hans", last: "Zimmer"});
+    var serverAttrs = {
+      id: "12345",
+      first: "Hans",
+      last: "Zimmer",
+      created_by: "spine_user",
+      created_at: "2013-07-14T14:00:00-04:00",
+      updated_at: "2013-07-14T14:00:00-04:00"
+    }
+
+    jqXHR.resolve(serverAttrs);
+    expect(User.first().created_by).toEqual("spine_user");
   });
 
   it("should change record ID after PUT/POST", function(){

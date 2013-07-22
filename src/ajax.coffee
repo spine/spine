@@ -190,18 +190,14 @@ class Singleton extends Base
 
   recordResponse: (options = {}) =>
     (data, status, xhr) =>
-      if Spine.isBlank(data) or @record.destroyed
-        data = false
-      else
-        data = @model.fromJSON(data)
 
       Ajax.disable =>
-        if data
+        unless Spine.isBlank(data) or @record.destroyed
           # ID change, need to do some shifting
           if data.id and @record.id isnt data.id
             @record.changeID(data.id)
           # Update with latest data
-          @record.updateAttributes(data.attributes())
+          @record.refresh(data)
 
       @record.trigger('ajaxSuccess', data, status, xhr)
       options.success?.apply(@record) # Deprecated
