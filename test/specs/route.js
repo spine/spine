@@ -303,20 +303,31 @@ describe("Routing", function () {
 
   describe('With Redirect', function() {
 
-    beforeEach(function () {
-      Route.setup({redirect: true});
-    });
-
     afterEach(function () {
       setUrl();
     });
 
-    it("bubbles unmatched routes to the browser", function() {
+    it("when true bubbles unmatched routes to the browser", function() {
+      Route.setup({redirect: true});
       spyOn(Route, 'redirect');
       Route.navigate('/unmatched')
       expect(Route.redirect).toHaveBeenCalledWith('/unmatched');
     });
 
+    it("when function will apply function with path and options arguments", function() {
+      var calledCount = 0;
+      var callback =  function(path, options) {
+        calledCount++;
+        return [path, options.testing];
+      };
+      Route.setup({redirect: callback});
+      //spyOn(callback);
+      var options = {'testing': 123};
+      var unmatchedResult = Route.navigate('/unmatched', options);
+      //expect(callback).toHaveBeenCalled();
+      expect(calledCount).toBe(1)
+      expect(unmatchedResult).toEqual(['/unmatched', options.testing])
+    });
   });
 
 });

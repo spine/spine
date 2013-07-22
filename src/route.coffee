@@ -69,8 +69,12 @@ class Spine.Route extends Spine.Module
 
     return if options.shim
 
-    if !route and options.redirect
-      @redirect(@path)
+    if !route 
+      if typeof options.redirect is 'function'
+        return options.redirect.apply this, [@path, options]
+      else 
+        if options.redirect is true
+          @redirect(@path)
 
     if @history and options.replace
       history.replaceState({}, document.title, @path)
