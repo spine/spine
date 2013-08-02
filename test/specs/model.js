@@ -23,12 +23,10 @@ describe("Model", function(){
 
   it("can refresh existing records", function(){
     var asset = Asset.create({name: "test.pdf"});
-
     expect(Asset.first().name).toEqual("test.pdf");
 
     var changedAsset = asset.toJSON();
     changedAsset.name = "wem.pdf";
-
     Asset.refresh(changedAsset);
 
     expect(Asset.count()).toEqual(1);
@@ -78,6 +76,13 @@ describe("Model", function(){
 
     // Reload should return a clone, more useful that way
     expect(original.__proto__.__proto__).toEqual(Asset.prototype)
+  });
+
+  it("can refresh", function(){
+    var asset = Asset.create({name: 'foo.pdf'});
+    var clone = asset.clone();
+    clone.refresh({name: 'bar.pdf'});
+    expect(asset.name).toEqual('bar.pdf');
   });
 
   it("can select records", function(){

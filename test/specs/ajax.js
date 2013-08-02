@@ -53,6 +53,19 @@ describe("Ajax", function(){
     });
   });
 
+  it("allows undeclared attributes from server", function(){
+    User.refresh([{
+      id: "12345",
+      first: "Hans",
+      last: "Zimmer",
+      created_by: "spine_user",
+      created_at: "2013-07-14T14:00:00-04:00",
+      updated_at: "2013-07-14T14:00:00-04:00"
+    }]);
+
+    expect(User.first().created_by).toEqual("spine_user");
+  });
+
   it("should send POST on create", function(){
     spyOn(jQuery, "ajax").andReturn(jqXHR);
 
@@ -114,6 +127,23 @@ describe("Ajax", function(){
     expect(User.first().attributes()).toEqual(newAtts);
   });
 
+  it("should update record with undeclared attributes from server", function(){
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+
+    User.create({first: "Hans", last: "Zimmer"});
+    var serverAttrs = {
+      id: "12345",
+      first: "Hans",
+      last: "Zimmer",
+      created_by: "spine_user",
+      created_at: "2013-07-14T14:00:00-04:00",
+      updated_at: "2013-07-14T14:00:00-04:00"
+    }
+
+    jqXHR.resolve(serverAttrs);
+    expect(User.first().created_by).toEqual("spine_user");
+  });
+
   it("should change record ID after PUT/POST", function(){
     spyOn(jQuery, "ajax").andReturn(jqXHR);
 
@@ -124,6 +154,22 @@ describe("Ajax", function(){
 
     expect(User.first().id).toEqual("IDD2");
     expect(User.irecords["IDD2"]).toEqual(User.first());
+  });
+
+  it("can update record IDs for already queued requests", function(){
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+
+    u = User.create();
+    u.first = "Todd";
+    u.last = "Shaw";
+    u.save();
+
+    var newAtts = {id: "IDD"};
+    jqXHR.resolve(newAtts);
+
+
+    updateAjaxRequest = jQuery.ajax.mostRecentCall.args[0]
+    expect(updateAjaxRequest.url).toBe("/users/IDD")
   });
 
   it("should not recreate records after DELETE", function() {
@@ -241,6 +287,64 @@ describe("Ajax", function(){
 
     Spine.Model.host = 'http://example.com';
     expect(user.url()).toBe('http://example.com/people/1');
+  });
+
+  it("can override POST url with options on create", function(){
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+
+    User.create({ first: 'Adam', id: '123' }, { url: '/people' });
+    expect(jQuery.ajax).toHaveBeenCalledWith({
+      type:         'POST',
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      dataType:     'json',
+      data:         '{"first":"Adam","id":"123"}',
+      contentType:  'application/json',
+      url:          '/people',
+      processData:  false
+    });
+  });
+
+  it("can override GET url with options on fetch", function(){
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+
+    User.fetch({ url: '/people' });
+    expect(jQuery.ajax).toHaveBeenCalledWith({
+      type:         'GET',
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      dataType:     'json',
+      url:          '/people',
+      processData:  false
+    });
+  });
+
+  it("can override PUT url with options on update", function(){
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+
+    user = User.create({ first: 'Adam', id: '123' }, { ajax: false });
+    user.updateAttributes({ first: 'Odam' }, { url: '/people' });
+    expect(jQuery.ajax).toHaveBeenCalledWith({
+      type:         'PUT',
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      dataType:     'json',
+      data:         '{"first":"Odam","id":"123"}',
+      contentType:  'application/json',
+      url:          '/people',
+      processData:  false
+    });
+  });
+
+  it("can override DELETE url with options on destroy", function(){
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+
+    user = User.create({ first: 'Adam', id: '123' }, { ajax: false });
+    user.destroy({ url: '/people' });
+    expect(jQuery.ajax).toHaveBeenCalledWith({
+      type:         'DELETE',
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      dataType:     'json',
+      url:          '/people',
+      processData:  false
+    });
   });
 
   it("should have a url function", function(){
