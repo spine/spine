@@ -21,6 +21,7 @@ class Spine.List extends Spine.Controller
       @children().removeClass('active')
       return
 
+    @children().removeClass('active')
     for item, index in @items
       if @current.id is item.id
         break
