@@ -21,8 +21,10 @@ class Spine.List extends Spine.Controller
       @children().removeClass('active')
       return
 
-    @children().removeClass('active')
-    $(@children().get(@items.indexOf(@current))).addClass('active')
+    for item, index in @items
+      if @current.id is item.id
+        break
+    $(@children().get(index)).addClass('active')
 
   render: (items) ->
     @items = items if items
