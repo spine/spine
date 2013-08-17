@@ -53,6 +53,36 @@ describe("Ajax", function(){
     });
   });
 
+  it("can fetch a record to [re]hydrate an instance", function(){
+    user = new User({id: "IDD"});
+
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+
+    user.fetch();
+
+    expect(jQuery.ajax).toHaveBeenCalledWith({
+      type:         'GET',
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      dataType:     'json',
+      url:          '/users/IDD',
+      processData:  false
+    });
+  });
+
+  it("triggers 'refresh' after fetch on a record", function(){
+    var user = new User({id: "IDD"});
+
+    spyOn(user, "refresh");
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+
+    user.fetch();
+
+    var attrs = { id: "IDD" }
+    jqXHR.resolve(attrs)
+
+    expect(user.refresh).toHaveBeenCalledWith(attrs);
+  });
+
   it("allows undeclared attributes from server", function(){
     User.refresh([{
       id: "12345",

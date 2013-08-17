@@ -234,8 +234,12 @@ Model.Ajax =
 
   # Private
 
-  ajaxFetch: ->
-    @ajax().fetch(arguments...)
+  ajaxFetch: (paramsOrRecord = {}, options = {})->
+    ajax = @ajax()
+    if paramsOrRecord instanceof ajax.model
+      paramsOrRecord.ajax().reload()
+    else
+      ajax.fetch(paramsOrRecord, options)
 
   ajaxChange: (record, type, options = {}) ->
     return if options.ajax is false

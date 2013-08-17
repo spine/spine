@@ -372,6 +372,7 @@ class Model extends Module
     return this if @isNew()
     original = @constructor.find(@id)
     @load(original.attributes())
+    @trigger('refresh')
     original
 
   refresh: (data) ->
@@ -380,6 +381,12 @@ class Model extends Module
     root.load(data)
     @trigger('refresh')
     @
+
+  fetch: (callbackOrParams) ->
+    if typeof callbackOrParams is 'function'
+      @bind('fetch', callbackOrParams)
+    else
+      @trigger('fetch', arguments...)
 
   toJSON: ->
     @attributes()

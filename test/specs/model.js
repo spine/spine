@@ -78,6 +78,16 @@ describe("Model", function(){
     expect(original.__proto__.__proto__).toEqual(Asset.prototype)
   });
 
+  it("triggers 'refresh' on reload", function(){
+    var asset = Asset.create({name: "test.pdf"}).dup(false);
+
+    spyOn(asset, 'trigger')
+    Asset.find(asset.id).updateAttributes({name: "foo.pdf"});
+    asset.reload();
+
+    expect(asset.trigger).toHaveBeenCalledWith('refresh')
+  });
+
   it("can refresh", function(){
     var asset = Asset.create({name: 'foo.pdf'});
     var clone = asset.clone();
