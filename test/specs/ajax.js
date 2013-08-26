@@ -276,6 +276,54 @@ describe("Ajax", function(){
   it("should expose the defaults object", function(){
     expect(Spine.Ajax.defaults).toBeDefined();
   });
+  
+  it("should not double stringify GET requests where data is a string", function(){
+    User.url = "/people";
+    expect(Spine.Ajax.getURL(User)).toBe('/people');
+
+    User.fetch({ data : "shineyHappy=true"})
+    expect(jQuery.ajax).toHaveBeenCalledWith({
+      type:         'GET',
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      dataType:     'json',
+      data:         "shineyHappy=true",
+      contentType:  'application/json',
+      url:          '/people',
+      processData:  false
+    });
+  });
+  
+  it("should not stringify data for GET requests where data is an object and processData is set to true", function(){
+    User.url = "/people";
+    expect(Spine.Ajax.getURL(User)).toBe('/people');
+
+    User.fetch({ data : { shineyHappy : true}, processData : true })
+    expect(jQuery.ajax).toHaveBeenCalledWith({
+      type:         'GET',
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      dataType:     'json',
+      data:         { shineyHappy : true },
+      contentType:  'application/json',
+      url:          '/people',
+      processData:  true
+    });
+  });
+  
+  it("should not stringify data for POST requests where data is an object and processData is set to true", function(){
+    User.url = "/people";
+    expect(Spine.Ajax.getURL(User)).toBe('/people');
+
+    User.create({ first: 'Adam', id: '123' }, { processData : true })
+    expect(jQuery.ajax).toHaveBeenCalledWith({
+      type:         'GET',
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      dataType:     'json',
+      data:         { first: 'Adam', id: '123' },
+      contentType:  'application/json',
+      url:          '/people',
+      processData:  true
+    });
+  });
 
   it("can get a url property with optional host from a model and model instances", function(){
     User.url = "/people";

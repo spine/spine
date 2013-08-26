@@ -83,8 +83,14 @@ class Base
         # after request has been queued
         settings.url ?= Ajax.getURL(record)
         settings.data?.id = record.id
-
-      settings.data = JSON.stringify(settings.data)
+      # if data is string not an object, we should not stringify
+      shouldStringify = typeof settings.data isnt 'string'
+      # if data is not a string, and the requestType is 'GET' and processData is true we should not stringify
+      if shouldStringify and (settings.type is 'GET' and settings.processData is true and typeof settings.data isnt 'string')
+        shouldStringify = false
+      # if processData is false, and we have no other reason not to then we should stringify
+      if shouldStringify and settings.processData is false
+        settings.data = JSON.stringify(settings.data)
       jqXHR = $.ajax(settings)
                 .done(deferred.resolve)
                 .fail(deferred.reject)
