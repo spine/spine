@@ -296,7 +296,7 @@ class Model extends Module
 
   eql: (rec) ->
     !!(rec and rec.constructor is @constructor and
-        (rec.cid is @cid) or (rec.id and rec.id is @id))
+        ((rec.cid is @cid) or (rec.id and rec.id is @id)))
 
   save: (options = {}) ->
     unless options.validate is false
