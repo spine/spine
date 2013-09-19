@@ -14,7 +14,6 @@
   }
 
   var query = getQueryParams(document.location.search);
-  console.log(query);
   // defaut jquery version (1.8.3) is local
   window.dependencySrc = "lib/jquery.js";
   // dynamicly chosen jquery version is fetched

@@ -215,6 +215,7 @@ describe("Controller", function(){
       expect(spy2).toHaveBeenCalled();
     });
 
+
   });
 
   describe("When using inheritance", function() {
@@ -262,4 +263,4 @@ describe("Controller", function(){
       expect(c.cEventHandler).toHaveBeenCalled();
     });
   });
-});
+  });
