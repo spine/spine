@@ -12,7 +12,7 @@ class Spine.Route extends Spine.Module
   @historySupport: window.history?.pushState?
 
   @routes: []
-  @navigationHistory: []
+  @routesHistory: []
 
   @options:
     trigger: true
@@ -60,7 +60,7 @@ class Spine.Route extends Spine.Module
     options = $.extend({}, @options, options)
 
     if(args[0] == 'back')
-      prevRoute = @navigationHistory.splice(0,2)[1]
+      prevRoute = @routesHistory.splice(0,2)[1]
       path = prevRoute.path
       options = $.extend(prevRoute.options, options)
     else 
@@ -69,7 +69,7 @@ class Spine.Route extends Spine.Module
     return if @path is path
     @path = path
 
-    @navigationHistory.unshift(path: path, options: options)
+    @routesHistory.unshift(path: path, options: options)
     
     @trigger('navigate', @path)
 

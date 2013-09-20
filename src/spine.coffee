@@ -160,7 +160,7 @@ class Model extends Module
     @sort()
 
     result = @cloneArray(records)
-    @trigger('refresh', @cloneArray(records), options)
+    @trigger('refresh', @cloneArray(records))
     result
 
   @select: (callback) ->
@@ -373,18 +373,8 @@ class Model extends Module
 
   fromForm: (form) ->
     result = {}
-
-    for checkbox in $(form).find('[type=checkbox]:not([value])')
-      result[checkbox.name] = $(checkbox).prop('checked')
-
-    for checkbox in $(form).find('[type=checkbox][name$="[]"]')
-      name = checkbox.name.replace(/\[\]$/, '')
-      result[name] or= []
-      result[name].push checkbox.value if $(checkbox).prop('checked')
-
     for key in $(form).serializeArray()
-      result[key.name] or= key.value
-
+      result[key.name] = key.value
     @load(result)
 
   exists: ->
@@ -586,8 +576,7 @@ class Controller extends Module
     @el
 
   replace: (element) ->
-    element = $.trim(element.el or element)
-    [previous, @el] = [@el, $($.parseHTML(element)?[0] or element)]
+    [previous, @el] = [@el, $(element.el or element)]
     previous.replaceWith(@el)
     @delegateEvents(@events)
     @refreshElements()
