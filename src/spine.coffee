@@ -330,7 +330,7 @@ class Model extends Module
     return if id is @id
     records = @constructor.irecords
     records[id] = records[@id]
-    delete records[@id]
+    delete records[@id] unless @cid is @id
     @id = id
     @save()
 
