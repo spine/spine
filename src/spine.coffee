@@ -1,3 +1,8 @@
+###
+Spine.js MVC library
+Released under the MIT License
+###
+
 Events =
   bind: (ev, callback) ->
     evs   = ev.split(' ')
