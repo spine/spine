@@ -364,6 +364,14 @@ describe("Model", function(){
     expect(asset1.eql(asset2)).toBeTruthy();
   });
 
+  it("should not delete reference to cID when changing ID", function(){
+    var asset = Asset.create({name: "hotel california"});
+    var cid = asset.cid;
+
+    asset.changeID(1);
+    expect(Asset.exists(cid)).toBeTruthy();
+  });
+
   it("new records should not be eql", function(){
     var asset1 = new Asset;
     var asset2 = new Asset;

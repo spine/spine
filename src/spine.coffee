@@ -1,3 +1,8 @@
+###
+Spine.js MVC library
+Released under the MIT License
+###
+
 Events =
   bind: (ev, callback) ->
     evs   = ev.split(' ')
@@ -296,7 +301,7 @@ class Model extends Module
 
   eql: (rec) ->
     !!(rec and rec.constructor is @constructor and
-        (rec.cid is @cid) or (rec.id and rec.id is @id))
+        ((rec.cid is @cid) or (rec.id and rec.id is @id)))
 
   save: (options = {}) ->
     unless options.validate is false
@@ -330,7 +335,7 @@ class Model extends Module
     return if id is @id
     records = @constructor.irecords
     records[id] = records[@id]
-    delete records[@id]
+    delete records[@id] unless @cid is @id
     @id = id
     @save()
 
