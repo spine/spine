@@ -278,50 +278,54 @@ describe("Ajax", function(){
   });
   
   it("should not double stringify GET requests where data is a string", function(){
-    User.url = "/people";
+    spyOn(jQuery, 'ajax').andReturn(jqXHR);
+    User.url = '/people';
     expect(Spine.Ajax.getURL(User)).toBe('/people');
 
     User.fetch({ data : "shineyHappy=true"})
+    jqXHR.resolve([{id:44},{id:33}]);
     expect(jQuery.ajax).toHaveBeenCalledWith({
-      type:         'GET',
-      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
       dataType:     'json',
-      data:         "shineyHappy=true",
-      contentType:  'application/json',
+      processData:  false,
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      type:         'GET',
       url:          '/people',
-      processData:  false
+      data:         "shineyHappy=true",
     });
   });
   
   it("should not stringify data for GET requests where data is an object and processData is set to true", function(){
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
     User.url = "/people";
     expect(Spine.Ajax.getURL(User)).toBe('/people');
 
     User.fetch({ data : { shineyHappy : true}, processData : true })
+    jqXHR.resolve([{id:44},{id:33}]);
     expect(jQuery.ajax).toHaveBeenCalledWith({
-      type:         'GET',
-      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
       dataType:     'json',
+      processData:  true,
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      type:         'GET',
       data:         { shineyHappy : true },
-      contentType:  'application/json',
       url:          '/people',
-      processData:  true
     });
   });
   
-  it("should not stringify data for POST requests where data is an object and processData is set to true", function(){
+  it("should stringify data for POST requests where data gets passed as an object and processData is set as default (false)", function(){
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
     User.url = "/people";
     expect(Spine.Ajax.getURL(User)).toBe('/people');
 
-    User.create({ first: 'Adam', id: '123' }, { processData : true })
+    User.create({ first: 'Adam', id: '123' })
+    jqXHR.resolve();
     expect(jQuery.ajax).toHaveBeenCalledWith({
-      type:         'GET',
-      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
       dataType:     'json',
-      data:         { first: 'Adam', id: '123' },
+      processData:  false,
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      type:         'POST',
       contentType:  'application/json',
+      data:         '{"first":"Adam","id":"123"}',
       url:          '/people',
-      processData:  true
     });
   });
 
