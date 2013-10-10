@@ -83,8 +83,9 @@ class Base
         # after request has been queued
         settings.url ?= Ajax.getURL(record)
         settings.data?.id = record.id
-
-      settings.data = JSON.stringify(settings.data)
+      # 2 reasons not to stringify: if already a string, or if intend to have ajax processData
+      if typeof settings.data isnt 'string' and settings.processData isnt true
+        settings.data = JSON.stringify(settings.data)
       jqXHR = $.ajax(settings)
                 .done(deferred.resolve)
                 .fail(deferred.reject)
