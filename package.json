@@ -1,7 +1,7 @@
 {
   "name": "spine",
   "description": "MVC Framework.",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "author": "maccman",
   "keywords": ["spine", "coffeescript", "MVC"],
   "contributors": ["maccman", "aeischeid", "cengebretson", "adambiggs"],
