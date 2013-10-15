@@ -100,6 +100,18 @@ describe("Model", function(){
 
     expect(Asset.all()).toEqual([asset1, asset2]);
   });
+  
+  it("can return a slice of records", function(){
+    var asset0 = Asset.create({name: "test.pdf"});
+    var asset1 = Asset.create({name: "foo1.pdf"});
+    var asset2 = Asset.create({name: "foo2.pdf"});
+    var asset3 = Asset.create({name: "foo3.pdf"});
+    var asset4 = Asset.create({name: "foo4.pdf"});
+    var asset5 = Asset.create({name: "womp.pdf"});
+    var asset6 = Asset.create({name: "wamp.pdf"});
+    expect(Asset.slice(3)).toEqual([asset3, asset4, asset5, asset6]);
+    expect(Asset.slice(4,6)).toEqual([asset4, asset5]);
+  });
 
   it("can find records by attribute", function(){
     var asset = Asset.create({name: "foo.pdf"});
@@ -119,6 +131,19 @@ describe("Model", function(){
 
     expect(Asset.first()).toEqual(first);
     expect(Asset.last()).toEqual(last);
+  });
+  
+  it("can return first(x)/last(x) records", function(){
+    var asset0 = Asset.create({name: "test.pdf"});
+    var asset1 = Asset.create({name: "foo1.pdf"});
+    var asset2 = Asset.create({name: "foo2.pdf"});
+    var asset3 = Asset.create({name: "foo3.pdf"});
+    var asset4 = Asset.create({name: "foo4.pdf"});
+    var asset5 = Asset.create({name: "womp.pdf"});
+    var asset6 = Asset.create({name: "wamp.pdf"});
+    
+    expect(Asset.last(3)).toEqual([asset4, asset5, asset6]);
+    expect(Asset.first(2)).toEqual([asset0, asset1]);
   });
 
   it("can destroy all records", function(){

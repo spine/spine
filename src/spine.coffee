@@ -194,12 +194,21 @@ class Model extends Module
 
   @all: ->
     @cloneArray(@records)
+    
+  @slice: (begin = 0, end)->
+    @cloneArray(@records.slice(begin, end))
 
-  @first: ->
-    @records[0]?.clone()
+  @first: (end = 1)->
+    if end > 1
+      @cloneArray(@records.slice(0, end))
+    else
+      @records[0]?.clone()
 
-  @last: ->
-    @records[@records.length - 1]?.clone()
+  @last: (begin)->
+    if typeof begin is 'number'
+      @cloneArray(@records.slice(-begin))
+    else
+      @records[@records.length - 1]?.clone()
 
   @count: ->
     @records.length
