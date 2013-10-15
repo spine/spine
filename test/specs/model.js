@@ -19,6 +19,7 @@ describe("Model", function(){
     asset.save();
 
     expect(Asset.first().name).toEqual("wem.pdf");
+    expect(asset.hasOwnProperty("name")).toBeFalsy();
   });
 
   it("can refresh existing records", function(){
@@ -100,7 +101,7 @@ describe("Model", function(){
 
     expect(Asset.all()).toEqual([asset1, asset2]);
   });
-  
+
   it("can return a slice of records", function(){
     var asset0 = Asset.create({name: "test.pdf"});
     var asset1 = Asset.create({name: "foo1.pdf"});
@@ -132,7 +133,7 @@ describe("Model", function(){
     expect(Asset.first()).toEqual(first);
     expect(Asset.last()).toEqual(last);
   });
-  
+
   it("can return first(x)/last(x) records", function(){
     var asset0 = Asset.create({name: "test.pdf"});
     var asset1 = Asset.create({name: "foo1.pdf"});
@@ -141,7 +142,7 @@ describe("Model", function(){
     var asset4 = Asset.create({name: "foo4.pdf"});
     var asset5 = Asset.create({name: "womp.pdf"});
     var asset6 = Asset.create({name: "wamp.pdf"});
-    
+
     expect(Asset.last(3)).toEqual([asset4, asset5, asset6]);
     expect(Asset.first(2)).toEqual([asset0, asset1]);
   });

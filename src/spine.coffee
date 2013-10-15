@@ -194,7 +194,7 @@ class Model extends Module
 
   @all: ->
     @cloneArray(@records)
-    
+
   @slice: (begin = 0, end)->
     @cloneArray(@records.slice(begin, end))
 
@@ -327,8 +327,8 @@ class Model extends Module
 
   stripCloneAttrs: ->
     return if @hasOwnProperty 'cid' # Make sure it's not the raw object
-    for own key, value of @
-      delete @[key] if @constructor.attributes.indexOf(key) > -1
+    for own key, value of this
+      delete @[key] if key in @constructor.attributes
     this
 
   updateAttribute: (name, value, options) ->
