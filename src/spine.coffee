@@ -65,8 +65,8 @@ Events =
               listeningTo.splice(idx, 1) unless idx is -1
             else if ev
               evts = lt.ev.split(' ')
-              if ~(i = evts.indexOf(ev))
-                evts.splice(i, 1)
+              if ev in evts
+                evts = (e for e in evts when e isnt ev)
                 lt.ev = $.trim(evts.join(' '))
                 lt.obj.unbind(ev, lt.handler or lt.callback)
 
