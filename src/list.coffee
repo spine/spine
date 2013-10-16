@@ -12,7 +12,7 @@ class Spine.List extends Spine.Controller
     @bind 'change', @change
 
   template: ->
-    throw 'Override template'
+    throw Error 'Override template'
 
   change: (item) =>
     @current = item
@@ -22,8 +22,9 @@ class Spine.List extends Spine.Controller
       return
 
     @children().removeClass('active')
-    for item, idx in @items
-      index = idx if item is @current
+    for item, idx in @items when item is @current
+      index = idx
+      break
 
     $(@children().get(index)).addClass('active')
 
