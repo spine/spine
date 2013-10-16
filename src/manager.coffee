@@ -16,7 +16,7 @@ class Spine.Manager extends Spine.Module
     controller.bind 'active', (args...) =>
       @trigger('change', controller, args...)
     controller.bind 'release', =>
-      @controllers.splice(@controllers.indexOf(controller), 1)
+      @controllers = (c for c in @controllers when c isnt controller)
 
     @controllers.push(controller)
 
