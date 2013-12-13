@@ -69,10 +69,10 @@ class Spine.Route extends Spine.Module
 
     return if options.shim
 
-    if !route 
+    if !route
       if typeof options.redirect is 'function'
         return options.redirect.apply this, [@path, options]
-      else 
+      else
         if options.redirect is true
           @redirect(@path)
 
@@ -140,7 +140,7 @@ class Spine.Route extends Spine.Module
     if @names.length
       for param, i in params
         options[@names[i]] = param
-
+    @.constructor.trigger('before', @)
     @callback.call(null, options) isnt false
 
 # Coffee-script bug
