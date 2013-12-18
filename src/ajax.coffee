@@ -5,28 +5,29 @@ Queue  = $({})
 
 Ajax =
   getURL: (object) ->
-    object.url?() or object.url
-
+    if object.className?
+      @generateURL(object)
+    else
+      @generateURL(object, encodeURIComponent(object.id))
+    
   getCollectionURL: (object) ->
-    if object
-      if typeof object.url is "function"
-        @generateURL(object)
-      else
-        object.url
-
+    @generateURL(object)
+  
   getScope: (object) ->
     object.scope?() or object.scope
+  
+  getCollection: (object) ->
+    if object.url isnt object.generateURL
+      if typeof object.url is 'function'
+        object.url()
+      else
+        object.url
+    else if object.className?
+      object.className.toLowerCase() + 's'
 
   generateURL: (object, args...) ->
-    if object.className
-      collection = object.className.toLowerCase() + 's'
-      scope = Ajax.getScope(object)
-    else
-      if typeof object.constructor.url is 'string'
-        collection = object.constructor.url
-      else
-        collection = object.constructor.className.toLowerCase() + 's'
-      scope = Ajax.getScope(object) or Ajax.getScope(object.constructor)
+    collection = Ajax.getCollection(object) or Ajax.getCollection(object.constructor)
+    scope = Ajax.getScope(object) or Ajax.getScope(object.constructor)
     args.unshift(collection)
     args.unshift(scope)
     # construct and clean url
@@ -213,18 +214,26 @@ class Singleton extends Base
 # Ajax endpoint
 Model.host = ''
 
-Include =
-  ajax: -> new Singleton(this)
-
-  url: (args...) ->
+GenerateURL =
+  include: (args...) ->
     args.unshift(encodeURIComponent(@id))
     Ajax.generateURL(@, args...)
+  extend: (args...) ->
+    Ajax.generateURL(@, args...)
 
+Include =
+  ajax: -> new Singleton(this)
+  
+  generateURL: GenerateURL.include
+  
+  url: GenerateURL.include
+  
 Extend =
   ajax: -> new Collection(this)
-
-  url: (args...) ->
-    Ajax.generateURL(@, args...)
+  
+  generateURL: GenerateURL.extend
+  
+  url: GenerateURL.extend
 
 Model.Ajax =
   extended: ->
