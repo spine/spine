@@ -488,4 +488,43 @@ describe("Ajax", function(){
     user.scope = function() { return "/roots/" + this.id; };
     expect(Spine.Ajax.getCollectionURL(user)).toBe('/roots/1/users');
   });
+  
+  it("should apply scope to all urls", function(){
+    Spine.Model.host = ''
+    User.scope = 'foobar'
+    var user = new User({id: 1})
+    expect(Spine.Ajax.getURL(User)).toBe('/foobar/users')
+    expect(Spine.Ajax.getURL(user)).toBe('/foobar/users/1')
+
+    user.url = 'foobaz'
+    expect(Spine.Ajax.getURL(user)).toBe('/foobar/foobaz/1')
+    expect(Spine.Ajax.getCollectionURL(user)).toBe('/foobar/foobaz')
+  })
+
+  it("should allow scope and url to be defined functions", function(){
+    Spine.Model.host = ''
+    User.scope = function(){
+      return 'foo'
+    }
+    User.url = function(){
+      return 'bar'
+    }
+    var user = new User({id: 1})
+    expect(Spine.Ajax.getURL(User)).toBe('/foo/bar')
+    expect(Spine.Ajax.getURL(user)).toBe('/foo/bar/1')
+    delete User.scope
+    User.url = User.getCollectionURL
+  })
+
+  it("should allow scope and url to be functions on model instance", function(){
+    Spine.Model.host = ''
+    var user = new User({id: 1})
+    user.scope = function(){
+      return 'one'
+    }
+    user.url = function(){
+      return 'two'
+    }
+    expect(Spine.Ajax.getURL(user)).toBe('/one/two/1')
+  })
 });
