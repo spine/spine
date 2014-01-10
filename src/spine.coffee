@@ -278,8 +278,12 @@ class Model extends Module
 
   constructor: (atts) ->
     super
+    if @constructor.uuid? and typeof @constructor.uuid is 'function'
+      @cid = @constructor.uuid()
+      @id = @cid unless @id
+    else
+      @cid = atts?.cid or @constructor.uid('c-')
     @load atts if atts
-    @cid = atts?.cid or @constructor.uid('c-')
 
   isNew: ->
     not @exists()
