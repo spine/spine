@@ -12,17 +12,6 @@ describe("Manager", function(){
     groups = new Groups();
   });
 
-  it("shouldn't overwrite existing methods in Spine.Stack.constructor()", function(){
-    var BadStack = Spine.Stack.sub({
-      controllers: {
-        manager: Users
-      }
-    });
-    expect(function(){
-      new BadStack
-    }).toThrow();
-  });
-
   it("should toggle active class", function(){
     new Spine.Manager(users, groups);
 
@@ -54,9 +43,7 @@ describe("Manager", function(){
     var spy;
 
     beforeEach(function(){
-      var noop = {spy: function(){}};
-      spyOn(noop, "spy");
-      spy = noop.spy;
+      spy = jasmine.createSpy();
     });
 
     it("should fire 'active' event on new active controller", function(){
@@ -86,5 +73,39 @@ describe("Manager", function(){
       groups.active(1, 2, 3);
       expect(users.deactivate).toHaveBeenCalledWith(1, 2, 3);
     });
+
   });
+
+  describe("Using Spine.Stack", function(){
+
+    it("constructor shouldn't overwrite existing methods", function(){
+      var BadStack = Spine.Stack.sub({
+        controllers: {
+          manager: Users
+        }
+      });
+      expect(function(){
+        new BadStack
+      }).toThrow();
+    });
+
+    it("should clean up router when released", function(){
+      var TestStack = Spine.Stack.sub({
+        controllers: {
+          users: Users,
+          groups: Groups
+        },
+        routes: {
+          '/users': users,
+          '/groups': groups
+        }
+      });
+      var stack = new TestStack;
+      spy2 = spyOn(stack.router, 'destroy');
+      stack.release();
+      expect(spy2).toHaveBeenCalled();
+    });
+
+  });
+
 });
