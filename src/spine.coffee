@@ -33,7 +33,7 @@ Events =
     this
 
   listenToOnce: (obj, ev, callback) ->
-    listeningToOnce = @listeningToOnce or = []
+    listeningToOnce = @listeningToOnce or= []
     obj.bind ev, handler = ->
       idx = -1
       for lt, i in listeningToOnce when lt.obj is obj
