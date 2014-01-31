@@ -47,9 +47,24 @@ describe("Model", function(){
     expect(Asset.find(asset.id)).toBeTruthy();
 
     asset.destroy();
-    expect(function(){
-      Asset.find(asset.id);
-    }).toThrow();
+    expect(Asset.find(asset.id)).toBeFalsy();
+  });
+  
+  it("can handle a fallback function given to find if records are not found", function(){
+    var asset = Asset.create({name: "test.pdf"});
+    expect(Asset.find(asset.id)).toBeTruthy();
+
+    asset.destroy();
+    expect(Asset.find(asset.id)).toBeFalsy();
+    
+    var fallback = function(id){ 
+      sessionStorage.fallbackRan = true
+      sessionStorage.fallbackReceivedId = id
+      return Asset.create({name: 'test2.pdf', id:id})
+    };
+    expect(Asset.find(asset.id, fallback)).toBeTruthy();
+    expect(sessionStorage.fallbackRan).toBe('true');
+    expect(sessionStorage.fallbackReceivedId).toBe(asset.id);
   });
 
   it("can check existence", function(){

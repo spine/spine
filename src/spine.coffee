@@ -147,9 +147,9 @@ class Model extends Module
 
   @toString: -> "#{@className}(#{@attributes.join(", ")})"
 
-  @find: (id) ->
+  @find: (id, fallbackFn) ->
     record = @exists(id)
-    throw new Error("\"#{@className}\" model could not find a record for the ID \"#{id}\"") unless record
+    record or= fallbackFn?(id)
     return record
 
   @exists: (id) ->
