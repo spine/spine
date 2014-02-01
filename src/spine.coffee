@@ -147,13 +147,14 @@ class Model extends Module
 
   @toString: -> "#{@className}(#{@attributes.join(", ")})"
 
-  @find: (id, fallbackFn) ->
-    record = @exists(id)
-    record or= fallbackFn?(id)
-    return record
+  @find: (id, notFound = @notFound) ->
+    record = @irecords[id]?.clone()
+    return record or notFound?(id)
+
+  @notFound: (id) -> return null
 
   @exists: (id) ->
-    @irecords[id]?.clone()
+    return if @irecords[id] then true else false
 
   @addRecord: (record) ->
     if record.id and @irecords[record.id]
