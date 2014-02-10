@@ -91,6 +91,7 @@ class Base
                 .done(deferred.resolve)
                 .fail(deferred.reject)
                 .then(next, next)
+                .then( -> Spine.trigger 'ajaxQueueEmptied' unless Queue.queue().length > 0)
 
     promise.abort = (statusText) ->
       return jqXHR.abort(statusText) if jqXHR
