@@ -47,9 +47,41 @@ describe("Model", function(){
     expect(Asset.find(asset.id)).toBeTruthy();
 
     asset.destroy();
-    expect(function(){
-      Asset.find(asset.id);
-    }).toThrow();
+    expect(Asset.find(asset.id)).toBeFalsy();
+  });
+  
+  it("can use notFound fallback function if records are not found", function(){
+    var asset = Asset.create({name: "test.pdf"});
+    expect(Asset.find(asset.id)).toBeTruthy();
+    // defauly notFound simply returns null
+    asset.destroy();
+    expect(Asset.find(asset.id)).toBeFalsy();
+    // a custom notFound fallback can be added to the find
+    var customfallback = function(id){ 
+      sessionStorage.fallbackRan = true
+      sessionStorage.fallbackReceivedId = id
+      return Asset.create({name: 'test2.pdf', id:id})
+    };
+    var foundAsset = Asset.find(asset.id, customfallback);
+    expect(foundAsset).toBeTruthy();
+    expect(foundAsset.id).toBe(asset.id);
+    expect(sessionStorage.fallbackRan).toBe('true');
+    expect(sessionStorage.fallbackReceivedId).toBe(asset.id);
+    // notFound can be customized on the model 
+    asset.destroy(); //reset
+    expect(Asset.find(asset.id)).toBeFalsy(); // test reset worked
+    Asset.notFound = function(id){
+      sessionStorage.fallback2Ran = true
+      sessionStorage.fallback2ReceivedId = id
+      return Asset.create({name: 'test3.pdf'})
+    };
+    var foundAsset2 = Asset.find(asset.id);
+    expect(foundAsset2).toBeTruthy();
+    expect(foundAsset2.name).toBe('test3.pdf');
+    expect(sessionStorage.fallback2Ran).toBe('true');
+    expect(sessionStorage.fallback2ReceivedId).toBe(asset.id);
+    
+    sessionStorage.clear()
   });
 
   it("can check existence", function(){
@@ -58,7 +90,7 @@ describe("Model", function(){
 
     expect(asset1.exists()).toBeTruthy();
     expect(Asset.exists(asset1.id)).toBeTruthy();
-    expect(Asset.exists(asset1.id).name).toEqual("test.pdf");
+    expect(Asset.find(asset1.id).name).toEqual("test.pdf");
 
     asset1.destroy();
 
