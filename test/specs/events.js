@@ -110,6 +110,9 @@ describe("Events", function(){
     ListenTest.extend(Spine.Events);
     ListenTest.listenTo(EventTest, "keep", spy);
     ListenTest.listenTo(EventTest, "keep", spy2);
+    //EventTest.trigger("keep");
+    //expect(spy).toHaveBeenCalled();
+    //expect(spy2).toHaveBeenCalled();
     ListenTest.stopListening(EventTest, "keep", spy2);
     EventTest.trigger("keep");
     expect(spy).toHaveBeenCalled();
