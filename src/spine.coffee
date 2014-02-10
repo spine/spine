@@ -60,6 +60,7 @@ Events =
         for ev in events
           for idx in [listeningTo.length-1..0]
             lt = listeningTo[idx]
+            continue if callback and (lt.handler or lt.callback) isnt callback
             if (not ev) or (ev is lt.ev)
               lt.obj.unbind(lt.ev, lt.handler or lt.callback)
               listeningTo.splice(idx, 1) unless idx is -1

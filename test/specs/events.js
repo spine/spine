@@ -102,6 +102,20 @@ describe("Events", function(){
     expect(spy).toHaveBeenCalled();
   });
   
+  it("can stop listening to a specific callback", function(){
+    var noop2 = {spy2: function(){}};
+    spyOn(noop2, "spy2");
+    var spy2 = noop2.spy2;
+    ListenTest = Spine.Class.create();
+    ListenTest.extend(Spine.Events);
+    ListenTest.listenTo(EventTest, "keep", spy);
+    ListenTest.listenTo(EventTest, "keep", spy2);
+    ListenTest.stopListening(EventTest, "keep", spy2);
+    EventTest.trigger("keep");
+    expect(spy).toHaveBeenCalled();
+    expect(spy2).not.toHaveBeenCalled();
+  });
+
   it("can bind to an event only once", function(){
     EventTest.one("indahouse", spy);
     EventTest.trigger("indahouse");
