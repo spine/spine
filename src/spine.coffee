@@ -6,10 +6,10 @@ Released under the MIT License
 Events =
   bind: (ev, callback) ->
     evs   = ev.split(' ')
-    calls = @hasOwnProperty('_callbacks') and @_callbacks or= {}
+    @_callbacks = {} unless @hasOwnProperty('_callbacks') and @_callbacks
     for name in evs
-      calls[name] or= []
-      calls[name].push(callback)
+      @_callbacks[name] or= []
+      @_callbacks[name].push(callback)
     this
 
   one: (ev, callback) ->
@@ -626,7 +626,7 @@ makeArray = (args) ->
 Spine = @Spine   = {}
 module?.exports  = Spine
 
-Spine.version    = '1.2.2'
+Spine.version    = '1.3.0'
 Spine.isArray    = isArray
 Spine.isBlank    = isBlank
 Spine.$          = $
