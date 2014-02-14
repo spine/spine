@@ -73,6 +73,9 @@ class Instance extends Spine.Module
 
   exists: ->
     return if @record[@fkey] then @model.exists(@record[@fkey]) else false
+  
+  find: ->
+    return @model.find(@record[@fkey])
 
   update: (value) ->
     return this unless value?
@@ -122,8 +125,7 @@ Spine.Model.extend
   belongsTo: (name, model, fkey) ->
     fkey ?= "#{underscore(singularize(name))}_id"
     @::[name] = (value) ->
-      association(name, model, @, fkey, Instance).update(value).exists()
-
+      association(name, model, @, fkey, Instance).update(value).find()
     @attributes.push(fkey)
 
   hasOne: (name, model, fkey) ->

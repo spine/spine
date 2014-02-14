@@ -105,6 +105,20 @@ describe("Routing", function () {
       })
     });
 
+    it("should trigger 'before' when a route matches", function () {
+      var triggerBefore = false;
+      var routePath = "";
+      Route.one('before', function (route) {triggerBefore = true;routePath = route.path});
+      Route.add("/foo", function () {});
+
+      Route.navigate('/foo');
+
+      runs(function () {
+        expect(triggerBefore).toBe(true);
+        expect(routePath).toBe('/foo');
+      })
+    });
+
     it("can navigate to path", function () {
       Route.add("/users", function () {});
 

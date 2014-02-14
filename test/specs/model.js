@@ -19,6 +19,7 @@ describe("Model", function(){
     asset.save();
 
     expect(Asset.first().name).toEqual("wem.pdf");
+    expect(asset.hasOwnProperty("name")).toBeFalsy();
   });
 
   it("can refresh existing records", function(){
@@ -46,9 +47,41 @@ describe("Model", function(){
     expect(Asset.find(asset.id)).toBeTruthy();
 
     asset.destroy();
-    expect(function(){
-      Asset.find(asset.id);
-    }).toThrow();
+    expect(Asset.find(asset.id)).toBeFalsy();
+  });
+  
+  it("can use notFound fallback function if records are not found", function(){
+    var asset = Asset.create({name: "test.pdf"});
+    expect(Asset.find(asset.id)).toBeTruthy();
+    // defauly notFound simply returns null
+    asset.destroy();
+    expect(Asset.find(asset.id)).toBeFalsy();
+    // a custom notFound fallback can be added to the find
+    var customfallback = function(id){ 
+      sessionStorage.fallbackRan = true
+      sessionStorage.fallbackReceivedId = id
+      return Asset.create({name: 'test2.pdf', id:id})
+    };
+    var foundAsset = Asset.find(asset.id, customfallback);
+    expect(foundAsset).toBeTruthy();
+    expect(foundAsset.id).toBe(asset.id);
+    expect(sessionStorage.fallbackRan).toBe('true');
+    expect(sessionStorage.fallbackReceivedId).toBe(asset.id);
+    // notFound can be customized on the model 
+    asset.destroy(); //reset
+    expect(Asset.find(asset.id)).toBeFalsy(); // test reset worked
+    Asset.notFound = function(id){
+      sessionStorage.fallback2Ran = true
+      sessionStorage.fallback2ReceivedId = id
+      return Asset.create({name: 'test3.pdf'})
+    };
+    var foundAsset2 = Asset.find(asset.id);
+    expect(foundAsset2).toBeTruthy();
+    expect(foundAsset2.name).toBe('test3.pdf');
+    expect(sessionStorage.fallback2Ran).toBe('true');
+    expect(sessionStorage.fallback2ReceivedId).toBe(asset.id);
+    
+    sessionStorage.clear()
   });
 
   it("can check existence", function(){
@@ -57,7 +90,7 @@ describe("Model", function(){
 
     expect(asset1.exists()).toBeTruthy();
     expect(Asset.exists(asset1.id)).toBeTruthy();
-    expect(Asset.exists(asset1.id).name).toEqual("test.pdf");
+    expect(Asset.find(asset1.id).name).toEqual("test.pdf");
 
     asset1.destroy();
 
@@ -100,7 +133,7 @@ describe("Model", function(){
 
     expect(Asset.all()).toEqual([asset1, asset2]);
   });
-  
+
   it("can return a slice of records", function(){
     var asset0 = Asset.create({name: "test.pdf"});
     var asset1 = Asset.create({name: "foo1.pdf"});
@@ -132,7 +165,7 @@ describe("Model", function(){
     expect(Asset.first()).toEqual(first);
     expect(Asset.last()).toEqual(last);
   });
-  
+
   it("can return first(x)/last(x) records", function(){
     var asset0 = Asset.create({name: "test.pdf"});
     var asset1 = Asset.create({name: "foo1.pdf"});
@@ -141,7 +174,7 @@ describe("Model", function(){
     var asset4 = Asset.create({name: "foo4.pdf"});
     var asset5 = Asset.create({name: "womp.pdf"});
     var asset6 = Asset.create({name: "wamp.pdf"});
-    
+
     expect(Asset.last(3)).toEqual([asset4, asset5, asset6]);
     expect(Asset.first(2)).toEqual([asset0, asset1]);
   });
@@ -309,6 +342,15 @@ describe("Model", function(){
   it("can generate ID", function(){
     var asset = Asset.create({name: "who's in the house?"});
     expect(asset.id).toBeTruthy();
+  });
+
+  it("can generate UUID if enabled", function(){
+    Asset.uuid = function(){ return 'fc0942b0-956f-11e2-9c95-9b0af2c6635d' };
+    var asset = new Asset({name: "who's in the house?"});
+    expect(asset.id).toBeTruthy();
+    expect(asset.id).toEqual(Asset.uuid());
+    expect(asset.id).toEqual(asset.cid);
+    delete Asset.uuid
   });
 
   it("can be duplicated", function(){

@@ -6,10 +6,10 @@ Released under the MIT License
 Events =
   bind: (ev, callback) ->
     evs   = ev.split(' ')
-    calls = @hasOwnProperty('_callbacks') and @_callbacks or= {}
+    @_callbacks = {} unless @hasOwnProperty('_callbacks') and @_callbacks
     for name in evs
-      calls[name] or= []
-      calls[name].push(callback)
+      @_callbacks[name] or= []
+      @_callbacks[name].push(callback)
     this
 
   one: (ev, callback) ->
@@ -33,7 +33,7 @@ Events =
     this
 
   listenToOnce: (obj, ev, callback) ->
-    listeningToOnce = @listeningToOnce or = []
+    listeningToOnce = @listeningToOnce or= []
     obj.bind ev, handler = ->
       idx = -1
       for lt, i in listeningToOnce when lt.obj is obj
@@ -60,13 +60,14 @@ Events =
         for ev in events
           for idx in [listeningTo.length-1..0]
             lt = listeningTo[idx]
+            continue if callback and (lt.handler or lt.callback) isnt callback
             if (not ev) or (ev is lt.ev)
               lt.obj.unbind(lt.ev, lt.handler or lt.callback)
               listeningTo.splice(idx, 1) unless idx is -1
             else if ev
               evts = lt.ev.split(' ')
-              if ~(i = evts.indexOf(ev))
-                evts.splice(i, 1)
+              if ev in evts
+                evts = (e for e in evts when e isnt ev)
                 lt.ev = $.trim(evts.join(' '))
                 lt.obj.unbind(ev, lt.handler or lt.callback)
 
@@ -147,13 +148,14 @@ class Model extends Module
 
   @toString: -> "#{@className}(#{@attributes.join(", ")})"
 
-  @find: (id) ->
-    record = @exists(id)
-    throw new Error("\"#{@className}\" model could not find a record for the ID \"#{id}\"") unless record
-    return record
+  @find: (id, notFound = @notFound) ->
+    record = @irecords[id]?.clone()
+    return record or notFound?(id)
+
+  @notFound: (id) -> return null
 
   @exists: (id) ->
-    @irecords[id]?.clone()
+    return if @irecords[id] then true else false
 
   @addRecord: (record) ->
     if record.id and @irecords[record.id]
@@ -194,7 +196,7 @@ class Model extends Module
 
   @all: ->
     @cloneArray(@records)
-    
+
   @slice: (begin = 0, end)->
     @cloneArray(@records.slice(begin, end))
 
@@ -278,8 +280,12 @@ class Model extends Module
 
   constructor: (atts) ->
     super
+    if @constructor.uuid? and typeof @constructor.uuid is 'function'
+      @cid = @constructor.uuid()
+      @id = @cid unless @id
+    else
+      @cid = atts?.cid or @constructor.uid('c-')
     @load atts if atts
-    @cid = atts?.cid or @constructor.uid('c-')
 
   isNew: ->
     not @exists()
@@ -327,8 +333,8 @@ class Model extends Module
 
   stripCloneAttrs: ->
     return if @hasOwnProperty 'cid' # Make sure it's not the raw object
-    for own key, value of @
-      delete @[key] if @constructor.attributes.indexOf(key) > -1
+    for own key, value of this
+      delete @[key] if key in @constructor.attributes
     this
 
   updateAttribute: (name, value, options) ->
@@ -620,7 +626,7 @@ makeArray = (args) ->
 Spine = @Spine   = {}
 module?.exports  = Spine
 
-Spine.version    = '1.2.2'
+Spine.version    = '1.3.0'
 Spine.isArray    = isArray
 Spine.isBlank    = isBlank
 Spine.$          = $
