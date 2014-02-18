@@ -77,7 +77,6 @@ class Base
     promise  = deferred.promise()
     return promise unless Ajax.enabled
     settings = @ajaxSettings(params, defaults)
-
     request = (next) ->
       if record?.id?
         # for existing singleton, model id may have been updated
@@ -101,8 +100,12 @@ class Base
         [promise, statusText, '']
       )
       promise
-
+    
     @queue request
+    # prefer setting if exists else default is to skip queueing for 'GET' requests
+    skipQueue = if settings.skipQueue isnt undefined then settings.skipQueue else (settings.type is 'GET')
+    if skipQueue
+      Queue.dequeue()
     promise
 
   ajaxSettings: (params, defaults) ->
@@ -114,17 +117,21 @@ class Collection extends Base
   find: (id, params, options = {}) ->
     record = new @model(id: id)
     @ajaxQueue(
-      params,
-      type: 'GET',
-      url: options.url or Ajax.getURL(record)
+      params, {
+        type: 'GET'
+        url: options.url or Ajax.getURL(record)
+        skipQueue: options.skipQueue
+      }
     ).done(@recordsResponse)
      .fail(@failResponse)
 
   all: (params, options = {}) ->
     @ajaxQueue(
-      params,
-      type: 'GET',
-      url: options.url or Ajax.getURL(@model)
+      params, {
+        type: 'GET'
+        url: options.url or Ajax.getURL(@model)
+        skipQueue: options.skipQueue
+      }
     ).done(@recordsResponse)
      .fail(@failResponse)
 
@@ -154,17 +161,20 @@ class Singleton extends Base
       params, {
         type: 'GET'
         url: options.url
+        skipQueue: options.skipQueue
       }, @record
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
 
   create: (params, options = {}) ->
     @ajaxQueue(
-      params,
-      type: 'POST'
-      contentType: 'application/json'
-      data: @record.toJSON()
-      url: options.url or Ajax.getCollectionURL(@record)
+      params, {
+        type: 'POST'
+        contentType: 'application/json'
+        data: @record.toJSON()
+        url: options.url or Ajax.getCollectionURL(@record)
+        skipQueue: options.skipQueue
+      }
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
 
@@ -175,6 +185,7 @@ class Singleton extends Base
         contentType: 'application/json'
         data: @record.toJSON()
         url: options.url
+        skipQueue: options.skipQueue
       }, @record
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
@@ -184,6 +195,7 @@ class Singleton extends Base
       params, {
         type: 'DELETE'
         url: options.url
+        skipQueue: options.skipQueue
       }, @record
     ).done(@recordResponse(options))
      .fail(@failResponse(options))

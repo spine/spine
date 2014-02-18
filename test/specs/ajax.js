@@ -22,6 +22,10 @@ describe("Ajax", function(){
       complete: jqXHR.done
     });
   });
+  
+  //afterEach(function() {
+  //  foo = 0;
+  //});
 
   it("can GET a collection on fetch", function(){
     spyOn(jQuery, "ajax").andReturn(jqXHR);
@@ -184,20 +188,52 @@ describe("Ajax", function(){
     expect(User.count()).toEqual(0);
   });
 
-  it("should send requests syncronously", function(){
+  it("should send requests serially", function(){
     spyOn(jQuery, "ajax").andReturn(jqXHR);
-
+    
     User.create({first: "First"});
-
     expect(jQuery.ajax).toHaveBeenCalled();
-
+    
     jQuery.ajax.reset();
-
     User.create({first: "Second"});
-
     expect(jQuery.ajax).not.toHaveBeenCalled();
+    
     jqXHR.resolve();
     expect(jQuery.ajax).toHaveBeenCalled();
+  });
+  
+  it("should send GET requests in parallel by default", function() {
+    console.log('GET - parallel');
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    User.fetch(1);
+    expect(jQuery.ajax).toHaveBeenCalled();
+    User.fetch(2);
+    User.fetch(3);
+    User.fetch(4);
+    User.fetch(5);
+    expect(jQuery.ajax.calls.length).toEqual(5);
+    jQuery.ajax.reset();
+  });
+  
+  it("should be able to send GET requests serially", function() {
+    console.log('GET - serially');
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    User.fetch(1, {skipQueue:false});
+    User.fetch(2, {skipQueue:false});
+    User.fetch(3, {skipQueue:false});
+    User.fetch(4, {skipQueue:false});
+    User.fetch(5, {skipQueue:false});
+    expect(jQuery.ajax.calls.length).toEqual(1);
+    jQuery.ajax.reset();
+  });
+  
+  it("should be able to send non GET requests in parallel", function() {
+    console.log('POST - parallel ');
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    User.create({first: "First"}, {skipQueue:true});
+    User.create({first: "Second"}, {skipQueue:true});
+    expect(jQuery.ajax.calls.length).toEqual(2);
+    jQuery.ajax.reset();
   });
 
   it("should return promise objects", function(){
