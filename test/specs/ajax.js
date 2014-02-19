@@ -235,8 +235,8 @@ describe("Ajax", function(){
     expect(jQuery.ajax.calls.length).toEqual(2);
     jQuery.ajax.reset();
   });
-
-  it("should return promise objects", function(){
+  
+  it("should return jquery promise objects", function(){
     spyOn(jQuery, "ajax").andReturn(jqXHR);
     User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
     var user = User.find("IDD");
@@ -248,6 +248,48 @@ describe("Ajax", function(){
     user.ajax().update().done(spy);
     jqXHR.resolve();
     expect(spy).toHaveBeenCalled();
+    jQuery.ajax.reset();
+  });
+
+  it("should still respect promises if requests done in parallel", function() {
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    user1 = User.create({first: "First"}, {skipQueue:true});
+    user2 = User.create({first: "Second"}, {skipQueue:true});
+    expect(jQuery.ajax.calls.length).toEqual(2);
+    jqXHR.resolve();
+    
+    user1.first = 'firstUpdated';
+    user2.first = 'secondUpdated';
+    
+    var promiseTimingTest = [{},{}];
+    var counter = 0
+    
+    runs(function() {
+      user1.bind('ajaxSuccess', function(){
+        counter++;
+        promiseTimingTest[0].first = this.first;
+      });
+      user2.bind('ajaxSuccess', function(){
+        counter++;
+        promiseTimingTest[1].first = this.first;
+      });
+      //user1.save();
+      //user2.save();
+      user1.save({skipQueue:true});
+      user2.save({skipQueue:true});
+      console.log('pre resolve state()', jqXHR.state());
+      jqXHR.resolve();
+    });
+    
+    waitsFor(function() {
+      return counter == 2;
+    }, 'promises should have returned', 1000);
+    
+    runs(function(){
+      expect(promiseTimingTest[0].first).toEqual('firstUpdated');
+      expect(promiseTimingTest[1].first).toEqual('secondUpdated');
+    });
+    jQuery.ajax.reset();
   });
 
   it("should allow promise objects to abort the request and dequeue", function(){
