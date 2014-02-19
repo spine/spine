@@ -319,26 +319,26 @@ describe("Ajax", function(){
     expect(User.exists("IDD")).toBeTruthy();
   });
 
-  it("should have success callbacks", function(){
+  it("should have done callbacks", function(){
     spyOn(jQuery, "ajax").andReturn(jqXHR);
 
     var noop = {spy: function(){}};
     spyOn(noop, "spy");
     var spy = noop.spy;
 
-    User.create({first: "Second"}, {success: spy});
+    User.create({first: "Second"}, {done: spy});
     jqXHR.resolve();
     expect(spy).toHaveBeenCalled();
   });
 
-  it("should have error callbacks", function(){
+  it("should have fail callbacks", function(){
     spyOn(jQuery, "ajax").andReturn(jqXHR);
 
     var noop = {spy: function(){}};
     spyOn(noop, "spy");
     var spy = noop.spy;
 
-    User.create({first: "Second"}, {error: spy});
+    User.create({first: "Second"}, {fail: spy});
     jqXHR.reject();
     expect(spy).toHaveBeenCalled();
   });
