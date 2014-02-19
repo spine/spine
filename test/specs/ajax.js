@@ -218,11 +218,11 @@ describe("Ajax", function(){
   it("should be able to send GET requests serially", function() {
     console.log('GET - serially');
     spyOn(jQuery, "ajax").andReturn(jqXHR);
-    User.fetch(1, {skipQueue:false});
-    User.fetch(2, {skipQueue:false});
-    User.fetch(3, {skipQueue:false});
-    User.fetch(4, {skipQueue:false});
-    User.fetch(5, {skipQueue:false});
+    User.fetch(1, {parallel:false});
+    User.fetch(2, {parallel:false});
+    User.fetch(3, {parallel:false});
+    User.fetch(4, {parallel:false});
+    User.fetch(5, {parallel:false});
     expect(jQuery.ajax.calls.length).toEqual(1);
     jQuery.ajax.reset();
   });
@@ -230,8 +230,8 @@ describe("Ajax", function(){
   it("should be able to send non GET requests in parallel", function() {
     console.log('POST - parallel ');
     spyOn(jQuery, "ajax").andReturn(jqXHR);
-    User.create({first: "First"}, {skipQueue:true});
-    User.create({first: "Second"}, {skipQueue:true});
+    User.create({first: "First"}, {parallel:true});
+    User.create({first: "Second"}, {parallel:true});
     expect(jQuery.ajax.calls.length).toEqual(2);
     jQuery.ajax.reset();
   });
@@ -253,8 +253,8 @@ describe("Ajax", function(){
 
   it("should still respect promises if requests done in parallel", function() {
     spyOn(jQuery, "ajax").andReturn(jqXHR);
-    user1 = User.create({first: "First"}, {skipQueue:true});
-    user2 = User.create({first: "Second"}, {skipQueue:true});
+    user1 = User.create({first: "First"}, {parallel:true});
+    user2 = User.create({first: "Second"}, {parallel:true});
     expect(jQuery.ajax.calls.length).toEqual(2);
     jqXHR.resolve();
     
@@ -275,9 +275,8 @@ describe("Ajax", function(){
       });
       //user1.save();
       //user2.save();
-      user1.save({skipQueue:true});
-      user2.save({skipQueue:true});
-      console.log('pre resolve state()', jqXHR.state());
+      user1.save({parallel:true});
+      user2.save({parallel:true});
       jqXHR.resolve();
     });
     

@@ -102,9 +102,9 @@ class Base
       promise
     
     @queue request
-    # prefer setting if exists else default is to skip queueing for 'GET' requests
-    skipQueue = if settings.skipQueue isnt undefined then settings.skipQueue else (settings.type is 'GET')
-    if skipQueue
+    # prefer setting if exists else default is to parallelize 'GET' requests
+    parallel = if settings.parallel isnt undefined then settings.parallel else (settings.type is 'GET')
+    if parallel
       Queue.dequeue()
     promise
 
@@ -120,7 +120,7 @@ class Collection extends Base
       params, {
         type: 'GET'
         url: options.url or Ajax.getURL(record)
-        skipQueue: options.skipQueue
+        parallel: options.parallel
       }
     ).done(@recordsResponse)
      .fail(@failResponse)
@@ -130,7 +130,7 @@ class Collection extends Base
       params, {
         type: 'GET'
         url: options.url or Ajax.getURL(@model)
-        skipQueue: options.skipQueue
+        parallel: options.parallel
       }
     ).done(@recordsResponse)
      .fail(@failResponse)
@@ -161,7 +161,7 @@ class Singleton extends Base
       params, {
         type: 'GET'
         url: options.url
-        skipQueue: options.skipQueue
+        parallel: options.parallel
       }, @record
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
@@ -173,7 +173,7 @@ class Singleton extends Base
         contentType: 'application/json'
         data: @record.toJSON()
         url: options.url or Ajax.getCollectionURL(@record)
-        skipQueue: options.skipQueue
+        parallel: options.parallel
       }
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
@@ -185,7 +185,7 @@ class Singleton extends Base
         contentType: 'application/json'
         data: @record.toJSON()
         url: options.url
-        skipQueue: options.skipQueue
+        parallel: options.parallel
       }, @record
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
@@ -195,7 +195,7 @@ class Singleton extends Base
       params, {
         type: 'DELETE'
         url: options.url
-        skipQueue: options.skipQueue
+        parallel: options.parallel
       }, @record
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
