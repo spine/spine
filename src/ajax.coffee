@@ -77,6 +77,8 @@ class Base
     promise  = deferred.promise()
     return promise unless Ajax.enabled
     settings = @ajaxSettings(params, defaults)
+    # prefer setting if exists else default is to parallelize 'GET' requests
+    parallel = if settings.parallel isnt undefined then settings.parallel else (settings.type is 'GET')
     request = (next) ->
       if record?.id?
         # for existing singleton, model id may have been updated
@@ -90,6 +92,8 @@ class Base
                 .done(deferred.resolve)
                 .fail(deferred.reject)
                 .then(next, next)
+      if parallel
+        Queue.dequeue()
 
     promise.abort = (statusText) ->
       return jqXHR.abort(statusText) if jqXHR
@@ -102,10 +106,6 @@ class Base
       promise
     
     @queue request
-    # prefer setting if exists else default is to parallelize 'GET' requests
-    parallel = if settings.parallel isnt undefined then settings.parallel else (settings.type is 'GET')
-    if parallel
-      Queue.dequeue()
     promise
 
   ajaxSettings: (params, defaults) ->
