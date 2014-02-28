@@ -59,6 +59,19 @@ describe("Model.Relation", function(){
     expect( album.photos().count() ).toEqual(2)
   });
 
+  it("can find records by ID within a Collection", function(){
+    Album.hasMany("photos", Photo);
+    Photo.belongsTo("album", Album);
+
+    var album = Album.create();
+    var photo = album.photos().create({ id: "1" });
+    Photo.create({ id: "2" });
+
+    expect( album.photos().find("1").id ).toEqual(photo.id);
+    expect( album.photos().find("2") ).toBeFalsy();
+    expect( album.photos().find("wut?") ).toBeFalsy();
+  });
+
   it("should associate an existing Singleton record", function(){
     Album.hasOne("photo", Photo);
     Photo.belongsTo("album", Album);
