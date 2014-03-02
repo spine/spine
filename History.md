@@ -1,11 +1,15 @@
-## 1.3 (unreleased)
-* Update for CoffeeScript 1.7
-* Change Model.find() to not throw error and accept fallback function
-* Add Trigger for ajaxQueue being cleared out. (pending)
+## next
 * Fixes and improvements to route and manager modules #513 (pending)
+* Add Trigger for ajaxQueue being cleared out. (pending)
+
+## 1.3 (unreleased)
+* Minor updates for CoffeeScript 1.7
+* Change Model.find() to not throw error and accept fallback function
+* Model.exists() will now return simply true or false
 * Optional customizable UUID for model records #451
 * Improvements to some triggers #508
 * Improve ajax route and scope customizability #510
+* Expiremental bindings module #491
 
 ## 1.2.2
 * Add Model.slice() and improve .last() and .first()
