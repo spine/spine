@@ -22,6 +22,10 @@ describe("Ajax", function(){
       complete: jqXHR.done
     });
   });
+  
+  //afterEach(function() {
+  //  foo = 0;
+  //});
 
   it("can GET a collection on fetch", function(){
     spyOn(jQuery, "ajax").andReturn(jqXHR);
@@ -184,23 +188,55 @@ describe("Ajax", function(){
     expect(User.count()).toEqual(0);
   });
 
-  it("should send requests syncronously", function(){
+  it("should send requests serially", function(){
     spyOn(jQuery, "ajax").andReturn(jqXHR);
-
+    
     User.create({first: "First"});
-
     expect(jQuery.ajax).toHaveBeenCalled();
-
+    
     jQuery.ajax.reset();
-
     User.create({first: "Second"});
-
     expect(jQuery.ajax).not.toHaveBeenCalled();
+    
     jqXHR.resolve();
     expect(jQuery.ajax).toHaveBeenCalled();
   });
-
-  it("should return promise objects", function(){
+  
+  it("should send GET requests in parallel by default", function() {
+    console.log('GET - parallel');
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    User.fetch(1);
+    expect(jQuery.ajax).toHaveBeenCalled();
+    User.fetch(2);
+    User.fetch(3);
+    User.fetch(4);
+    User.fetch(5);
+    expect(jQuery.ajax.calls.length).toEqual(5);
+    jQuery.ajax.reset();
+  });
+  
+  it("should be able to send GET requests serially", function() {
+    console.log('GET - serially');
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    User.fetch(1, {parallel:false});
+    User.fetch(2, {parallel:false});
+    User.fetch(3, {parallel:false});
+    User.fetch(4, {parallel:false});
+    User.fetch(5, {parallel:false});
+    expect(jQuery.ajax.calls.length).toEqual(1);
+    jQuery.ajax.reset();
+  });
+  
+  it("should be able to send non GET requests in parallel", function() {
+    console.log('POST - parallel ');
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    User.create({first: "First"}, {parallel:true});
+    User.create({first: "Second"}, {parallel:true});
+    expect(jQuery.ajax.calls.length).toEqual(2);
+    jQuery.ajax.reset();
+  });
+  
+  it("should return jquery promise objects", function(){
     spyOn(jQuery, "ajax").andReturn(jqXHR);
     User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
     var user = User.find("IDD");
@@ -212,6 +248,47 @@ describe("Ajax", function(){
     user.ajax().update().done(spy);
     jqXHR.resolve();
     expect(spy).toHaveBeenCalled();
+    jQuery.ajax.reset();
+  });
+
+  it("should still respect promises if requests done in parallel", function() {
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    user1 = User.create({first: "First"}, {parallel:true});
+    user2 = User.create({first: "Second"}, {parallel:true});
+    expect(jQuery.ajax.calls.length).toEqual(2);
+    jqXHR.resolve();
+    
+    user1.first = 'firstUpdated';
+    user2.first = 'secondUpdated';
+    
+    var promiseTimingTest = [{},{}];
+    var counter = 0
+    
+    runs(function() {
+      user1.bind('ajaxSuccess', function(){
+        counter++;
+        promiseTimingTest[0].first = this.first;
+      });
+      user2.bind('ajaxSuccess', function(){
+        counter++;
+        promiseTimingTest[1].first = this.first;
+      });
+      //user1.save();
+      //user2.save();
+      user1.save({parallel:true});
+      user2.save({parallel:true});
+      jqXHR.resolve();
+    });
+    
+    waitsFor(function() {
+      return counter == 2;
+    }, 'promises should have returned', 1000);
+    
+    runs(function(){
+      expect(promiseTimingTest[0].first).toEqual('firstUpdated');
+      expect(promiseTimingTest[1].first).toEqual('secondUpdated');
+    });
+    jQuery.ajax.reset();
   });
 
   it("should allow promise objects to abort the request and dequeue", function(){
@@ -241,26 +318,26 @@ describe("Ajax", function(){
     expect(User.exists("IDD")).toBeTruthy();
   });
 
-  it("should have success callbacks", function(){
+  it("should have done callbacks", function(){
     spyOn(jQuery, "ajax").andReturn(jqXHR);
 
     var noop = {spy: function(){}};
     spyOn(noop, "spy");
     var spy = noop.spy;
 
-    User.create({first: "Second"}, {success: spy});
+    User.create({first: "Second"}, {done: spy});
     jqXHR.resolve();
     expect(spy).toHaveBeenCalled();
   });
 
-  it("should have error callbacks", function(){
+  it("should have fail callbacks", function(){
     spyOn(jQuery, "ajax").andReturn(jqXHR);
 
     var noop = {spy: function(){}};
     spyOn(noop, "spy");
     var spy = noop.spy;
 
-    User.create({first: "Second"}, {error: spy});
+    User.create({first: "Second"}, {fail: spy});
     jqXHR.reject();
     expect(spy).toHaveBeenCalled();
   });
