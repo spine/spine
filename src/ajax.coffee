@@ -77,7 +77,8 @@ class Base
     promise  = deferred.promise()
     return promise unless Ajax.enabled
     settings = @ajaxSettings(params, defaults)
-
+    # prefer setting if exists else default is to parallelize 'GET' requests
+    parallel = if settings.parallel isnt undefined then settings.parallel else (settings.type is 'GET')
     request = (next) ->
       if record?.id?
         # for existing singleton, model id may have been updated
@@ -91,6 +92,8 @@ class Base
                 .done(deferred.resolve)
                 .fail(deferred.reject)
                 .then(next, next)
+      if parallel
+        Queue.dequeue()
 
     promise.abort = (statusText) ->
       return jqXHR.abort(statusText) if jqXHR
@@ -101,7 +104,7 @@ class Base
         [promise, statusText, '']
       )
       promise
-
+    
     @queue request
     promise
 
@@ -114,17 +117,21 @@ class Collection extends Base
   find: (id, params, options = {}) ->
     record = new @model(id: id)
     @ajaxQueue(
-      params,
-      type: 'GET',
-      url: options.url or Ajax.getURL(record)
+      params, {
+        type: 'GET'
+        url: options.url or Ajax.getURL(record)
+        parallel: options.parallel
+      }
     ).done(@recordsResponse)
      .fail(@failResponse)
 
   all: (params, options = {}) ->
     @ajaxQueue(
-      params,
-      type: 'GET',
-      url: options.url or Ajax.getURL(@model)
+      params, {
+        type: 'GET'
+        url: options.url or Ajax.getURL(@model)
+        parallel: options.parallel
+      }
     ).done(@recordsResponse)
      .fail(@failResponse)
 
@@ -154,17 +161,20 @@ class Singleton extends Base
       params, {
         type: 'GET'
         url: options.url
+        parallel: options.parallel
       }, @record
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
 
   create: (params, options = {}) ->
     @ajaxQueue(
-      params,
-      type: 'POST'
-      contentType: 'application/json'
-      data: @record.toJSON()
-      url: options.url or Ajax.getCollectionURL(@record)
+      params, {
+        type: 'POST'
+        contentType: 'application/json'
+        data: @record.toJSON()
+        url: options.url or Ajax.getCollectionURL(@record)
+        parallel: options.parallel
+      }
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
 
@@ -175,6 +185,7 @@ class Singleton extends Base
         contentType: 'application/json'
         data: @record.toJSON()
         url: options.url
+        parallel: options.parallel
       }, @record
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
@@ -184,6 +195,7 @@ class Singleton extends Base
       params, {
         type: 'DELETE'
         url: options.url
+        parallel: options.parallel
       }, @record
     ).done(@recordResponse(options))
      .fail(@failResponse(options))
@@ -202,13 +214,11 @@ class Singleton extends Base
           @record.refresh(data)
 
       @record.trigger('ajaxSuccess', data, status, xhr)
-      options.success?.apply(@record) # Deprecated
       options.done?.apply(@record)
 
   failResponse: (options = {}) =>
     (xhr, statusText, error) =>
       @record.trigger('ajaxError', xhr, statusText, error)
-      options.error?.apply(@record) # Deprecated
       options.fail?.apply(@record)
 
 # Ajax endpoint
