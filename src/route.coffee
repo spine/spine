@@ -99,7 +99,7 @@ class Route extends Spine.Module
 
     return if options.shim
 
-    if !routes.length
+    unless routes.length
       if typeof options.redirect is 'function'
         return options.redirect.apply this, [@path, options]
       else
@@ -146,7 +146,7 @@ class Route extends Spine.Module
   @getHost: ->
     "#{window.location.protocol}//#{window.location.host}"
 
-  @change: ->
+  @change: =>
     path = @getPath()
     return if path is @path
     @path = path
