@@ -20,11 +20,14 @@ class Spine.Route extends Spine.Module
     replace: false
     redirect: false
 
-  @add: (path, callback) ->
+  @add: (path, callback, options = {}) ->
     if (typeof path is 'object' and path not instanceof RegExp)
-      @add(key, value) for key, value of path
+      @add(key, value, options) for key, value of path
     else
-      @routes.push(new @(path, callback))
+      route = new @(path, callback)
+      if options.trigger
+        route.match @path
+      @routes.push(route)
 
   @setup: (options = {}) ->
     @options = $.extend({}, @options, options)
@@ -147,11 +150,11 @@ class Spine.Route extends Spine.Module
 Spine.Route.change = Spine.Route.proxy(Spine.Route.change)
 
 Spine.Controller.include
-  route: (path, callback) ->
-    Spine.Route.add(path, @proxy(callback))
+  route: (path, callback, options) ->
+    Spine.Route.add(path, @proxy(callback), options)
 
-  routes: (routes) ->
-    @route(key, value) for key, value of routes
+  routes: (routes, options) ->
+    @route(key, value, options) for key, value of routes
 
   navigate: ->
     Spine.Route.navigate.apply(Spine.Route, arguments)
