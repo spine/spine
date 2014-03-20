@@ -34,6 +34,19 @@ describe("Model", function(){
     expect(Asset.first().name).toEqual("wem.pdf");
   });
 
+  it("can keep record clones in sync after refreshing the record", function(){
+    var asset = Asset.create({name: "test.pdf"});
+    expect(asset.name).toEqual("test.pdf");
+    expect(asset.__proto__).toEqual(Asset.irecords[asset.id]);
+
+    var changedAsset = asset.toJSON();
+    changedAsset.name = "wem.pdf";
+    Asset.refresh(changedAsset);
+
+    expect(asset.name).toEqual("wem.pdf");
+    expect(asset.__proto__).toEqual(Asset.irecords[asset.id]);
+  });
+
   it("can destroy records", function(){
     var asset = Asset.create({name: "test.pdf"});
 
@@ -49,7 +62,7 @@ describe("Model", function(){
     asset.destroy();
     expect(Asset.find(asset.id)).toBeFalsy();
   });
-  
+
   it("can use notFound fallback function if records are not found", function(){
     var asset = Asset.create({name: "test.pdf"});
     expect(Asset.find(asset.id)).toBeTruthy();
@@ -57,7 +70,7 @@ describe("Model", function(){
     asset.destroy();
     expect(Asset.find(asset.id)).toBeFalsy();
     // a custom notFound fallback can be added to the find
-    var customfallback = function(id){ 
+    var customfallback = function(id){
       sessionStorage.fallbackRan = true
       sessionStorage.fallbackReceivedId = id
       return Asset.create({name: 'test2.pdf', id:id})
@@ -67,7 +80,7 @@ describe("Model", function(){
     expect(foundAsset.id).toBe(asset.id);
     expect(sessionStorage.fallbackRan).toBe('true');
     expect(sessionStorage.fallbackReceivedId).toBe(asset.id);
-    // notFound can be customized on the model 
+    // notFound can be customized on the model
     asset.destroy(); //reset
     expect(Asset.find(asset.id)).toBeFalsy(); // test reset worked
     Asset.notFound = function(id){
@@ -80,7 +93,7 @@ describe("Model", function(){
     expect(foundAsset2.name).toBe('test3.pdf');
     expect(sessionStorage.fallback2Ran).toBe('true');
     expect(sessionStorage.fallback2ReceivedId).toBe(asset.id);
-    
+
     sessionStorage.clear()
   });
 
