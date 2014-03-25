@@ -49,8 +49,8 @@ describe("Model", function(){
 
   it("can destroy records", function(){
     var asset = Asset.create({name: "test.pdf"});
-
     expect(Asset.first()).toEqual(asset);
+
     asset.destroy();
     expect(Asset.first()).toBeFalsy();
   });
@@ -569,14 +569,14 @@ describe("Model", function(){
       Asset.bind("destroy", spy);
       var asset = Asset.create({name: "cartoon world.png"});
       asset.destroy();
-      expect(spy).toHaveBeenCalledWith(asset, {});
+      expect(spy).toHaveBeenCalledWith(asset, {clear: true});
     });
 
     it("can fire destroy events when destroy all record with options", function(){
       Asset.bind("destroy", spy);
       var asset = Asset.create({name: "screaming goats.png"});
       Asset.destroyAll({ajax: false});
-      expect(spy).toHaveBeenCalledWith(asset, {ajax: false});
+      expect(spy).toHaveBeenCalledWith(asset, {ajax: false, clear: true});
     });
 
     it("can fire refresh events", function(){
@@ -615,7 +615,7 @@ describe("Model", function(){
       expect(spy).toHaveBeenCalledWith(asset, "update", {});
 
       asset.destroy();
-      expect(spy).toHaveBeenCalledWith(asset, "destroy", {});
+      expect(spy).toHaveBeenCalledWith(asset, "destroy", {clear: true});
     });
 
     it("can fire error events", function(){
