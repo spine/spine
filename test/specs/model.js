@@ -319,7 +319,7 @@ describe("Model", function(){
     expect(asset.attributes()).toEqual({});
   });
 
-  it("can load attributes()", function(){
+  it("can load() attributes", function(){
     var asset = new Asset();
     var result = asset.load({name: "In da' house"});
     expect(result).toBe(asset);
@@ -339,6 +339,24 @@ describe("Model", function(){
     asset.load({name: "Alex MacCaw"});
     expect(asset.first_name).toEqual("Alex");
     expect(asset.last_name).toEqual("MacCaw");
+  });
+
+  it("can load() attributes from model instances respecting getters/setters", function(){
+    spy = jasmine.createSpy();
+    Asset.include({spy: spy});
+    var asset     = Asset.create({name: "test.pdf"});
+    var assetDupe = new Asset(asset.attributes());
+
+    assetDupe.spy  = spy; // Simulate instance method using CoffeeScript fat-arrow
+    assetDupe.name = "wem.pdf";
+
+    asset.load(assetDupe);
+    expect(spy).not.toHaveBeenCalled();
+    expect(asset.name).toEqual("wem.pdf");
+
+    assetDupe.spy = "setter value";
+    asset.load(assetDupe);
+    expect(spy).toHaveBeenCalledWith("setter value");
   });
 
   it("attributes() respects getters/setters", function(){
@@ -526,9 +544,7 @@ describe("Model", function(){
     var spy;
 
     beforeEach(function(){
-      var noop = {spy: function(){}};
-      spyOn(noop, "spy");
-      spy = noop.spy;
+      spy = jasmine.createSpy();
     });
 
     it("can interate over records", function(){
