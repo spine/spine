@@ -9,13 +9,13 @@ Ajax =
       @generateURL(object)
     else
       @generateURL(object, encodeURIComponent(object.id))
-    
+
   getCollectionURL: (object) ->
     @generateURL(object)
-  
+
   getScope: (object) ->
     object.scope?() or object.scope
-  
+
   getCollection: (object) ->
     if object.url isnt object.generateURL
       if typeof object.url is 'function'
@@ -104,7 +104,7 @@ class Base
         [promise, statusText, '']
       )
       promise
-    
+
     @queue request
     promise
 
@@ -233,16 +233,16 @@ GenerateURL =
 
 Include =
   ajax: -> new Singleton(this)
-  
+
   generateURL: GenerateURL.include
-  
+
   url: GenerateURL.include
-  
+
 Extend =
   ajax: -> new Collection(this)
-  
+
   generateURL: GenerateURL.extend
-  
+
   url: GenerateURL.extend
 
 Model.Ajax =

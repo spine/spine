@@ -34,10 +34,23 @@ describe("Model", function(){
     expect(Asset.first().name).toEqual("wem.pdf");
   });
 
+  it("can keep record clones in sync after refreshing the record", function(){
+    var asset = Asset.create({name: "test.pdf"});
+    expect(asset.name).toEqual("test.pdf");
+    expect(asset.__proto__).toEqual(Asset.irecords[asset.id]);
+
+    var changedAsset = asset.toJSON();
+    changedAsset.name = "wem.pdf";
+    Asset.refresh(changedAsset);
+
+    expect(asset.name).toEqual("wem.pdf");
+    expect(asset.__proto__).toEqual(Asset.irecords[asset.id]);
+  });
+
   it("can destroy records", function(){
     var asset = Asset.create({name: "test.pdf"});
-
     expect(Asset.first()).toEqual(asset);
+
     asset.destroy();
     expect(Asset.first()).toBeFalsy();
   });
@@ -49,7 +62,7 @@ describe("Model", function(){
     asset.destroy();
     expect(Asset.find(asset.id)).toBeFalsy();
   });
-  
+
   it("can use notFound fallback function if records are not found", function(){
     var asset = Asset.create({name: "test.pdf"});
     expect(Asset.find(asset.id)).toBeTruthy();
@@ -57,7 +70,7 @@ describe("Model", function(){
     asset.destroy();
     expect(Asset.find(asset.id)).toBeFalsy();
     // a custom notFound fallback can be added to the find
-    var customfallback = function(id){ 
+    var customfallback = function(id){
       sessionStorage.fallbackRan = true
       sessionStorage.fallbackReceivedId = id
       return Asset.create({name: 'test2.pdf', id:id})
@@ -67,7 +80,7 @@ describe("Model", function(){
     expect(foundAsset.id).toBe(asset.id);
     expect(sessionStorage.fallbackRan).toBe('true');
     expect(sessionStorage.fallbackReceivedId).toBe(asset.id);
-    // notFound can be customized on the model 
+    // notFound can be customized on the model
     asset.destroy(); //reset
     expect(Asset.find(asset.id)).toBeFalsy(); // test reset worked
     Asset.notFound = function(id){
@@ -80,7 +93,7 @@ describe("Model", function(){
     expect(foundAsset2.name).toBe('test3.pdf');
     expect(sessionStorage.fallback2Ran).toBe('true');
     expect(sessionStorage.fallback2ReceivedId).toBe(asset.id);
-    
+
     sessionStorage.clear()
   });
 
@@ -306,7 +319,7 @@ describe("Model", function(){
     expect(asset.attributes()).toEqual({});
   });
 
-  it("can load attributes()", function(){
+  it("can load() attributes", function(){
     var asset = new Asset();
     var result = asset.load({name: "In da' house"});
     expect(result).toBe(asset);
@@ -326,6 +339,24 @@ describe("Model", function(){
     asset.load({name: "Alex MacCaw"});
     expect(asset.first_name).toEqual("Alex");
     expect(asset.last_name).toEqual("MacCaw");
+  });
+
+  it("can load() attributes from model instances respecting getters/setters", function(){
+    spy = jasmine.createSpy();
+    Asset.include({spy: spy});
+    var asset     = Asset.create({name: "test.pdf"});
+    var assetDupe = new Asset(asset.attributes());
+
+    assetDupe.spy  = spy; // Simulate instance method using CoffeeScript fat-arrow
+    assetDupe.name = "wem.pdf";
+
+    asset.load(assetDupe);
+    expect(spy).not.toHaveBeenCalled();
+    expect(asset.name).toEqual("wem.pdf");
+
+    assetDupe.spy = "setter value";
+    asset.load(assetDupe);
+    expect(spy).toHaveBeenCalledWith("setter value");
   });
 
   it("attributes() respects getters/setters", function(){
@@ -513,9 +544,7 @@ describe("Model", function(){
     var spy;
 
     beforeEach(function(){
-      var noop = {spy: function(){}};
-      spyOn(noop, "spy");
-      spy = noop.spy;
+      spy = jasmine.createSpy();
     });
 
     it("can interate over records", function(){
@@ -556,14 +585,14 @@ describe("Model", function(){
       Asset.bind("destroy", spy);
       var asset = Asset.create({name: "cartoon world.png"});
       asset.destroy();
-      expect(spy).toHaveBeenCalledWith(asset, {});
+      expect(spy).toHaveBeenCalledWith(asset, {clear: true});
     });
 
     it("can fire destroy events when destroy all record with options", function(){
       Asset.bind("destroy", spy);
       var asset = Asset.create({name: "screaming goats.png"});
       Asset.destroyAll({ajax: false});
-      expect(spy).toHaveBeenCalledWith(asset, {ajax: false});
+      expect(spy).toHaveBeenCalledWith(asset, {ajax: false, clear: true});
     });
 
     it("can fire refresh events", function(){
@@ -602,7 +631,7 @@ describe("Model", function(){
       expect(spy).toHaveBeenCalledWith(asset, "update", {});
 
       asset.destroy();
-      expect(spy).toHaveBeenCalledWith(asset, "destroy", {});
+      expect(spy).toHaveBeenCalledWith(asset, "destroy", {clear: true});
     });
 
     it("can fire error events", function(){
