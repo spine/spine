@@ -3,13 +3,13 @@
 [![Build Status](https://secure.travis-ci.org/spine/spine.png)](http://travis-ci.org/spine/spine)
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/spine/spine/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
-Spine is a lightweight framework for building JavaScript web applications. Spine gives you an MVC structure and then gets out of your way, allowing you to concentrate on the fun stuff, building awesome web applications.
+Spine is a lightweight MVC library for building JavaScript web applications. Spine gives you structure and then gets out of your way, allowing you to concentrate on the fun stuff, building awesome web applications.
 
 Spine is opinionated in its approach to web application architecture and design. Spine's architecture complements patterns such as de-coupled components and CommonJS modules, markedly helping with code quality and maintainability.
 
-The library is written in [CoffeeScript](http://jashkenas.github.com/coffee-script), but doesn't necessarily require CoffeeScript to develop applications - you can use whichever language you're most familiar with.
+The library is written in [CoffeeScript](http://jashkenas.github.com/coffee-script), and though it doesn't necessarily require CoffeeScript to develop applications - you can use whichever language you're most familiar with - the documentation and some associated tools like [Hem](https://github.com/spine/hem) and [spine.app](https://github.com/spine/spine.app) cater to those who prefer CoffeeScript's syntax.
 
-Spine is tiny, the core library comes in at around 600 lines of CoffeeScript code that is written in such a way as not to sacrifice readability. Being lightweight and simple is fundamental to Spine.
+Documentation is often incomplete or just lies waiting to happen. Approachable source code reduces you knowledge dependencies. Spine is tiny, the core library comes in at less than 700 lines of CoffeeScript code that is written in such a way as not to sacrifice readability. Being lightweight and simple is fundamental to Spine.
 
 For documentation, usage, and examples, see: [spinejs.com](http://spinejs.com)
 
@@ -36,7 +36,7 @@ Next, open `test/index.html` to run the [Jasmine](http://pivotal.github.com/jasm
 
 ## Contributing to the Spine documentation
 
-Perhaps the easiest way to get started with contributing is through the docs.  If you find typos, bugs, or omissions in the docs, please submit a pull request to fix.  The Spine documentation is a simple rails app  spine.site GitHub repository.
+Perhaps the easiest way to get started with contributing is through the docs.  If you find typos, bugs, or omissions in the docs, please submit a pull request to fix.  The Spine documentation is a very simple rails app [spine.site](https://github.com/spine/spine.site).
 
 ## Contributing to the Spine code
 
@@ -69,7 +69,7 @@ Let's say I'm going to submit a patch to add someFeatureFix:
 $ git checkout dev
 ```
 
-Feature branches should start from dev **not** master. If you branch off of, or do builds on the master branch you will get CoffeeScript source map files, which are cool, but tend to ruin automatic merges with git.
+Feature branches should start from `dev` **not** `master`. If you branch off of, or do builds on the master branch you will get CoffeeScript source map files, which are cool, but tend to ruin automatic merges with git.
 
 ```
 $ git checkout -b someFeatureFix
