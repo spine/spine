@@ -6,9 +6,7 @@ describe("Events", function(){
   beforeEach(function(){
     EventTest = Spine.Class.create();
     EventTest.extend(Spine.Events);
-    var noop = {spy: function(){}};
-    spyOn(noop, "spy");
-    spy = noop.spy;
+    spy = jasmine.createSpy();
   });
 
   it("can bind/trigger events", function(){
@@ -168,7 +166,7 @@ describe("Events", function(){
     var c = jasmine.createSpy("c");
 
     b.andCallFake(function () {
-        EventTest.unbind("once", b);
+      EventTest.unbind("once", b);
     });
 
     EventTest.bind("once", a);

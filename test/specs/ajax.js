@@ -240,10 +240,7 @@ describe("Ajax", function(){
     spyOn(jQuery, "ajax").andReturn(jqXHR);
     User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
     var user = User.find("IDD");
-
-    var noop = {spy: function(){}};
-    spyOn(noop, "spy");
-    var spy = noop.spy;
+    var spy = jasmine.createSpy();
 
     user.ajax().update().done(spy);
     jqXHR.resolve();
@@ -295,10 +292,7 @@ describe("Ajax", function(){
     spyOn(jQuery, "ajax").andReturn(jqXHR);
     User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
     var user = User.find("IDD");
-
-    var noop = {spy: function(){}};
-    spyOn(noop, "spy");
-    var spy = noop.spy;
+    var spy = jasmine.createSpy();
 
     user.ajax().update().fail(spy);
     expect(Spine.Ajax.queue().length).toEqual(1);
@@ -320,10 +314,7 @@ describe("Ajax", function(){
 
   it("should have done callbacks", function(){
     spyOn(jQuery, "ajax").andReturn(jqXHR);
-
-    var noop = {spy: function(){}};
-    spyOn(noop, "spy");
-    var spy = noop.spy;
+    var spy = jasmine.createSpy();
 
     User.create({first: "Second"}, {done: spy});
     jqXHR.resolve();
@@ -332,10 +323,7 @@ describe("Ajax", function(){
 
   it("should have fail callbacks", function(){
     spyOn(jQuery, "ajax").andReturn(jqXHR);
-
-    var noop = {spy: function(){}};
-    spyOn(noop, "spy");
-    var spy = noop.spy;
+    var spy = jasmine.createSpy();
 
     User.create({first: "Second"}, {fail: spy});
     jqXHR.reject();

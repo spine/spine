@@ -818,11 +818,8 @@ describe("Model", function(){
       asset = Asset.create({name: "test.pdf"});
       asset2 = Asset.create({name: "scooby.pdf"});
       asset3 = Asset.create({name: "shaggy.pdf"});
-      var noop = {spy: function(){}, spy2: function(){}};
-      spyOn(noop, "spy");
-      spyOn(noop, "spy2");
-      spy = noop.spy;
-      spy2 = noop.spy2;
+      spy = jasmine.createSpy();
+      spy2 = jasmine.createSpy();
     });
 
     it("can listen to one event on a model instance", function(){

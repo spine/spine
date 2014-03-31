@@ -66,9 +66,7 @@ describe("Controller", function(){
     var spy;
 
     beforeEach(function(){
-      var noop = {spy: function(){}};
-      spyOn(noop, "spy");
-      spy = noop.spy;
+      spy = jasmine.createSpy();
     });
 
     it("should add events", function(){
@@ -107,11 +105,8 @@ describe("Controller", function(){
       asset = Asset.create({name: "test.pdf"});
       Users = Spine.Controller.sub();
       users = new Users();
-      var noop = {spy: function(){}, spy2: function(){}};
-      spyOn(noop, "spy");
-      spyOn(noop, "spy2");
-      spy = noop.spy;
-      spy2 = noop.spy2;
+      spy = jasmine.createSpy();
+      spy2 = jasmine.createSpy();
     });
 
     it("can listen to one event on a model instance", function(){
