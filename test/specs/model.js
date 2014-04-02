@@ -36,15 +36,19 @@ describe("Model", function(){
 
   it("can keep record clones in sync after refreshing the record", function(){
     var asset = Asset.create({name: "test.pdf"});
-    expect(asset.name).toEqual("test.pdf");
     expect(asset.__proto__).toEqual(Asset.irecords[asset.id]);
 
     var changedAsset = asset.toJSON();
     changedAsset.name = "wem.pdf";
     Asset.refresh(changedAsset);
+    selectedAsset = Asset.select(function(rec){
+      return rec.id === asset.id;
+    })[0];
 
     expect(asset.name).toEqual("wem.pdf");
-    expect(asset.__proto__).toEqual(Asset.irecords[asset.id]);
+    expect(selectedAsset.name).toEqual("wem.pdf");
+    expect(asset.__proto__).toBe(Asset.irecords[asset.id]);
+    expect(selectedAsset.__proto__).toBe(Asset.irecords[asset.id]);
   });
 
   it("can destroy records", function(){
