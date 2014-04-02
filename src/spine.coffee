@@ -160,7 +160,9 @@ class Model extends Module
   @addRecord: (record, options = {}) ->
     if record.id and @irecords[record.id]
       @irecords[record.id].remove(options)
-      @irecords[record.id].load record unless options.clear
+      unless options.clear
+        @irecords[record.id].load record
+        record = @irecords[record.id]
     record.id or= record.cid
     @irecords[record.id]  ?= record
     @irecords[record.cid] ?= record
