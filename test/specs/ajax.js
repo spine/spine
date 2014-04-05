@@ -1,9 +1,12 @@
 describe("Ajax", function(){
   var User;
   var jqXHR;
+  var defaultAjaxConfig = $.extend({}, Spine.Ajax.config);
 
   beforeEach(function(){
     Spine.Ajax.clearQueue();
+    // reset default ajax config (tests might modify that)
+    Spine.Ajax.config = $.extend({}, defaultAjaxConfig);
 
     User = Spine.Model.setup("User", ["first", "last"]);
     User.extend(Spine.Model.Ajax);
@@ -41,6 +44,21 @@ describe("Ajax", function(){
     });
   });
 
+  it("can use custom HTTP method to fetch a collection", function(){
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+
+    Spine.Ajax.config.loadMethod = 'POST'
+    User.fetch();
+
+    expect(jQuery.ajax).toHaveBeenCalledWith({
+      type:         'POST',
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      dataType:     'json',
+      url:          '/users',
+      processData:  false
+    });
+  });
+
   it("can GET a record on fetch", function(){
     User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
 
@@ -50,6 +68,23 @@ describe("Ajax", function(){
 
     expect(jQuery.ajax).toHaveBeenCalledWith({
       type:         'GET',
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      dataType:     'json',
+      url:          '/users/IDD',
+      processData:  false
+    });
+  });
+
+  it("can use custom HTTP method to fetch a record", function(){
+    User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
+
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+
+    Spine.Ajax.config.loadMethod = 'POST'
+    User.fetch({id: "IDD"});
+
+    expect(jQuery.ajax).toHaveBeenCalledWith({
+      type:         'POST',
       headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
       dataType:     'json',
       url:          '/users/IDD',
@@ -86,6 +121,23 @@ describe("Ajax", function(){
     });
   });
 
+  it("can use custom HTTP method to create a record", function(){
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+
+    Spine.Ajax.config.createMethod = 'PUT'
+    User.create({first: "Hans", last: "Zimmer", id: "IDD"});
+
+    expect(jQuery.ajax).toHaveBeenCalledWith({
+      type:         'PUT',
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      contentType:  'application/json',
+      dataType:     'json',
+      data:         '{"first":"Hans","last":"Zimmer","id":"IDD"}',
+      url:          '/users',
+      processData:  false
+    });
+  });
+
   it("should send PUT on update", function(){
     User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
 
@@ -95,6 +147,25 @@ describe("Ajax", function(){
 
     expect(jQuery.ajax).toHaveBeenCalledWith({
       type:         'PUT',
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      contentType:  'application/json',
+      dataType:     'json',
+      data:         '{"first":"John2","last":"Williams2","id":"IDD"}',
+      url:          '/users/IDD',
+      processData:  false
+    });
+  });
+
+  it("can use custom HTTP method when updating record", function(){
+    User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
+
+    Spine.Ajax.config.updateMethod = 'PATCH'
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+
+    User.first().updateAttributes({first: "John2", last: "Williams2"});
+
+    expect(jQuery.ajax).toHaveBeenCalledWith({
+      type:         'PATCH',
       headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
       contentType:  'application/json',
       dataType:     'json',
@@ -116,6 +187,23 @@ describe("Ajax", function(){
       dataType:   'json',
       processData: false,
       type:        'DELETE',
+      url:         '/users/IDD'
+    });
+  });
+
+  it("can use custom HTTP method to destroy record", function(){
+    User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
+
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+
+    Spine.Ajax.config.destroyMethod = 'POST'
+    User.first().destroy();
+
+    expect(jQuery.ajax).toHaveBeenCalledWith({
+      headers:     { 'X-Requested-With' : 'XMLHttpRequest' },
+      dataType:   'json',
+      processData: false,
+      type:        'POST',
       url:         '/users/IDD'
     });
   });
@@ -240,10 +328,7 @@ describe("Ajax", function(){
     spyOn(jQuery, "ajax").andReturn(jqXHR);
     User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
     var user = User.find("IDD");
-
-    var noop = {spy: function(){}};
-    spyOn(noop, "spy");
-    var spy = noop.spy;
+    var spy = jasmine.createSpy();
 
     user.ajax().update().done(spy);
     jqXHR.resolve();
@@ -295,10 +380,7 @@ describe("Ajax", function(){
     spyOn(jQuery, "ajax").andReturn(jqXHR);
     User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
     var user = User.find("IDD");
-
-    var noop = {spy: function(){}};
-    spyOn(noop, "spy");
-    var spy = noop.spy;
+    var spy = jasmine.createSpy();
 
     user.ajax().update().fail(spy);
     expect(Spine.Ajax.queue().length).toEqual(1);
@@ -320,10 +402,7 @@ describe("Ajax", function(){
 
   it("should have done callbacks", function(){
     spyOn(jQuery, "ajax").andReturn(jqXHR);
-
-    var noop = {spy: function(){}};
-    spyOn(noop, "spy");
-    var spy = noop.spy;
+    var spy = jasmine.createSpy();
 
     User.create({first: "Second"}, {done: spy});
     jqXHR.resolve();
@@ -332,10 +411,7 @@ describe("Ajax", function(){
 
   it("should have fail callbacks", function(){
     spyOn(jQuery, "ajax").andReturn(jqXHR);
-
-    var noop = {spy: function(){}};
-    spyOn(noop, "spy");
-    var spy = noop.spy;
+    var spy = jasmine.createSpy();
 
     User.create({first: "Second"}, {fail: spy});
     jqXHR.reject();

@@ -1,8 +1,9 @@
-## next
-* Fixes and improvements to route and manager modules #513 (pending)
-* Add Trigger for ajaxQueue being cleared out. (pending)
+## 1.3.1 (pending)
+* Fixes and improvements to route and manager modules #513
+* Ajax methods configuable #523
+* Fix for orphaned model instances #527
 
-## 1.3 (unreleased)
+## 1.3
 * Minor updates for CoffeeScript 1.7
 * Change Model.find() to not throw error and accept fallback function
 * Model.exists() will now return simply true or false
