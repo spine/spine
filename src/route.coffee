@@ -93,18 +93,17 @@ class Route extends Spine.Module
     return if @path is path
     @path = path
 
-    @trigger('navigate', @path)
-
-    routes = @matchRoutes(@path, options) if options.trigger
+    if options.trigger
+      @trigger('navigate', @path)
+      routes = @matchRoutes(@path, options)
+      unless routes.length
+        if typeof options.redirect is 'function'
+          return options.redirect.apply this, [@path, options]
+        else
+          if options.redirect is true
+            @redirect(@path)
 
     return if options.shim
-
-    unless routes.length
-      if typeof options.redirect is 'function'
-        return options.redirect.apply this, [@path, options]
-      else
-        if options.redirect is true
-          @redirect(@path)
 
     if @history and options.replace
       history.replaceState({}, document.title, @path)
