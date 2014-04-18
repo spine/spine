@@ -80,13 +80,11 @@ class Route extends Spine.Module
 
   @navigate: (args...) ->
     options = {}
-
     lastArg = args[args.length - 1]
     if typeof lastArg is 'object'
       options = args.pop()
     else if typeof lastArg is 'boolean'
       options.trigger = args.pop()
-
     options = $.extend({}, @options, options)
 
     path = args.join('/')
@@ -103,9 +101,9 @@ class Route extends Spine.Module
           if options.redirect is true
             @redirect(@path)
 
-    return if options.shim
-
-    if @history and options.replace
+    if options.shim
+      true
+    else if @history and options.replace
       history.replaceState({}, document.title, @path)
     else if @history
       history.pushState({}, document.title, @path)
