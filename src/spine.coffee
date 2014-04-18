@@ -153,7 +153,7 @@ class Model extends Module
 
   @notFound: (id) -> null
 
-  @exists: (id) -> !!@irecords[id]
+  @exists: (id) -> Boolean @irecords[id]
 
   @addRecord: (record, options = {}) ->
     if record.id and @irecords[record.id]
