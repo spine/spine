@@ -111,8 +111,10 @@ underscore = (str) ->
      .toLowerCase()
 
 requireModel = (model) ->
-  requireFn = @require or ((value) -> eval(value))
-  requireFn(model)
+  if typeof model is 'string'
+    require?(model) or eval(model)
+  else
+    model
 
 association = (name, model, record, fkey, Ctor) ->
   model = requireModel(model) if typeof model is 'string'
