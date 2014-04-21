@@ -149,13 +149,11 @@ class Model extends Module
   @toString: -> "#{@className}(#{@attributes.join(", ")})"
 
   @find: (id, notFound = @notFound) ->
-    record = @irecords[id]?.clone()
-    return record or notFound?(id)
+    @irecords[id]?.clone() or notFound?(id)
 
-  @notFound: (id) -> return null
+  @notFound: (id) -> null
 
-  @exists: (id) ->
-    return if @irecords[id] then true else false
+  @exists: (id) -> Boolean @irecords[id]
 
   @addRecord: (record, options = {}) ->
     if record.id and @irecords[record.id]
