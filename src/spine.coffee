@@ -236,11 +236,13 @@ class Model extends Module
     else
       @trigger('change', arguments...)
 
-  @fetch: (callbackOrParams) ->
+  @fetch: (callbackOrParams, options={}) ->
     if typeof callbackOrParams is 'function'
       @bind('fetch', callbackOrParams)
     else
-      @trigger('fetch', arguments...)
+      new Spine.Promise (resolve, reject) =>
+        options = $.extend({}, options, { reject, resolve })
+        @trigger('fetch', callbackOrParams, options)
 
   @toJSON: ->
     @records
@@ -607,6 +609,21 @@ class Controller extends Module
     @refreshElements()
     @el
 
+
+JQueryPromise = (fn) ->
+  deferred = new $.Deferred()
+  resolve = (result) -> deferred.resolve(result)
+  reject = (error) -> deferred.reject(error)
+  fn(resolve, reject)
+  deferred.promise()
+
+JQueryPromise.resolve = (result) ->
+  JQueryPromise (resolve) -> resolve(result)
+
+JQueryPromise.reject = (error) ->
+  JQueryPromise (_, reject) -> reject(error)
+
+
 # Utilities & Shims
 
 $ = window?.jQuery or window?.Zepto or (element) -> element
@@ -641,6 +658,7 @@ Spine.Log        = Log
 Spine.Module     = Module
 Spine.Controller = Controller
 Spine.Model      = Model
+Spine.Promise    = JQueryPromise
 
 # Global events
 

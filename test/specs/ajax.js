@@ -390,6 +390,121 @@ describe("Ajax", function(){
     expect(spy).toHaveBeenCalled();
   });
 
+  it("should resolve the promise with results of 'fetch()'", function(){
+    var promise,
+        refreshSpy = jasmine.createSpy('refresh'),
+        thenSpy = jasmine.createSpy('then');
+
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    User.bind('refresh', refreshSpy); // capture results passed to 'refresh' event listeners
+
+    runs(function(){
+      promise = User.fetch();
+      promise.then(thenSpy);
+      expect(thenSpy).not.toHaveBeenCalled(); // promise has not yet been fulfilled
+    });
+
+    runs(function() {
+      jqXHR.resolve([{ id: 123 }]);
+    });
+
+    waitsFor(function(){
+      return thenSpy.wasCalled;
+    }, "Promise should have been resolved", 50);
+
+    runs(function(){
+      var results = refreshSpy.mostRecentCall.args[0]
+      expect(thenSpy).toHaveBeenCalledWith(results);
+    });
+
+  });
+
+  it("should resolve the promise with results of 'fetch({ id: 123 })'", function(){
+    var promise,
+        refreshSpy = jasmine.createSpy('refresh'),
+        thenSpy = jasmine.createSpy('then');
+
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    User.bind('refresh', refreshSpy); // capture results passed to 'refresh' event listeners
+
+    runs(function(){
+      promise = User.fetch({ id: 123 });
+      promise.then(thenSpy);
+      expect(thenSpy).not.toHaveBeenCalled(); // promise has not yet been fulfilled
+    });
+
+    runs(function() {
+      jqXHR.resolve({ id: 123 });
+    });
+
+    waitsFor(function(){
+      return thenSpy.wasCalled;
+    }, "Promise should have been resolved", 50);
+
+    runs(function(){
+      var results = refreshSpy.mostRecentCall.args[0]
+      expect(thenSpy).toHaveBeenCalledWith(results);
+    });
+
+  });
+
+  it("should reject the promise with error from 'fetch()'", function(){
+    var promise,
+        ajaxSpy = jasmine.createSpy('ajax'),
+        failSpy = jasmine.createSpy('fail');
+
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    User.bind('ajaxError', ajaxSpy); // capture results passed to 'refresh' event listeners
+
+    runs(function(){
+      promise = User.fetch();
+      promise.then(null, failSpy);
+      expect(failSpy).not.toHaveBeenCalled(); // promise has not yet been fulfilled
+    });
+
+    runs(function() {
+      jqXHR.reject(jqXHR, 'error', 'Not Found');
+    });
+
+    waitsFor(function(){
+      return failSpy.wasCalled;
+    }, "Promise should have been rejected", 50);
+
+    runs(function(){
+      var xhr = ajaxSpy.mostRecentCall.args[1]
+      expect(failSpy).toHaveBeenCalledWith(xhr);
+    });
+
+  });
+
+  it("should reject the promise with error from 'fetch({ id: 123 })'", function(){
+    var promise,
+        ajaxSpy = jasmine.createSpy('ajax'),
+        failSpy = jasmine.createSpy('fail');
+
+    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    User.bind('ajaxError', ajaxSpy); // capture results passed to 'refresh' event listeners
+
+    runs(function(){
+      promise = User.fetch({ id: 123 });
+      promise.then(null, failSpy);
+      expect(failSpy).not.toHaveBeenCalled(); // promise has not yet been fulfilled
+    });
+
+    runs(function() {
+      jqXHR.reject(jqXHR, 'error', 'Not Found');
+    });
+
+    waitsFor(function(){
+      return failSpy.wasCalled;
+    }, "Promise should have been rejected", 50);
+
+    runs(function(){
+      var xhr = ajaxSpy.mostRecentCall.args[1]
+      expect(failSpy).toHaveBeenCalledWith(xhr);
+    });
+  });
+
   it("should not replace AJAX results when dequeue", function() {
     User.refresh([], {clear: true});
 

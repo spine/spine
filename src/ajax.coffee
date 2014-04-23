@@ -142,13 +142,15 @@ class Collection extends Base
      .fail(@failResponse)
 
   fetch: (params = {}, options = {}) ->
-    if id = params.id
+    promise = if id = params.id
       delete params.id
-      @find(id, params, options).done (record) =>
-        @model.refresh(record, options)
+      @find(id, params, options)
     else
-      @all(params, options).done (records) =>
-        @model.refresh(records, options)
+      @all(params, options)
+
+    promise.fail(options.reject).done (record) =>
+      results = @model.refresh(record, options)
+      options.resolve?(results)
 
   # Private
 

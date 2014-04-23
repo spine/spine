@@ -47,7 +47,12 @@ describe("Model.Local", function(){
   });
 
   describe(".loadLocal", function(){
+    var resolve, reject;
+
     beforeEach(function(){
+      resolve = jasmine.createSpy('resolve');
+      reject = jasmine.createSpy('reject');
+
       User.extend(Spine.Model.Local);
       var data = [
         {name: "Bob", id: "c-1"}
@@ -61,12 +66,17 @@ describe("Model.Local", function(){
       expect(User.count()).toEqual(1);
     });
 
+    it("should resolve promise with results", function() {
+      User.loadLocal(null, { resolve: resolve });
+      expect(resolve).toHaveBeenCalledWith([User.find("c-1")]);
+    });
+
     it("should not delete existing records when set clear option to false", function(){
       User.refresh([
         {name: "Bob", id: "c-0"}
       ]);
       expect(User.count()).toEqual(1);
-      User.loadLocal({clear: false});
+      User.loadLocal(null, { clear: false });
       expect(User.count()).toEqual(2);
     });
   });

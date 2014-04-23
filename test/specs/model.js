@@ -101,6 +101,47 @@ describe("Model", function(){
     sessionStorage.clear()
   });
 
+  describe(".fetch", function(){
+    var promise, callback, params, options;
+
+    beforeEach(function(){
+      callback = jasmine.createSpy('callback');
+      params = { id: 123 };
+      options = { foo: 'bar' };
+    });
+
+    it("can register event listeners", function(){
+      Asset.fetch(callback);
+      Asset.trigger('fetch');
+      expect(callback).toHaveBeenCalled();
+    });
+
+    it("should return a promise", function(){
+      promise = Asset.fetch(params, options);
+      expect(promise.then).toEqual(jasmine.any(Function));
+    });
+
+    it("should pass 'resolve' and 'reject' functions to event listeners", function(){
+      runs(function(){
+        Asset.bind('fetch', callback);
+        Asset.fetch(params, options);
+      });
+
+      waitsFor(function(){
+        return callback.wasCalled
+      }, "'fetch' event handler to be invoked", 50);
+
+      runs(function(){
+        var expectedOptions = $.extend({}, options, {
+          resolve: jasmine.any(Function),
+          reject: jasmine.any(Function)
+        });
+        expect(callback.mostRecentCall.args[0]).toEqual(params);
+        expect(callback.mostRecentCall.args[1]).toEqual(expectedOptions);
+      });
+    });
+  });
+
   it("can check existence", function(){
     var asset1 = Asset.create({id: 1, name: "test.pdf"});
     var asset2 = Asset.create({id: 2, name: "wem.pdf"});
