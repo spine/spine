@@ -67,7 +67,7 @@ describe("Model", function(){
     expect(Asset.find(asset.id)).toBeFalsy();
   });
 
-  it("can use notFound fallback function if records are not found", function(){
+  it("can use notFound fallback function if records are not found with find", function(){
     var asset = Asset.create({name: "test.pdf"});
     expect(Asset.find(asset.id)).toBeTruthy();
     // defauly notFound simply returns null
@@ -97,6 +97,54 @@ describe("Model", function(){
     expect(foundAsset2.name).toBe('test3.pdf');
     expect(sessionStorage.fallback2Ran).toBe('true');
     expect(sessionStorage.fallback2ReceivedId).toBe(asset.id);
+
+    sessionStorage.clear()
+  });
+
+  it("can findAll records", function(){
+    var asset1 = Asset.create({name: "test1.pdf"}),
+        asset2 = Asset.create({name: "test2.pdf"});
+    expect(Asset.findAll([asset1.id, asset2.id]).length).toBe(2);
+
+    asset1.destroy();
+    asset2.destroy();
+    expect(Asset.findAll([asset1.id, asset2.id]).length).toBe(0);
+  });
+
+  it("can use notFound fallback function if records are not found with findAll", function(){
+    var asset1 = Asset.create({name: "test1.pdf"}),
+        asset2 = Asset.create({name: "test2.pdf"});
+    expect(Asset.findAll([asset1.id, asset2.id]).length).toBe(2);
+    // defauly notFound simply returns null
+    asset1.destroy();
+    expect(Asset.findAll([asset1.id]).length).toBe(0);
+    expect(Asset.findAll([asset1.id, asset2.id]).length).toBe(1);
+    // a custom notFound fallback can be added to the findAll
+    var customfallback = function(id){
+      sessionStorage.fallbackRan = true
+      sessionStorage.fallbackReceivedId = id
+      return Asset.create({name: 'test3.pdf', id:id})
+    };
+    var foundAssets = Asset.findAll([asset1.id, asset2.id], customfallback);
+    expect(foundAssets.length).toBe(2);
+    expect(foundAssets[0].id).toBe(asset1.id);
+    expect(sessionStorage.fallbackRan).toBe('true');
+    expect(sessionStorage.fallbackReceivedId).toBe(asset1.id);
+    // notFound can be customized on the model
+    asset1.destroy(); //reset
+    expect(Asset.findAll([asset1.id]).length).toBe(0); // test reset worked
+    expect(Asset.findAll([asset1.id, asset2.id]).length).toBe(1);
+    Asset.notFound = function(id){
+      sessionStorage.fallback2Ran = true
+      sessionStorage.fallback2ReceivedId = id
+      return Asset.create({name: 'test4.pdf'})
+    };
+    var foundAssets2 = Asset.findAll([asset1.id]);
+    expect(foundAssets2.length).toBe(1);
+    expect(foundAssets2[0].name).toBe('test4.pdf');
+    expect(sessionStorage.fallback2Ran).toBe('true');
+    expect(sessionStorage.fallback2ReceivedId).toBe(asset1.id);
+    expect(Asset.findAll([asset1.id, asset2.id]).length).toBe(2);
 
     sessionStorage.clear()
   });
