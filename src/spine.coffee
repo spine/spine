@@ -151,6 +151,9 @@ class Model extends Module
   @find: (id, notFound = @notFound) ->
     @irecords[id]?.clone() or notFound?(id)
 
+  @findAll: (ids, notFound) ->
+    (@find(id) for id in ids when @find(id, notFound))
+
   @notFound: (id) -> null
 
   @exists: (id) -> Boolean @irecords[id]
