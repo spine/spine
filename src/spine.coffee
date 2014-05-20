@@ -133,6 +133,7 @@ class Module
 class Model extends Module
   @extend Events
 
+  @root       : null
   @records    : []
   @irecords   : {}
   @attributes : []
@@ -147,6 +148,12 @@ class Model extends Module
     this
 
   @toString: -> "#{@className}(#{@attributes.join(", ")})"
+
+  @getObjects: (objects) ->
+    if typeof objects is 'object' and @root and objects.hasOwnProperty(@root)
+      objects[@root]
+    else
+      objects
 
   @find: (id, notFound = @notFound) ->
     @irecords[id]?.clone() or notFound?(id)
@@ -246,6 +253,7 @@ class Model extends Module
     @records
 
   @fromJSON: (objects) ->
+    objects = @getObjects(objects)
     return unless objects
     if typeof objects is 'string'
       objects = JSON.parse(objects)
@@ -403,6 +411,7 @@ class Model extends Module
   refresh: (data) ->
     # go to the source and load attributes
     root = @constructor.irecords[@id]
+    data = @constructor.getObjects(data)
     root.load(data)
     @trigger('refresh')
     @
