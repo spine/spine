@@ -403,6 +403,7 @@ class Model extends Module
   refresh: (data) ->
     # go to the source and load attributes
     root = @constructor.irecords[@id]
+    data = @constructor.fromJSON(data)
     root.load(data)
     @trigger('refresh')
     @
