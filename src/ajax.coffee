@@ -210,9 +210,9 @@ class Singleton extends Base
 
   recordResponse: (options = {}) =>
     (data, status, xhr) =>
-
       Ajax.disable =>
         unless Spine.isBlank(data) or @record.destroyed
+          data = @model.fromJSON(data)
           # ID change, need to do some shifting
           if data.id and @record.id isnt data.id
             @record.changeID(data.id)
