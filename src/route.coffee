@@ -71,6 +71,9 @@ class Route extends Spine.Module
     @change()
 
   @unbind: ->
+    # forward to Events.unbind() if given arguments
+    return Spine.Events.unbind.apply this, arguments if arguments.length > 0
+
     return if @options.shim
 
     if @history

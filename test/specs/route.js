@@ -304,6 +304,7 @@ describe("Routing", function(){
 
     beforeEach(function(){
       Route.setup({history: true});
+      spy = jasmine.createSpy();
     });
 
     afterEach(function(){
@@ -322,6 +323,20 @@ describe("Routing", function(){
       var events = $(window).data('events') || {};
 
       expect('popstate' in events).toBe(false);
+    });
+
+    it("should unbind single listeners", function(){
+      Route.bind('navigate', spy);
+      Route.unbind('navigate', spy);
+
+      // make sure our listener got unbound
+      Route.add('/foo/1', function(){});
+      navigate('/foo/1');
+      expect(spy).not.toHaveBeenCalled();
+
+      // make sure popstate didn't get unbound
+      var events = $(window).data('events') || $._data(window, 'events');
+      expect('popstate' in events).toBe(true);
     });
 
     it("can get a path", function(){
