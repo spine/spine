@@ -330,8 +330,7 @@ describe("Routing", function(){
       Route.unbind('navigate', spy);
 
       // make sure our listener got unbound
-      Route.add('/foo/1', function(){});
-      navigate('/foo/1');
+      Route.trigger('navigate');
       expect(spy).not.toHaveBeenCalled();
 
       // make sure popstate didn't get unbound
