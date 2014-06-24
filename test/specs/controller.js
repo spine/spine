@@ -59,7 +59,7 @@ describe("Controller", function(){
       attributes: {"style": "width: 100%"}
     });
     var users = new Users();
-    expect(users.el.attr("style")).toEqual("width: 100%");
+    expect(users.el.attr("style")).toMatch("width: 100%");
   });
 
   describe("When binding DOM events", function(){

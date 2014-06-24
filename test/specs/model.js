@@ -36,7 +36,7 @@ describe("Model", function(){
 
   it("can keep record clones in sync after refreshing the record", function(){
     var asset = Asset.create({name: "test.pdf"});
-    expect(asset.__proto__).toEqual(Asset.irecords[asset.id]);
+    expect(Object.getPrototypeOf(asset)).toEqual(Asset.irecords[asset.id]);
 
     var changedAsset = asset.toJSON();
     changedAsset.name = "wem.pdf";
@@ -47,8 +47,8 @@ describe("Model", function(){
 
     expect(asset.name).toEqual("wem.pdf");
     expect(selectedAsset.name).toEqual("wem.pdf");
-    expect(asset.__proto__).toBe(Asset.irecords[asset.id]);
-    expect(selectedAsset.__proto__).toBe(Asset.irecords[asset.id]);
+    expect(Object.getPrototypeOf(asset)).toBe(Asset.irecords[asset.id]);
+    expect(Object.getPrototypeOf(selectedAsset)).toBe(Asset.irecords[asset.id]);
   });
 
   it("can destroy records", function(){
@@ -173,7 +173,7 @@ describe("Model", function(){
     expect(asset.name).toEqual("foo.pdf");
 
     // Reload should return a clone, more useful that way
-    expect(original.__proto__.__proto__).toEqual(Asset.prototype)
+    expect(Object.getPrototypeOf(Object.getPrototypeOf(original))).toEqual(Asset.prototype)
   });
 
   it("can refresh", function(){
@@ -438,7 +438,7 @@ describe("Model", function(){
 
   it("can be duplicated", function(){
     var asset = Asset.create({name: "who's your daddy?"});
-    expect(asset.dup().__proto__).toBe(Asset.prototype);
+    expect(Object.getPrototypeOf(asset.dup())).toBe(Asset.prototype);
 
     expect(asset.name).toEqual("who's your daddy?");
     asset.name = "I am your father";
@@ -449,8 +449,8 @@ describe("Model", function(){
 
   it("can be cloned", function(){
     var asset = Asset.create({name: "what's cooler than cool?"}).dup(false);
-    expect(asset.clone().__proto__).not.toBe(Asset.prototype);
-    expect(asset.clone().__proto__.__proto__).toBe(Asset.prototype);
+    expect(Object.getPrototypeOf(asset.clone())).not.toBe(Asset.prototype);
+    expect(Object.getPrototypeOf(Object.getPrototypeOf(asset.clone()))).toBe(Asset.prototype);
 
     expect(asset.name).toEqual("what's cooler than cool?");
     asset.name = "ice cold";
@@ -471,8 +471,8 @@ describe("Model", function(){
 
   it("create or save should return a clone", function(){
     var asset = Asset.create({name: "what's cooler than cool?"});
-    expect(asset.__proto__).not.toBe(Asset.prototype);
-    expect(asset.__proto__.__proto__).toBe(Asset.prototype);
+    expect(Object.getPrototypeOf(asset)).not.toBe(Asset.prototype);
+    expect(Object.getPrototypeOf(Object.getPrototypeOf(asset))).toBe(Asset.prototype);
   });
 
   it("should be able to be subclassed", function(){
@@ -729,13 +729,13 @@ describe("Model", function(){
 
     it("it should pass clones with events", function(){
       Asset.bind("create", function(asset){
-        expect(asset.__proto__).not.toBe(Asset.prototype);
-        expect(asset.__proto__.__proto__).toBe(Asset.prototype);
+        expect(Object.getPrototypeOf(asset)).not.toBe(Asset.prototype);
+        expect(Object.getPrototypeOf(Object.getPrototypeOf(asset))).toBe(Asset.prototype);
       });
 
       Asset.bind("update", function(asset){
-        expect(asset.__proto__).not.toBe(Asset.prototype);
-        expect(asset.__proto__.__proto__).toBe(Asset.prototype);
+        expect(Object.getPrototypeOf(asset)).not.toBe(Asset.prototype);
+        expect(Object.getPrototypeOf(Object.getPrototypeOf(asset))).toBe(Asset.prototype);
       });
       var asset = Asset.create({name: "cartoon world.png"});
       asset.updateAttributes({name: "lonely heart.png"});
