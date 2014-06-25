@@ -14,9 +14,9 @@ describe("Routing", function(){
       Route.navigate.apply(Route, args);
 
       waitsFor(function(){return changed === true;});
-      runs(function(){dfd.resolve()});
+      runs(function(){dfd.resolve();});
     }).promise();
-  };
+  }
 
   // Set (default Reset) document's URL
   var setUrl = (function(){
@@ -35,7 +35,7 @@ describe("Routing", function(){
   afterEach(function(){
     Route.unbind();
     Route.routers = [];
-    Route.router = new Route
+    Route.router = new Route();
     delete Route.path;
   });
 
@@ -57,6 +57,31 @@ describe("Routing", function(){
   });
 
 
+  describe("Without trigger", function(){
+
+    beforeEach(function(){
+      Route.setup({trigger: false});
+      spy = jasmine.createSpy();
+    });
+
+    it("should not trigger before, navigate, or change", function(){
+      Route.one('before', spy);
+      Route.one('navigate', spy);
+      Route.one('change', spy);
+      Route.add('/foo', function(){});
+      Route.path = '/';
+
+      Route.navigate('/foo');
+
+      waits(1000);
+      runs(function(){
+        expect(spy).not.toHaveBeenCalled();
+        expect(Route.path).toBe('/foo');
+      });
+    });
+  });
+
+
   describe("With shim", function(){
 
     beforeEach(function(){
@@ -69,7 +94,7 @@ describe("Routing", function(){
     });
 
     it("can set its path", function(){
-      expect(Route.path).toBeUndefined()
+      expect(Route.path).toBeUndefined();
       Route.change();
 
       // Don't check the path is valid but just set to something -> check this for hashes and history
@@ -101,10 +126,10 @@ describe("Routing", function(){
 
       Route.navigate('/foo');
 
-      waitsFor(function(){return changed > 0;})
+      waitsFor(function(){return changed > 0;});
       runs(function(){
         expect(changed).toBe(1);
-      })
+      });
     });
 
     it("should trigger 'before' when a route matches", function () {
@@ -121,7 +146,7 @@ describe("Routing", function(){
       runs(function () {
         expect(triggerBefore).toBe(true);
         expect(routePath).toBe('/foo');
-      })
+      });
     });
 
     it("can navigate to path", function(){
@@ -209,7 +234,7 @@ describe("Routing", function(){
       it("can override trigger behavior when navigating", function(){
         expect(Route.options.trigger).toBe(true);
 
-        Route.one('change', spy)
+        Route.one('change', spy);
 
         Route.add('/users', function(){});
 
@@ -256,9 +281,9 @@ describe("Routing", function(){
     });
 
     it("can set its path", function(){
-      delete Route.path // Remove path which has been set by @setup > @change
+      delete Route.path; // Remove path which has been set by @setup > @change
 
-      window.location.hash = '#/foo'
+      window.location.hash = '#/foo';
       Route.change();
 
       expect(Route.path).toBe('/foo');
@@ -279,6 +304,7 @@ describe("Routing", function(){
 
     beforeEach(function(){
       Route.setup({history: true});
+      spy = jasmine.createSpy();
     });
 
     afterEach(function(){
@@ -299,13 +325,26 @@ describe("Routing", function(){
       expect('popstate' in events).toBe(false);
     });
 
+    it("should unbind single listeners", function(){
+      Route.bind('navigate', spy);
+      Route.unbind('navigate', spy);
+
+      // make sure our listener got unbound
+      Route.trigger('navigate');
+      expect(spy).not.toHaveBeenCalled();
+
+      // make sure popstate didn't get unbound
+      var events = $(window).data('events') || $._data(window, 'events');
+      expect('popstate' in events).toBe(true);
+    });
+
     it("can get a path", function(){
       // not checking weather the path is correct, just that it is something...
       expect(Route.getPath()).toBeDefined();
     });
 
     it("can set its path", function(){
-      delete Route.path // Remove path which has been set by @setup > @change
+      delete Route.path; // Remove path which has been set by @setup > @change
 
       setUrl('/foo');
       Route.change();
@@ -331,7 +370,7 @@ describe("Routing", function(){
     it("when true bubbles unmatched routes to the browser", function(){
       Route.setup({redirect: true});
       spyOn(Route, 'redirect');
-      Route.navigate('/unmatched')
+      Route.navigate('/unmatched');
       expect(Route.redirect).toHaveBeenCalledWith('/unmatched');
     });
 
@@ -346,8 +385,8 @@ describe("Routing", function(){
       var options = {'testing': 123};
       var unmatchedResult = Route.navigate('/unmatched', options);
       //expect(callback).toHaveBeenCalled();
-      expect(calledCount).toBe(1)
-      expect(unmatchedResult).toEqual(['/unmatched', options.testing])
+      expect(calledCount).toBe(1);
+      expect(unmatchedResult).toEqual(['/unmatched', options.testing]);
     });
 
   });

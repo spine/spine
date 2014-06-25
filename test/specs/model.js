@@ -36,7 +36,7 @@ describe("Model", function(){
 
   it("can keep record clones in sync after refreshing the record", function(){
     var asset = Asset.create({name: "test.pdf"});
-    expect(asset.__proto__).toEqual(Asset.irecords[asset.id]);
+    expect(Object.getPrototypeOf(asset)).toEqual(Asset.irecords[asset.id]);
 
     var changedAsset = asset.toJSON();
     changedAsset.name = "wem.pdf";
@@ -47,8 +47,8 @@ describe("Model", function(){
 
     expect(asset.name).toEqual("wem.pdf");
     expect(selectedAsset.name).toEqual("wem.pdf");
-    expect(asset.__proto__).toBe(Asset.irecords[asset.id]);
-    expect(selectedAsset.__proto__).toBe(Asset.irecords[asset.id]);
+    expect(Object.getPrototypeOf(asset)).toBe(Asset.irecords[asset.id]);
+    expect(Object.getPrototypeOf(selectedAsset)).toBe(Asset.irecords[asset.id]);
   });
 
   it("can destroy records", function(){
@@ -67,7 +67,7 @@ describe("Model", function(){
     expect(Asset.find(asset.id)).toBeFalsy();
   });
 
-  it("can use notFound fallback function if records are not found", function(){
+  it("can use notFound fallback function if records are not found with find", function(){
     var asset = Asset.create({name: "test.pdf"});
     expect(Asset.find(asset.id)).toBeTruthy();
     // defauly notFound simply returns null
@@ -101,6 +101,54 @@ describe("Model", function(){
     sessionStorage.clear()
   });
 
+  it("can findAll records", function(){
+    var asset1 = Asset.create({name: "test1.pdf"}),
+        asset2 = Asset.create({name: "test2.pdf"});
+    expect(Asset.findAll([asset1.id, asset2.id]).length).toBe(2);
+
+    asset1.destroy();
+    asset2.destroy();
+    expect(Asset.findAll([asset1.id, asset2.id]).length).toBe(0);
+  });
+
+  it("can use notFound fallback function if records are not found with findAll", function(){
+    var asset1 = Asset.create({name: "test1.pdf"}),
+        asset2 = Asset.create({name: "test2.pdf"});
+    expect(Asset.findAll([asset1.id, asset2.id]).length).toBe(2);
+    // defauly notFound simply returns null
+    asset1.destroy();
+    expect(Asset.findAll([asset1.id]).length).toBe(0);
+    expect(Asset.findAll([asset1.id, asset2.id]).length).toBe(1);
+    // a custom notFound fallback can be added to the findAll
+    var customfallback = function(id){
+      sessionStorage.fallbackRan = true
+      sessionStorage.fallbackReceivedId = id
+      return Asset.create({name: 'test3.pdf', id:id})
+    };
+    var foundAssets = Asset.findAll([asset1.id, asset2.id], customfallback);
+    expect(foundAssets.length).toBe(2);
+    expect(foundAssets[0].id).toBe(asset1.id);
+    expect(sessionStorage.fallbackRan).toBe('true');
+    expect(sessionStorage.fallbackReceivedId).toBe(asset1.id);
+    // notFound can be customized on the model
+    asset1.destroy(); //reset
+    expect(Asset.findAll([asset1.id]).length).toBe(0); // test reset worked
+    expect(Asset.findAll([asset1.id, asset2.id]).length).toBe(1);
+    Asset.notFound = function(id){
+      sessionStorage.fallback2Ran = true
+      sessionStorage.fallback2ReceivedId = id
+      return Asset.create({name: 'test4.pdf'})
+    };
+    var foundAssets2 = Asset.findAll([asset1.id]);
+    expect(foundAssets2.length).toBe(1);
+    expect(foundAssets2[0].name).toBe('test4.pdf');
+    expect(sessionStorage.fallback2Ran).toBe('true');
+    expect(sessionStorage.fallback2ReceivedId).toBe(asset1.id);
+    expect(Asset.findAll([asset1.id, asset2.id]).length).toBe(2);
+
+    sessionStorage.clear()
+  });
+
   it("can check existence", function(){
     var asset1 = Asset.create({id: 1, name: "test.pdf"});
     var asset2 = Asset.create({id: 2, name: "wem.pdf"});
@@ -125,7 +173,7 @@ describe("Model", function(){
     expect(asset.name).toEqual("foo.pdf");
 
     // Reload should return a clone, more useful that way
-    expect(original.__proto__.__proto__).toEqual(Asset.prototype)
+    expect(Object.getPrototypeOf(Object.getPrototypeOf(original))).toEqual(Asset.prototype)
   });
 
   it("can refresh", function(){
@@ -390,7 +438,7 @@ describe("Model", function(){
 
   it("can be duplicated", function(){
     var asset = Asset.create({name: "who's your daddy?"});
-    expect(asset.dup().__proto__).toBe(Asset.prototype);
+    expect(Object.getPrototypeOf(asset.dup())).toBe(Asset.prototype);
 
     expect(asset.name).toEqual("who's your daddy?");
     asset.name = "I am your father";
@@ -401,8 +449,8 @@ describe("Model", function(){
 
   it("can be cloned", function(){
     var asset = Asset.create({name: "what's cooler than cool?"}).dup(false);
-    expect(asset.clone().__proto__).not.toBe(Asset.prototype);
-    expect(asset.clone().__proto__.__proto__).toBe(Asset.prototype);
+    expect(Object.getPrototypeOf(asset.clone())).not.toBe(Asset.prototype);
+    expect(Object.getPrototypeOf(Object.getPrototypeOf(asset.clone()))).toBe(Asset.prototype);
 
     expect(asset.name).toEqual("what's cooler than cool?");
     asset.name = "ice cold";
@@ -423,8 +471,8 @@ describe("Model", function(){
 
   it("create or save should return a clone", function(){
     var asset = Asset.create({name: "what's cooler than cool?"});
-    expect(asset.__proto__).not.toBe(Asset.prototype);
-    expect(asset.__proto__.__proto__).toBe(Asset.prototype);
+    expect(Object.getPrototypeOf(asset)).not.toBe(Asset.prototype);
+    expect(Object.getPrototypeOf(Object.getPrototypeOf(asset))).toBe(Asset.prototype);
   });
 
   it("should be able to be subclassed", function(){
@@ -681,13 +729,13 @@ describe("Model", function(){
 
     it("it should pass clones with events", function(){
       Asset.bind("create", function(asset){
-        expect(asset.__proto__).not.toBe(Asset.prototype);
-        expect(asset.__proto__.__proto__).toBe(Asset.prototype);
+        expect(Object.getPrototypeOf(asset)).not.toBe(Asset.prototype);
+        expect(Object.getPrototypeOf(Object.getPrototypeOf(asset))).toBe(Asset.prototype);
       });
 
       Asset.bind("update", function(asset){
-        expect(asset.__proto__).not.toBe(Asset.prototype);
-        expect(asset.__proto__.__proto__).toBe(Asset.prototype);
+        expect(Object.getPrototypeOf(asset)).not.toBe(Asset.prototype);
+        expect(Object.getPrototypeOf(Object.getPrototypeOf(asset))).toBe(Asset.prototype);
       });
       var asset = Asset.create({name: "cartoon world.png"});
       asset.updateAttributes({name: "lonely heart.png"});
