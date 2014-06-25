@@ -1,4 +1,11 @@
-## 1.3.1 (pending)
+## 1.3.2
+* Fixes and minor improvements to route and relations modules #535, #551, #533
+* Add Model.findAll() #538
+* code cleanup #537, #536
+* jasmine test pass in IE9 #549
+* CoffeeScript 1.7.1
+
+## 1.3.1
 * Fixes and improvements to route and manager modules #513
 * Ajax methods configuable #523
 * Fix for orphaned model instances #527
