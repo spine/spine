@@ -289,9 +289,10 @@ class Model extends Module
     super
     if @constructor.uuid? and typeof @constructor.uuid is 'function'
       @cid = @constructor.uuid()
-      @id = @cid unless @id
+      @id  = @cid unless @id
     else
       @cid = atts?.cid or @constructor.uid('c-')
+    @_callbacks ?= {}
     @load atts if atts
 
   isNew: ->
@@ -392,7 +393,9 @@ class Model extends Module
       delete atts.id
     else
       atts.cid = @cid
-    new @constructor(atts)
+    record = new @constructor(atts)
+    @_callbacks and record._callbacks = @_callbacks
+    record
 
   clone: ->
     createObject(this)
@@ -464,11 +467,11 @@ class Model extends Module
     clone
 
   bind: ->
-    record = @constructor.irecords[@id]
+    record = @constructor.irecords[@id] or this
     Events.bind.apply record, arguments
 
   one: ->
-    record = @constructor.irecords[@id]
+    record = @constructor.irecords[@id] or this
     Events.one.apply record, arguments
 
   unbind: ->
