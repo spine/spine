@@ -6,7 +6,7 @@ Released under the MIT License
 Events =
   bind: (ev, callback) ->
     evs   = ev.split(' ')
-    @_callbacks = {} unless @hasOwnProperty('_callbacks') and @_callbacks
+    @_callbacks or= {} unless @hasOwnProperty('_callbacks')
     for name in evs
       @_callbacks[name] or= []
       @_callbacks[name].push(callback)
@@ -18,12 +18,11 @@ Events =
       callback.apply(this, arguments)
 
   trigger: (args...) ->
-    ev = args.shift()
-    list = @hasOwnProperty('_callbacks') and @_callbacks?[ev]
+    ev   = args.shift()
+    list = @_callbacks?[ev]
     return unless list
     for callback in list
-      if callback.apply(this, args) is false
-        break
+      break if callback.apply(this, args) is false
     true
 
   listenTo: (obj, ev, callback) ->
@@ -132,6 +131,7 @@ class Module
 
 class Model extends Module
   @extend Events
+  @include Events
 
   @records    : []
   @irecords   : {}
@@ -166,6 +166,7 @@ class Model extends Module
     @irecords[record.id]  ?= record
     @irecords[record.cid] ?= record
     @records.push(record)
+    record
 
   @refresh: (values, options = {}) ->
     @deleteAll() if options.clear
@@ -329,13 +330,13 @@ class Model extends Module
     unless options.validate is false
       error = @validate()
       if error
-        @trigger('error', error)
+        @trigger('error', this, error)
         return false
 
-    @trigger('beforeSave', options)
+    @trigger('beforeSave', this, options)
     record = if @isNew() then @create(options) else @update(options)
     @stripCloneAttrs()
-    @trigger('save', options)
+    @trigger('save', record, options)
     record
 
   stripCloneAttrs: ->
@@ -375,14 +376,13 @@ class Model extends Module
 
   destroy: (options = {}) ->
     options.clear ?= true
-    @trigger('beforeDestroy', options)
+    @trigger('beforeDestroy', this, options)
     @remove(options)
     @destroyed = true
     # handle events
-    @trigger('destroy', options)
-    @trigger('change', 'destroy', options)
-    if @listeningTo
-      @stopListening()
+    @trigger('destroy', this, options)
+    @trigger('change', this, 'destroy', options)
+    @stopListening() if @listeningTo
     @unbind()
     this
 
@@ -407,8 +407,8 @@ class Model extends Module
     # go to the source and load attributes
     root = @constructor.irecords[@id]
     root.load(data)
-    @trigger('refresh')
-    @
+    @trigger('refresh', this)
+    this
 
   toJSON: ->
     @attributes()
@@ -438,7 +438,7 @@ class Model extends Module
   # Private
 
   update: (options) ->
-    @trigger('beforeUpdate', options)
+    @trigger('beforeUpdate', this, options)
 
     records = @constructor.irecords
     records[@id].load @attributes()
@@ -446,60 +446,39 @@ class Model extends Module
     @constructor.sort()
 
     clone = records[@id].clone()
-    clone.trigger('update', options)
-    clone.trigger('change', 'update', options)
+    clone.trigger('update', clone, options)
+    clone.trigger('change', clone, 'update', options)
     clone
 
   create: (options) ->
-    @trigger('beforeCreate', options)
+    @trigger('beforeCreate', this, options)
     @id or= @cid
 
     record = @dup(false)
     @constructor.addRecord(record)
     @constructor.sort()
 
-    clone        = record.clone()
-    clone.trigger('create', options)
-    clone.trigger('change', 'create', options)
+    clone = record.clone()
+    clone.trigger('create', clone, options)
+    clone.trigger('change', clone, 'create', options)
     clone
 
-  bind: (events, callback) ->
-    @constructor.bind events, binder = (record) =>
-      if record && @eql(record)
-        callback.apply(this, arguments)
-    # create a wrapper function to be called with 'unbind' for each event
-    for singleEvent in events.split(' ')
-      do (singleEvent) =>
-        @constructor.bind "unbind", unbinder = (record, event, cb) =>
-          if record && @eql(record)
-            return if event and event isnt singleEvent
-            return if cb and cb isnt callback
-            @constructor.unbind(singleEvent, binder)
-            @constructor.unbind("unbind", unbinder)
-    this
+  bind: ->
+    record = @constructor.irecords[@id]
+    Events.bind.apply record, arguments
 
-  one: (events, callback) ->
-    @bind events, handler = =>
-      @unbind(events, handler)
-      callback.apply(this, arguments)
+  one: ->
+    record = @constructor.irecords[@id]
+    Events.one.apply record, arguments
 
-  trigger: (args...) ->
-    args.splice(1, 0, this)
-    @constructor.trigger(args...)
+  unbind: ->
+    record = @constructor.irecords[@id] or this
+    Events.unbind.apply record, arguments
 
-  listenTo: -> Events.listenTo.apply @, arguments
-  listenToOnce: -> Events.listenToOnce.apply @, arguments
-  stopListening: -> Events.stopListening.apply @, arguments
+  trigger: ->
+    Events.trigger.apply this, arguments
+    @constructor.trigger arguments...
 
-  unbind: (events, callback) ->
-    if arguments.length is 0
-      @trigger('unbind')
-    else if events
-      for event in events.split(' ')
-        @trigger('unbind', event, callback)
-
-Model::on = Model::bind
-Model::off = Model::unbind
 
 class Controller extends Module
   @include Events

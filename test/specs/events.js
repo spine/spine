@@ -14,7 +14,7 @@ describe("Events", function(){
     EventTest.trigger("daddyo");
     expect(spy).toHaveBeenCalled();
   });
-  
+
   it("can listen for events on other objects", function(){
     ListenTest = Spine.Class.create();
     ListenTest.extend(Spine.Events);
@@ -34,7 +34,7 @@ describe("Events", function(){
     EventTest.trigger("car");
     expect(spy).toHaveBeenCalled();
   });
-  
+
   it("can listen for multiple events on other objects", function(){
     ListenTest = Spine.Class.create();
     ListenTest.extend(Spine.Events);
@@ -65,7 +65,7 @@ describe("Events", function(){
     EventTest.trigger("daddyo");
     expect(spy).not.toHaveBeenCalled();
   });
-  
+
   it("can stop listening to events", function(){
     ListenTest = Spine.Class.create();
     ListenTest.extend(Spine.Events);
@@ -87,7 +87,7 @@ describe("Events", function(){
     EventTest.trigger("house");
     expect(spy).toHaveBeenCalled();
   });
-  
+
   it("can stopListening to one event", function(){
     ListenTest = Spine.Class.create();
     ListenTest.extend(Spine.Events);
@@ -99,7 +99,7 @@ describe("Events", function(){
     EventTest.trigger("house");
     expect(spy).toHaveBeenCalled();
   });
-  
+
   it("can stop listening to a specific callback", function(){
     var noop2 = {spy2: function(){}};
     spyOn(noop2, "spy2");
@@ -125,7 +125,7 @@ describe("Events", function(){
     EventTest.trigger("indahouse");
     expect(spy).not.toHaveBeenCalled();
   });
-  
+
   it("can listen to to a event only once", function(){
     ListenTest = Spine.Class.create();
     ListenTest.extend(Spine.Events);
