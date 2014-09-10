@@ -89,7 +89,7 @@ Events =
         break
     this
 
-Events.on = Events.bind
+Events.on  = Events.bind
 Events.off = Events.unbind
 
 Log =
@@ -479,6 +479,9 @@ class Model extends Module
     Events.trigger.apply this, arguments
     return true if arguments[0] is 'refresh' # Don't trigger refresh events
     @constructor.trigger arguments...
+
+Model::on  = Model::bind
+Model::off = Model::unbind
 
 
 class Controller extends Module
