@@ -478,6 +478,7 @@ class Model extends Module
 
   trigger: ->
     Events.trigger.apply this, arguments
+    return true if arguments[0] is 'refresh' # Don't trigger refresh events
     @constructor.trigger arguments...
 
 
