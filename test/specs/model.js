@@ -633,7 +633,7 @@ describe("Model", function(){
       expect(spy).toHaveBeenCalledWith(asset, {});
     });
 
-    it("can fire update events on instances", function(){
+    it("can fire update events on a record", function(){
       var asset = Asset.create({name: "cartoon world.png"});
       asset.bind("update", spy);
       asset.save();
@@ -673,6 +673,13 @@ describe("Model", function(){
       expect(spy).toHaveBeenCalledWith(tmpRecords, {clear: true});
     });
 
+    it("can fire refresh events on a record", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.bind("refresh", spy);
+      Asset.refresh(asset);
+      expect(spy).toHaveBeenCalledWith(asset);
+    });
+
     it("can fire save events on a record", function(){
       var asset = Asset.create({name: "cartoon world.png"});
       asset.bind("save", spy);
@@ -688,6 +695,20 @@ describe("Model", function(){
 
       asset.save();
       expect(spy).toHaveBeenCalledWith(asset, "update", {});
+
+      asset.destroy();
+      expect(spy).toHaveBeenCalledWith(asset, "destroy", {clear: true});
+    });
+
+    it("can fire change events on a record", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.bind("change", spy);
+
+      asset.save();
+      expect(spy).toHaveBeenCalledWith(asset, "update", {});
+
+      asset.refresh({});
+      expect(spy).toHaveBeenCalledWith(asset, "refresh");
 
       asset.destroy();
       expect(spy).toHaveBeenCalledWith(asset, "destroy", {clear: true});

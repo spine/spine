@@ -265,7 +265,7 @@ Model.Ajax =
 
   ajaxChange: (record, type, options = {}) ->
     return if options.ajax is false
-    record.ajax()[type](options.ajax, options)
+    record.ajax()[type]?(options.ajax, options)
 
 Model.Ajax.Methods =
   extended: ->

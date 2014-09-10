@@ -159,18 +159,16 @@ class Model extends Module
   @exists: (id) -> Boolean @irecords[id]
 
   @addRecord: (record, options = {}) ->
-    if record.id and @irecords[record.id]
-      @irecords[record.id].remove(options)
-      record = @irecords[record.id].load(record) unless options.clear
-    record.id or= record.cid
-    @irecords[record.id]  ?= record
-    @irecords[record.cid] ?= record
-    @records.push(record)
+    if root = @irecords[record.id or record.cid]
+      root.refresh(record)
+    else
+      record.id or= record.cid
+      @irecords[record.id] = @irecords[record.cid] = record
+      @records.push(record)
     record
 
   @refresh: (values, options = {}) ->
     @deleteAll() if options.clear
-
     records = @fromJSON(values)
     records = [records] unless isArray(records)
     @addRecord(record, options) for record in records
@@ -406,11 +404,11 @@ class Model extends Module
     @load(original.attributes())
     original
 
-  refresh: (data) ->
+  refresh: (atts) ->
     # go to the source and load attributes
-    root = @constructor.irecords[@id]
-    root.load(data)
+    @constructor.irecords[@id].load(atts)
     @trigger('refresh', this)
+    @trigger('change', this, 'refresh')
     this
 
   toJSON: ->
