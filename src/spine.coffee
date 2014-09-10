@@ -158,7 +158,7 @@ class Model extends Module
 
   @exists: (id) -> Boolean @irecords[id]
 
-  @addRecord: (record, options = {}) ->
+  @addRecord: (record) ->
     if root = @irecords[record.id or record.cid]
       root.refresh(record)
     else
@@ -171,7 +171,7 @@ class Model extends Module
     @deleteAll() if options.clear
     records = @fromJSON(values)
     records = [records] unless isArray(records)
-    @addRecord(record, options) for record in records
+    @addRecord(record) for record in records
     @sort()
 
     result = @cloneArray(records)
@@ -290,7 +290,6 @@ class Model extends Module
       @id  = @cid unless @id
     else
       @cid = atts?.cid or @constructor.uid('c-')
-    @_callbacks ?= {}
     @load atts if atts
 
   isNew: ->

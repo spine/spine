@@ -676,7 +676,7 @@ describe("Model", function(){
     it("can fire refresh events on a record", function(){
       var asset = Asset.create({name: "cartoon world.png"});
       asset.bind("refresh", spy);
-      Asset.refresh(asset);
+      Asset.refresh(asset.attributes());
       expect(spy).toHaveBeenCalledWith(asset);
     });
 
