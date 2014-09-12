@@ -391,7 +391,7 @@ class Model extends Module
     else
       atts.cid = @cid
     record = new @constructor(atts)
-    @_callbacks and record._callbacks = @_callbacks
+    @_callbacks and record._callbacks = @_callbacks unless newRecord
     record
 
   clone: ->
