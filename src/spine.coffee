@@ -36,11 +36,11 @@ Events =
     obj.bind ev, handler = ->
       idx = -1
       for lt, i in listeningToOnce when lt.obj is obj
-        idx = i if lt.ev is ev and lt.callback is callback
+        idx = i if lt.ev is ev and lt.callback is handler
       obj.unbind(ev, handler)
       listeningToOnce.splice(idx, 1) unless idx is -1
       callback.apply(this, arguments)
-    listeningToOnce.push {obj, ev, callback, handler}
+    listeningToOnce.push {obj, ev, callback: handler}
     this
 
   stopListening: (obj, events, callback) ->
@@ -48,7 +48,7 @@ Events =
       for listeningTo in [@listeningTo, @listeningToOnce]
         continue unless listeningTo
         for lt in listeningTo
-          lt.obj.unbind(lt.ev, lt.handler or lt.callback)
+          lt.obj.unbind(lt.ev, lt.callback)
       @listeningTo = undefined
       @listeningToOnce = undefined
 
@@ -59,16 +59,18 @@ Events =
         for ev in events
           for idx in [listeningTo.length-1..0]
             lt = listeningTo[idx]
-            continue if callback and (lt.handler or lt.callback) isnt callback
+            continue unless lt.obj is obj
+            continue if callback and lt.callback isnt callback
             if (not ev) or (ev is lt.ev)
-              lt.obj.unbind(lt.ev, lt.handler or lt.callback)
+              lt.obj.unbind(lt.ev, lt.callback)
               listeningTo.splice(idx, 1) unless idx is -1
             else if ev
               evts = lt.ev.split(' ')
               if ev in evts
                 evts = (e for e in evts when e isnt ev)
                 lt.ev = $.trim(evts.join(' '))
-                lt.obj.unbind(ev, lt.handler or lt.callback)
+                lt.obj.unbind(ev, lt.callback)
+    this
 
   unbind: (ev, callback) ->
     if arguments.length is 0
