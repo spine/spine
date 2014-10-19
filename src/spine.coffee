@@ -404,6 +404,10 @@ class Model extends Module
     original
 
   refresh: (data) ->
+    data = @constructor.fromJSON(data)
+    # ID change, need to do some shifting
+    if data.id and @id isnt data.id
+      @changeID(data.id)
     # go to the source and load attributes
     root = @constructor.irecords[@id]
     root.load(data)
