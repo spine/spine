@@ -8,7 +8,7 @@ Spine is a lightweight MVC library for building JavaScript web applications. Spi
 
 Spine is opinionated in its approach to web application architecture and design. Spine's architecture complements patterns such as de-coupled components and CommonJS modules, markedly helping with code quality and maintainability.
 
-The library is written in [CoffeeScript](http://jashkenas.github.com/coffee-script), and though it doesn't necessarily require CoffeeScript to develop applications - you can use whichever language you're most familiar with - the documentation and some associated tools like [Hem](https://github.com/spine/hem) and [spine.app](https://github.com/spine/spine.app) cater to those who prefer CoffeeScript's syntax.
+The library is written in [CoffeeScript](http://jashkenas.github.com/coffee-script), and though it doesn't necessarily require CoffeeScript to develop applications - you can use whichever language you're most familiar with or prefer - the documentation and some associated tools like [Hem](https://github.com/spine/hem) and [spine.app](https://github.com/spine/spine.app) cater to those who prefer CoffeeScript's syntax.
 
 Documentation is often incomplete or just lies waiting to happen. Approachable source code reduces you knowledge dependencies. Spine is tiny, the core library comes in at less than 700 lines of CoffeeScript code that is written in such a way as not to sacrifice readability. Being lightweight and simple is fundamental to Spine.
 
