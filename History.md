@@ -1,3 +1,7 @@
+## 1.3.3
+* CoffeeScript 1.8.0
+* exists() replaced with find() in relation module
+
 ## 1.3.2
 * Fixes and minor improvements to route and relations modules #535, #551, #533
 * Add Model.findAll() #538
