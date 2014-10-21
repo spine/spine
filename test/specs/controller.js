@@ -130,14 +130,14 @@ describe("Controller", function(){
       asset.trigger("event2");
       asset.trigger("event3");
       expect(spy).toHaveBeenCalled();
-      expect(spy.callCount).toBe(3);
+      expect(spy..calls.count()).toBe(3);
     });
 
     it("can listen once for an event on a model instance", function(){
       users.listenToOnce(asset, 'event1', spy);
       asset.trigger("event1");
       expect(spy).toHaveBeenCalled();
-      spy.reset();
+      spy.calls.reset();
       asset.trigger("event1");
       expect(spy).not.toHaveBeenCalled();
     });
@@ -146,14 +146,14 @@ describe("Controller", function(){
       users.listenTo(asset, 'event1 event2 event3', spy);
       asset.trigger("event1");
       expect(spy).toHaveBeenCalled();
-      spy.reset();
+      spy.calls.reset();
       users.stopListening(asset, 'event1');
       asset.trigger("event1");
       expect(spy).not.toHaveBeenCalled();
-      spy.reset();
+      spy.calls.reset();
       asset.trigger("event2");
       expect(spy).toHaveBeenCalled();
-      spy.reset();
+      spy.calls.reset();
       asset.trigger("event3");
       expect(spy).toHaveBeenCalled();
     });
@@ -162,7 +162,7 @@ describe("Controller", function(){
       users.listenTo(asset, 'event1 event2 event3', spy);
       asset.trigger("event2");
       expect(spy).toHaveBeenCalled();
-      spy.reset();
+      spy.calls.reset();
       users.stopListening(asset);
       asset.trigger("event1");
       asset.trigger("event2");
@@ -176,8 +176,8 @@ describe("Controller", function(){
       asset.trigger("event1");
       expect(spy).toHaveBeenCalled();
       expect(spy2).toHaveBeenCalled();
-      spy.reset();
-      spy2.reset();
+      spy.calls.reset();
+      spy2.calls.reset();
       users.stopListening(asset, 'event1');
       asset.trigger("event1");
       expect(spy).not.toHaveBeenCalled();
@@ -190,7 +190,7 @@ describe("Controller", function(){
       users.listenTo(asset, 'event1', spy);
       asset.trigger("event1");
       expect(spy).toHaveBeenCalled();
-      spy.reset();
+      spy.calls.reset();
       users.release();
       asset.trigger("event1");
       expect(spy).not.toHaveBeenCalled();
@@ -202,8 +202,8 @@ describe("Controller", function(){
       asset.trigger("event1");
       expect(spy).toHaveBeenCalled();
       expect(spy2).toHaveBeenCalled();
-      spy.reset();
-      spy2.reset();
+      spy.calls.reset();
+      spy2.calls.reset();
       users.release();
       asset.trigger("event1");
       expect(spy).not.toHaveBeenCalled();

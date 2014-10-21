@@ -31,64 +31,68 @@ describe("Ajax", function(){
   //});
 
   it("can GET a collection on fetch", function(){
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
 
     User.fetch();
 
     expect(jQuery.ajax).toHaveBeenCalledWith({
-      type:         'GET',
-      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
       dataType:     'json',
+      processData:  false,
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      type:         'GET',
       url:          '/users',
-      processData:  false
+      data:         undefined
     });
   });
 
   it("can use custom HTTP method to fetch a collection", function(){
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
 
     Spine.Ajax.config.loadMethod = 'POST'
     User.fetch();
 
     expect(jQuery.ajax).toHaveBeenCalledWith({
-      type:         'POST',
-      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
       dataType:     'json',
+      processData:  false,
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      type:         'POST',
       url:          '/users',
-      processData:  false
+      data:         undefined
     });
   });
 
   it("can GET a record on fetch", function(){
     User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
 
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
 
     User.fetch({id: "IDD"});
 
     expect(jQuery.ajax).toHaveBeenCalledWith({
-      type:         'GET',
-      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
       dataType:     'json',
+      processData:  false,
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      type:         'GET',
       url:          '/users/IDD',
-      processData:  false
+      data:         undefined
     });
   });
 
   it("can use custom HTTP method to fetch a record", function(){
     User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
 
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
 
     Spine.Ajax.config.loadMethod = 'POST'
     User.fetch({id: "IDD"});
 
     expect(jQuery.ajax).toHaveBeenCalledWith({
-      type:         'POST',
-      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
       dataType:     'json',
+      processData:  false,
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      type:         'POST',
       url:          '/users/IDD',
-      processData:  false
+      data:         undefined
     });
   });
 
@@ -106,23 +110,23 @@ describe("Ajax", function(){
   });
 
   it("should send POST on create", function(){
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
 
     User.create({first: "Hans", last: "Zimmer", id: "IDD"});
 
     expect(jQuery.ajax).toHaveBeenCalledWith({
-      type:         'POST',
-      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
-      contentType:  'application/json',
       dataType:     'json',
-      data:         '{"first":"Hans","last":"Zimmer","id":"IDD"}',
+      processData:  false,
+      headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
+      type:         'POST',
+      contentType:  'application/json',
       url:          '/users',
-      processData:  false
+      data:         '{"first":"Hans","last":"Zimmer","id":"IDD"}'
     });
   });
 
   it("can use custom HTTP method to create a record", function(){
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
 
     Spine.Ajax.config.createMethod = 'PUT'
     User.create({first: "Hans", last: "Zimmer", id: "IDD"});
@@ -141,7 +145,7 @@ describe("Ajax", function(){
   it("should send PUT on update", function(){
     User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
 
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
 
     User.first().updateAttributes({first: "John2", last: "Williams2"});
 
@@ -160,7 +164,7 @@ describe("Ajax", function(){
     User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
 
     Spine.Ajax.config.updateMethod = 'PATCH'
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
 
     User.first().updateAttributes({first: "John2", last: "Williams2"});
 
@@ -178,38 +182,40 @@ describe("Ajax", function(){
   it("should send DELETE on destroy", function(){
     User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
 
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
 
     User.first().destroy();
 
     expect(jQuery.ajax).toHaveBeenCalledWith({
-      headers:     { 'X-Requested-With' : 'XMLHttpRequest' },
       dataType:   'json',
       processData: false,
+      headers:     { 'X-Requested-With' : 'XMLHttpRequest' },
       type:        'DELETE',
-      url:         '/users/IDD'
+      url:         '/users/IDD',
+      data:        undefined
     });
   });
 
   it("can use custom HTTP method to destroy record", function(){
     User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
 
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
 
     Spine.Ajax.config.destroyMethod = 'POST'
     User.first().destroy();
 
     expect(jQuery.ajax).toHaveBeenCalledWith({
       headers:     { 'X-Requested-With' : 'XMLHttpRequest' },
-      dataType:   'json',
+      dataType:    'json',
       processData: false,
       type:        'POST',
-      url:         '/users/IDD'
+      url:         '/users/IDD',
+      data:        undefined
     });
   });
 
   it("should update record after PUT/POST", function(){
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
 
     User.create({first: "Hans", last: "Zimmer", id: "IDD"});
 
@@ -220,7 +226,7 @@ describe("Ajax", function(){
   });
 
   it("should update record with undeclared attributes from server", function(){
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
 
     User.create({first: "Hans", last: "Zimmer"});
     var serverAttrs = {
@@ -237,19 +243,20 @@ describe("Ajax", function(){
   });
 
   it("should change record ID after PUT/POST", function(){
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
 
     User.create({id: "IDD"});
 
     var newAtts = {id: "IDD2"};
     jqXHR.resolve(newAtts);
-
-    expect(User.first().id).toEqual("IDD2");
-    expect(User.irecords["IDD2"]).toEqual(User.first());
+    
+    var first = User.first()
+    expect(first.id).toEqual("IDD2");
+    expect(User.irecords["IDD2"].id).toEqual(first.id);
   });
 
   it("can update record IDs for already queued requests", function(){
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
 
     u = User.create();
     u.first = "Todd";
@@ -259,15 +266,14 @@ describe("Ajax", function(){
     var newAtts = {id: "IDD"};
     jqXHR.resolve(newAtts);
 
-
-    updateAjaxRequest = jQuery.ajax.mostRecentCall.args[0]
+    updateAjaxRequest = jQuery.ajax.calls.mostRecent().args[0]
     expect(updateAjaxRequest.url).toBe("/users/IDD")
   });
 
   it("should not recreate records after DELETE", function() {
     User.refresh([{first: "Phillip", last: "Fry", id: "MYID"}]);
 
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
 
     User.first().destroy();
 
@@ -277,12 +283,12 @@ describe("Ajax", function(){
   });
 
   it("should send requests serially", function(){
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
     
     User.create({first: "First"});
     expect(jQuery.ajax).toHaveBeenCalled();
     
-    jQuery.ajax.reset();
+    jQuery.ajax.calls.reset();
     User.create({first: "Second"});
     expect(jQuery.ajax).not.toHaveBeenCalled();
     
@@ -292,40 +298,40 @@ describe("Ajax", function(){
   
   it("should send GET requests in parallel by default", function() {
     console.log('GET - parallel');
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
     User.fetch(1);
     expect(jQuery.ajax).toHaveBeenCalled();
     User.fetch(2);
     User.fetch(3);
     User.fetch(4);
     User.fetch(5);
-    expect(jQuery.ajax.calls.length).toEqual(5);
-    jQuery.ajax.reset();
+    expect(jQuery.ajax.calls.count()).toEqual(5);
+    jQuery.ajax.calls.reset();
   });
   
   it("should be able to send GET requests serially", function() {
     console.log('GET - serially');
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
     User.fetch(1, {parallel:false});
     User.fetch(2, {parallel:false});
     User.fetch(3, {parallel:false});
     User.fetch(4, {parallel:false});
     User.fetch(5, {parallel:false});
-    expect(jQuery.ajax.calls.length).toEqual(1);
-    jQuery.ajax.reset();
+    expect(jQuery.ajax.calls.count()).toEqual(1);
+    jQuery.ajax.calls.reset();
   });
   
   it("should be able to send non GET requests in parallel", function() {
     console.log('POST - parallel ');
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
     User.create({first: "First"}, {parallel:true});
     User.create({first: "Second"}, {parallel:true});
-    expect(jQuery.ajax.calls.length).toEqual(2);
-    jQuery.ajax.reset();
+    expect(jQuery.ajax.calls.count()).toEqual(2);
+    jQuery.ajax.calls.reset();
   });
   
   it("should return jquery promise objects", function(){
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
     User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
     var user = User.find("IDD");
     var spy = jasmine.createSpy();
@@ -333,23 +339,23 @@ describe("Ajax", function(){
     user.ajax().update().done(spy);
     jqXHR.resolve();
     expect(spy).toHaveBeenCalled();
-    jQuery.ajax.reset();
+    jQuery.ajax.calls.reset();
   });
 
-  it("should still respect promises if requests done in parallel", function() {
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
-    user1 = User.create({first: "First"}, {parallel:true});
-    user2 = User.create({first: "Second"}, {parallel:true});
-    expect(jQuery.ajax.calls.length).toEqual(2);
-    jqXHR.resolve();
-    
-    user1.first = 'firstUpdated';
-    user2.first = 'secondUpdated';
-    
+  describe("the request queue that runs asyncronosly", function() {
+    var counter = 0;
     var promiseTimingTest = [{},{}];
-    var counter = 0
     
-    runs(function() {
+    beforeEach(function(done){
+      spyOn(jQuery, "ajax").and.returnValue(jqXHR);
+      user1 = User.create({first: "First"}, {parallel:true});
+      user2 = User.create({first: "Second"}, {parallel:true});
+      expect(jQuery.ajax.calls.count()).toEqual(2);
+      jqXHR.resolve();
+      
+      user1.first = 'firstUpdated';
+      user2.first = 'secondUpdated';
+    
       user1.bind('ajaxSuccess', function(){
         counter++;
         promiseTimingTest[0].first = this.first;
@@ -363,21 +369,23 @@ describe("Ajax", function(){
       user1.save({parallel:true});
       user2.save({parallel:true});
       jqXHR.resolve();
+      done();
     });
     
-    waitsFor(function() {
-      return counter == 2;
-    }, 'promises should have returned', 1000);
-    
-    runs(function(){
+    it("should still respect promises if requests done in parallel", function(done) {
+      expect(counter).toBe(2);
       expect(promiseTimingTest[0].first).toEqual('firstUpdated');
       expect(promiseTimingTest[1].first).toEqual('secondUpdated');
+      done();
     });
-    jQuery.ajax.reset();
+    
+    afterEach(function(){
+      jQuery.ajax.calls.reset();
+    })
   });
 
   it("should allow promise objects to abort the request and dequeue", function(){
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
     User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
     var user = User.find("IDD");
     var spy = jasmine.createSpy();
@@ -393,7 +401,7 @@ describe("Ajax", function(){
   it("should not replace AJAX results when dequeue", function() {
     User.refresh([], {clear: true});
 
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
     jqXHR.resolve([{id: "IDD"}]);
 
     User.fetch();
@@ -401,7 +409,7 @@ describe("Ajax", function(){
   });
 
   it("should have done callbacks", function(){
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
     var spy = jasmine.createSpy();
 
     User.create({first: "Second"}, {done: spy});
@@ -410,7 +418,7 @@ describe("Ajax", function(){
   });
 
   it("should have fail callbacks", function(){
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
     var spy = jasmine.createSpy();
 
     User.create({first: "Second"}, {fail: spy});
@@ -419,7 +427,7 @@ describe("Ajax", function(){
   });
 
   it("should cancel ajax on change", function() {
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
 
     User.create({first: "Second"}, {ajax: false});
     jqXHR.resolve();
@@ -431,7 +439,7 @@ describe("Ajax", function(){
   });
   
   it("should not double stringify GET requests where data is a string", function(){
-    spyOn(jQuery, 'ajax').andReturn(jqXHR);
+    spyOn(jQuery, 'ajax').and.returnValue(jqXHR);
     User.url = '/people';
     expect(Spine.Ajax.getURL(User)).toBe('/people');
 
@@ -448,7 +456,7 @@ describe("Ajax", function(){
   });
   
   it("should not stringify data for GET requests where data is an object and processData is set to true", function(){
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
     User.url = "/people";
     expect(Spine.Ajax.getURL(User)).toBe('/people');
 
@@ -465,7 +473,7 @@ describe("Ajax", function(){
   });
   
   it("should stringify data for POST requests where data gets passed as an object and processData is set as default (false)", function(){
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
     User.url = "/people";
     expect(Spine.Ajax.getURL(User)).toBe('/people');
 
@@ -495,7 +503,7 @@ describe("Ajax", function(){
   });
 
   it("can override POST url with options on create", function(){
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
 
     User.create({ first: 'Adam', id: '123' }, { url: '/people' });
     expect(jQuery.ajax).toHaveBeenCalledWith({
@@ -510,7 +518,7 @@ describe("Ajax", function(){
   });
 
   it("can override GET url with options on fetch", function(){
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
 
     User.fetch({ url: '/people' });
     expect(jQuery.ajax).toHaveBeenCalledWith({
@@ -518,12 +526,13 @@ describe("Ajax", function(){
       headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
       dataType:     'json',
       url:          '/people',
-      processData:  false
+      processData:  false,
+      data:         undefined
     });
   });
 
   it("can override PUT url with options on update", function(){
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
 
     user = User.create({ first: 'Adam', id: '123' }, { ajax: false });
     user.updateAttributes({ first: 'Odam' }, { url: '/people' });
@@ -539,7 +548,7 @@ describe("Ajax", function(){
   });
 
   it("can override DELETE url with options on destroy", function(){
-    spyOn(jQuery, "ajax").andReturn(jqXHR);
+    spyOn(jQuery, "ajax").and.returnValue(jqXHR);
 
     user = User.create({ first: 'Adam', id: '123' }, { ajax: false });
     user.destroy({ url: '/people' });
@@ -548,7 +557,8 @@ describe("Ajax", function(){
       headers:      { 'X-Requested-With' : 'XMLHttpRequest' },
       dataType:     'json',
       url:          '/people',
-      processData:  false
+      processData:  false,
+      data:         undefined
     });
   });
 
