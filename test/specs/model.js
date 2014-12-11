@@ -1,8 +1,9 @@
 describe("Model", function(){
-  var Asset;
+  var Asset, spy;
 
   beforeEach(function(){
     Asset = Spine.Model.setup("Asset", ["name", "visible", "contact_methods"]);
+    spy = jasmine.createSpy();
   });
 
   it("can create records", function(){
@@ -592,67 +593,253 @@ describe("Model", function(){
     expect(Asset.first().id).toEqual(ref1.id);
   });
 
-  describe("with spy", function(){
-    var spy;
+  it("can iterate over records", function(){
+    var asset1 = Asset.create({name: "test.pdf"});
+    var asset2 = Asset.create({name: "foo.pdf"});
 
-    beforeEach(function(){
-      spy = jasmine.createSpy();
-    });
+    Asset.each(spy);
+    expect(spy).toHaveBeenCalledWith(asset1);
+    expect(spy).toHaveBeenCalledWith(asset2);
+  });
 
-    it("can interate over records", function(){
-      var asset1 = Asset.create({name: "test.pdf"});
-      var asset2 = Asset.create({name: "foo.pdf"});
-
-      Asset.each(spy);
-      expect(spy).toHaveBeenCalledWith(asset1);
-      expect(spy).toHaveBeenCalledWith(asset2);
-    });
+  describe("instance events", function(){
 
     it("can fire create events", function(){
-      Asset.bind("create", spy);
+      var asset = new Asset({name: "cartoon world.png"});
+      asset.on("create", spy);
+      asset.save();
+      expect(spy).toHaveBeenCalledWith(asset, {});
+    });
+
+    it("can fire save events", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.on("save", spy);
+      asset.save();
+      expect(spy).toHaveBeenCalledWith(asset, {});
+    });
+
+    it("can fire update events", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.on("update", spy);
+      asset.save();
+      expect(spy).toHaveBeenCalledWith(asset, {});
+    });
+
+    it("can fire refresh events", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.on("refresh", spy);
+      Asset.refresh(asset.attributes());
+      expect(spy).toHaveBeenCalledWith(asset);
+    });
+
+    it("can fire destroy events", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.on("destroy", spy);
+      asset.destroy();
+      expect(spy).toHaveBeenCalledWith(asset, {clear: true});
+    });
+
+    it("can fire change events", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.on("change", spy);
+      asset.save();
+      expect(spy).toHaveBeenCalledWith(asset, "update", {});
+      asset.refresh({});
+      expect(spy).toHaveBeenCalledWith(asset, "refresh");
+      asset.destroy();
+      expect(spy).toHaveBeenCalledWith(asset, "destroy", {clear: true});
+    });
+
+    it("can fire error events", function(){
+      Asset.include({
+        validate: function(){ return "Validation error"; }
+      });
+      var asset = new Asset({name: ""});
+      asset.on("error", spy);
+      expect(asset.save()).toBeFalsy();
+      expect(spy).toHaveBeenCalledWith(asset, "Validation error");
+    });
+
+    it("should invoke callbacks in the context of the record", function(){
+      var asset = new Asset({name: "cartoon world.png"});
+      asset.on("create update destroy change save error custom", function(){
+        expect(this).toEqual(asset);
+      });
+      asset.save();
+      asset.updateAttribute("name", "nice meme.png");
+      asset.trigger("custom");
+      asset.trigger("error");
+      asset.destroy();
+    });
+
+    it("can bind once to an event", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.one("save", spy);
+      asset.save();
+      expect(spy).toHaveBeenCalledWith(asset, {});
+      spy.reset();
+      asset.save();
+      expect(spy).not.toHaveBeenCalled();
+    });
+
+    it("can unbind all events", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.on("save", spy);
+      asset.unbind();
+      asset.save();
+      expect(spy).not.toHaveBeenCalled();
+    });
+
+    it("can unbind individual events", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.on("save", spy);
+      asset.on("customEvent", spy);
+      asset.unbind('save');
+      asset.save();
+      expect(spy).not.toHaveBeenCalled();
+      asset.trigger('customEvent');
+      expect(spy).toHaveBeenCalled();
+    });
+
+    it("can unbind individual callbacks to individual events", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+      var noop2 = {spy2: function(){}};
+      spyOn(noop2, "spy2");
+      var spy2 = noop2.spy2;
+      asset.on("customEvent", spy);
+      asset.on("customEvent", spy2);
+      asset.trigger("customEvent");
+      expect(spy).toHaveBeenCalled();
+      expect(spy2).toHaveBeenCalled();
+      spy.reset();
+      spy2.reset();
+      asset.unbind("customEvent", spy2);
+      asset.trigger('customEvent');
+      expect(spy).toHaveBeenCalled();
+      expect(spy2).not.toHaveBeenCalled();
+    });
+
+    it("can unbind a single event that uses the same callback as another event", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.on("customEvent1 customEvent2", spy);
+      asset.trigger("customEvent1");
+      asset.trigger("customEvent2");
+      expect(spy.calls.length).toEqual(2);
+      spy.reset();
+      asset.unbind("customEvent1");
+      asset.trigger("customEvent1");
+      asset.trigger("customEvent2");
+      expect(spy.calls.length).toEqual(1);
+    });
+
+    it("can bind and unbind multiple events with a single call", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.on("customEvent1 customEvent2", spy)
+      asset.trigger("customEvent1");
+      asset.trigger("customEvent2");
+      expect(spy.calls.length).toEqual(2);
+      spy.reset();
+      asset.unbind("customEvent1 customEvent2")
+      asset.trigger("customEvent1");
+      asset.trigger("customEvent2");
+      expect(spy.calls.length).toEqual(0);
+    });
+
+    it("can unbind all events if no arguments are passed", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.on("customEvent1 customEvent2", spy)
+      asset.trigger("customEvent1");
+      asset.trigger("customEvent2");
+      expect(spy.calls.length).toEqual(2);
+      spy.reset();
+      asset.unbind();
+      asset.trigger("customEvent1");
+      asset.trigger("customEvent2");
+      expect(spy.calls.length).toEqual(0);
+    });
+
+    it("should not unbind all events if passed undefined", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.on("customEvent1 customEvent2", spy)
+      asset.trigger("customEvent1");
+      asset.trigger("customEvent2");
+      expect(spy.calls.length).toEqual(2);
+      spy.reset();
+      asset.unbind(undefined);
+      asset.trigger("customEvent1");
+      asset.trigger("customEvent2");
+      expect(spy.calls.length).toEqual(2);
+    });
+
+    it("should unbind events when the instance is destroyed", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.on("save", spy);
+      asset.destroy();
+      asset.trigger("save", asset);
+      expect(spy).not.toHaveBeenCalled();
+    });
+
+    it("should maintain callbacks when the record ID changes", function(){
+      var asset = Asset.create({name: "hotel california", id: "bar"});
+      asset.on("test", spy);
+      asset.changeID("foo");
+      asset = Asset.find("foo");
+      asset.trigger("test", asset);
+      expect(spy).toHaveBeenCalled();
+    });
+
+    it("should not unbind class-level callbacks", function(){
+      Asset.on("customEvent1", spy);
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.on("customEvent2", function() {});
+      asset.trigger("unbind");
+      Asset.trigger("customEvent1");
+      expect(spy.calls.length).toEqual(1);
+    });
+
+    it("should not copy callbacks for new duplicated records", function(){
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.on("save", spy);
+      new_asset = asset.dup();
+      new_asset.trigger("save");
+      expect(spy).not.toHaveBeenCalled();
+      duplicate_asset = asset.dup(false);
+      duplicate_asset.trigger("save");
+      expect(spy).toHaveBeenCalled();
+    });
+
+  });
+
+  describe("class events", function(){
+
+    it("can fire create events", function(){
+      Asset.on("create", spy);
       var asset = Asset.create({name: "cartoon world.png"});
       expect(spy).toHaveBeenCalledWith(asset, {});
     });
 
     it("can fire save events", function(){
-      Asset.bind("save", spy);
+      Asset.on("save", spy);
       var asset = Asset.create({name: "cartoon world.png"});
       expect(spy).toHaveBeenCalledWith(asset, {});
-
       asset.save();
       expect(spy).toHaveBeenCalled();
     });
 
     it("can fire update events", function(){
-      Asset.bind("update", spy);
-
+      Asset.on("update", spy);
       var asset = Asset.create({name: "cartoon world.png"});
       expect(spy).not.toHaveBeenCalledWith(asset);
-
       asset.save();
       expect(spy).toHaveBeenCalledWith(asset, {});
     });
 
-    it("can fire destroy events", function(){
-      Asset.bind("destroy", spy);
-      var asset = Asset.create({name: "cartoon world.png"});
-      asset.destroy();
-      expect(spy).toHaveBeenCalledWith(asset, {clear: true});
-    });
-
-    it("can fire destroy events when destroy all record with options", function(){
-      Asset.bind("destroy", spy);
-      var asset = Asset.create({name: "screaming goats.png"});
-      Asset.destroyAll({ajax: false});
-      expect(spy).toHaveBeenCalledWith(asset, {ajax: false, clear: true});
-    });
-
     it("can fire refresh events", function(){
-      Asset.bind("refresh", spy);
+      Asset.on("refresh", spy);
 
       var values = JSON.stringify([]);
-      Asset.refresh(values, {refresh: true, clear: true});
-      expect(spy).toHaveBeenCalledWith([], {refresh: true, clear: true});
+      Asset.refresh(values, {clear: true});
+      expect(spy).toHaveBeenCalledWith([], {clear: true});
 
       var asset = Asset.create({name: "test.pdf"});
       var values = asset.toJSON();
@@ -666,15 +853,31 @@ describe("Model", function(){
       expect(spy).toHaveBeenCalledWith(tmpRecords, {clear: true});
     });
 
-    it("can fire events on record", function(){
-      var asset = Asset.create({name: "cartoon world.png"});
-      asset.bind("save", spy);
-      asset.save();
-      expect(spy).toHaveBeenCalledWith(asset, {});
+    it("should only trigger one refresh event when refreshing multiple records", function(){
+      Asset.on("refresh", spy);
+      var asset1 = Asset.create({id: 1, name: "test.pdf"});
+      var asset2 = Asset.create({id: 2, name: "wem.pdf"});
+      var values = JSON.stringify([asset1, asset2]);
+      Asset.refresh(values, {clear: true});
+      expect(spy.calls.length).toEqual(1);
     });
 
-    it("can fire change events on record", function(){
-      Asset.bind("change", spy);
+    it("can fire destroy events", function(){
+      Asset.on("destroy", spy);
+      var asset = Asset.create({name: "cartoon world.png"});
+      asset.destroy();
+      expect(spy).toHaveBeenCalledWith(asset, {clear: true});
+    });
+
+    it("can fire destroy events when destroying all records with options", function(){
+      Asset.on("destroy", spy);
+      var asset = Asset.create({name: "screaming goats.png"});
+      Asset.destroyAll({ajax: false});
+      expect(spy).toHaveBeenCalledWith(asset, {ajax: false, clear: true});
+    });
+
+    it("can fire change events", function(){
+      Asset.on("change", spy);
 
       var asset = Asset.create({name: "cartoon world.png"});
       expect(spy).toHaveBeenCalledWith(asset, "create", {});
@@ -687,7 +890,7 @@ describe("Model", function(){
     });
 
     it("can fire error events", function(){
-      Asset.bind("error", spy);
+      Asset.on("error", spy);
 
       Asset.include({
         validate: function(){
@@ -701,39 +904,38 @@ describe("Model", function(){
       expect(spy).toHaveBeenCalledWith(asset, "Name required");
     });
 
-    it("should be able to bind once", function(){
+    it("should invoke callbacks in the context of the class", function(){
+      Asset.on("create update destroy change save error custom", function(){
+        expect(this).toEqual(Asset);
+      });
+      var asset = Asset.create({name: "screaming goats.png"});
+      asset.updateAttribute("name", "more screaming goats.png");
+      asset.save();
+      asset.trigger("custom");
+      asset.trigger("error");
+      asset.destroy();
+    })
+
+    it("can bind once", function(){
       Asset.one("save", spy);
 
       var asset = new Asset({name: "cartoon world.png"});
       asset.save();
 
-      expect(spy).toHaveBeenCalledWith(asset, {});
+      expect(spy).toHaveBeenCalledWith(asset.clone(), {});
       spy.reset();
 
       asset.save();
       expect(spy).not.toHaveBeenCalled();
     });
 
-    it("should be able to bind once on instance", function(){
-      var asset = Asset.create({name: "cartoon world.png"});
-
-      asset.one("save", spy);
-      asset.save();
-
-      expect(spy).toHaveBeenCalledWith(asset, {});
-      spy.reset();
-
-      asset.save();
-      expect(spy).not.toHaveBeenCalled();
-    });
-
-    it("it should pass clones with events", function(){
-      Asset.bind("create", function(asset){
+    it("should pass clones into callbacks", function(){
+      Asset.on("create", function(asset){
         expect(Object.getPrototypeOf(asset)).not.toBe(Asset.prototype);
         expect(Object.getPrototypeOf(Object.getPrototypeOf(asset))).toBe(Asset.prototype);
       });
 
-      Asset.bind("update", function(asset){
+      Asset.on("update", function(asset){
         expect(Object.getPrototypeOf(asset)).not.toBe(Asset.prototype);
         expect(Object.getPrototypeOf(Object.getPrototypeOf(asset))).toBe(Asset.prototype);
       });
@@ -741,120 +943,6 @@ describe("Model", function(){
       asset.updateAttributes({name: "lonely heart.png"});
     });
 
-    it("should be able to unbind all instance events", function(){
-      var asset = Asset.create({name: "cartoon world.png"});
-      asset.bind("save", spy);
-      asset.unbind();
-      asset.save();
-      expect(spy).not.toHaveBeenCalled();
-    });
-
-    it("should be able to unbind individual instance events", function(){
-      var asset = Asset.create({name: "cartoon world.png"});
-      asset.bind("save", spy);
-      asset.bind("customEvent", spy);
-      asset.unbind('save');
-      asset.save();
-      expect(spy).not.toHaveBeenCalled();
-      asset.trigger('customEvent');
-      expect(spy).toHaveBeenCalled();
-    });
-
-    it("should be able to unbind individual callbacks to individual instance events", function(){
-      var asset = Asset.create({name: "cartoon world.png"});
-      var noop2 = {spy2: function(){}};
-      spyOn(noop2, "spy2");
-      var spy2 = noop2.spy2;
-      asset.bind("customEvent", spy);
-      asset.bind("customEvent", spy2);
-      asset.trigger("customEvent");
-      expect(spy).toHaveBeenCalled();
-      expect(spy2).toHaveBeenCalled();
-      spy.reset();
-      spy2.reset();
-      asset.unbind("customEvent", spy2);
-      asset.trigger('customEvent');
-      expect(spy).toHaveBeenCalled();
-      expect(spy2).not.toHaveBeenCalled();
-    });
-
-    it("should be able to unbind a single event that uses a callback another event is bind to.", function(){
-      var asset = Asset.create({name: "cartoon world.png"});
-      asset.bind("customEvent1 customEvent2", spy);
-      asset.trigger("customEvent1");
-      asset.trigger("customEvent2");
-      expect(spy.calls.length).toEqual(2);
-      spy.reset();
-      asset.unbind("customEvent1");
-      asset.trigger("customEvent1");
-      asset.trigger("customEvent2");
-      expect(spy.calls.length).toEqual(1);
-    });
-
-    it("should be able to bind and unbind multiple events with a single call.", function(){
-      var asset = Asset.create({name: "cartoon world.png"});
-      asset.bind("customEvent1 customEvent2", spy)
-      asset.trigger("customEvent1");
-      asset.trigger("customEvent2");
-      expect(spy.calls.length).toEqual(2);
-      spy.reset();
-      asset.unbind("customEvent1 customEvent2")
-      asset.trigger("customEvent1");
-      asset.trigger("customEvent2");
-      expect(spy.calls.length).toEqual(0);
-    });
-
-    it("should be able to unbind all events if no arguments given", function(){
-      var asset = Asset.create({name: "cartoon world.png"});
-      asset.bind("customEvent1 customEvent2", spy)
-      asset.trigger("customEvent1");
-      asset.trigger("customEvent2");
-      expect(spy.calls.length).toEqual(2);
-      spy.reset();
-      asset.unbind();
-      asset.trigger("customEvent1");
-      asset.trigger("customEvent2");
-      expect(spy.calls.length).toEqual(0);
-    });
-
-    it("should not be able to unbind all events if given and undefined object", function(){
-      var asset = Asset.create({name: "cartoon world.png"});
-      asset.bind("customEvent1 customEvent2", spy)
-      asset.trigger("customEvent1");
-      asset.trigger("customEvent2");
-      expect(spy.calls.length).toEqual(2);
-      spy.reset();
-      asset.unbind(undefined);
-      asset.trigger("customEvent1");
-      asset.trigger("customEvent2");
-      expect(spy.calls.length).toEqual(2);
-    });
-
-    it("should not unbind class-level callbacks", function(){
-      Asset.bind('customEvent1', spy);
-      var asset = Asset.create({name: "cartoon world.png"});
-      asset.bind('customEvent2', function() {});
-      asset.trigger('unbind');
-      Asset.trigger('customEvent1');
-      expect(spy.calls.length).toEqual(1);
-    });
-
-    it("should unbind events on instance destroy", function(){
-      var asset = Asset.create({name: "cartoon world.png"});
-      asset.bind("save", spy);
-      asset.destroy();
-      asset.trigger("save", asset);
-      expect(spy).not.toHaveBeenCalled();
-    });
-
-    it("callbacks should still work on ID changes", function(){
-      var asset = Asset.create({name: "hotel california", id: "bar"});
-      asset.bind("test", spy);
-      asset.changeID("foo");
-      asset = Asset.find("foo");
-      asset.trigger("test", asset);
-      expect(spy).toHaveBeenCalled();
-    })
   });
 
   /*
@@ -934,7 +1022,7 @@ describe("Model", function(){
     });
 
     it("can stop listening to events on a model instance, without canceling out other binders on that model instance", function(){
-      Asset.bind('event1', spy2)
+      Asset.on('event1', spy2)
       asset2.listenTo(asset, 'event1', spy);
       asset.trigger("event1");
       expect(spy).toHaveBeenCalled();
