@@ -4,7 +4,7 @@
 [![Build Status](https://secure.travis-ci.org/spine/spine.png)](http://travis-ci.org/spine/spine)
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/spine/spine/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
-Spine is a lightweight MVC library for building JavaScript web applications. Spine gives you structure and then gets out of your way, allowing you to concentrate on the fun stuff, building awesome web applications.
+Spine is a lightweight MVC library for building JavaScript web applications. Spine gives you structure and then gets out of your way, allowing you to concentrate on the fun stuff: building awesome web applications.
 
 Spine is opinionated in its approach to web application architecture and design. Spine's architecture complements patterns such as de-coupled components and CommonJS modules, markedly helping with code quality and maintainability.
 
