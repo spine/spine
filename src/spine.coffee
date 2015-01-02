@@ -526,7 +526,7 @@ class Controller extends Module
     @unbind()
     @stopListening()
 
-  $: (selector) -> $(selector, @el)
+  $: (selector) -> @el.find(selector)
 
   delegateEvents: (events) ->
     for key, method of events
