@@ -10,9 +10,13 @@ Spine is opinionated in its approach to web application architecture and design.
 
 The library is written in [CoffeeScript](http://jashkenas.github.com/coffee-script), and though it doesn't necessarily require CoffeeScript to develop applications - you can use whichever language you're most familiar with or prefer - the documentation and some associated tools like [Hem](https://github.com/spine/hem) and [spine.app](https://github.com/spine/spine.app) cater to those who prefer CoffeeScript's syntax.
 
-Documentation is often incomplete or just lies waiting to happen. Approachable source code reduces your knowledge dependencies. Spine is tiny; The core library comes in at less than 700 lines of CoffeeScript code that is written in such a way as not to sacrifice readability. Being lightweight and simple is fundamental to Spine.
+# Documentation
+
+Documentation is often incomplete or just lies waiting to happen. Approachable source code reduces knowledge dependencies. This is an area where Spine really excells compared to other MVC frameworks. Spine is tiny; The core library comes in at less than 700 lines of CoffeeScript code. It is written in such a way as prefer readability over terseness or clever tricks, and it is small enough that within a rather small timeframe you can understand how all the pieces work together. Expertise is acheivable within days or weeks rather than months or years. For these reasones remaining lightweight and simple is fundamental to Spine.
 
 For documentation, usage, and examples, see: [spinejs.com](http://spinejs.com)
+
+The test suite also occasionsly can serve as useful examples.
 
 # Contributing
 
@@ -20,7 +24,7 @@ For documentation, usage, and examples, see: [spinejs.com](http://spinejs.com)
 
 To file a bug report, please visit the [GitHub issues page](https://github.com/spine/spine/issues).  It's great if you can attach code (test cases and fixes for bugs, and test cases and a proposed implementation for features), but reproducible bug reports are also welcome. 
 
-For support or help with using spine please use the [Spine Google Group](https://groups.google.com/forum/#!forum/spinejs) and/or StackOverflow. If you post in those places you are more likely to get more people to chime in, and others can benefit from it more readily.
+For support or help with using spine please use the [Spine Google Group](https://groups.google.com/forum/#!forum/spinejs) and/or StackOverflow rather than opening an issue on Github. If you post in those places you are more likely to get more people to chime in, and others can benefit from it more readily.
 
 ## Cloning master and running the test suite
 
@@ -37,7 +41,7 @@ Next, open `test/index.html` to run the [Jasmine](http://pivotal.github.com/jasm
 
 ## Contributing to the Spine documentation
 
-Perhaps the easiest way to get started with contributing is through the docs.  If you find typos, bugs, or omissions in the docs, please submit a pull request to fix.  The Spine documentation is a very simple rails app [spine.site](https://github.com/spine/spine.site).
+Perhaps the easiest way to get started with contributing is through the docs.  If you find typos, bugs, or omissions in the docs, please submit a pull request to fix.  The Spine website [spinejs.com](http://spinejs.com), which is the primary documentation, is a very simple rails app [spine.site](https://github.com/spine/spine.site). You don't need to know Rails or Ruby to contribute. The vast majority of it is in Markdown
 
 ## Contributing to the Spine code
 
@@ -50,7 +54,7 @@ When submitting a pull request for code, please submit in CoffeeScript. Building
 Start by installing local dev dependencies:
 
 ```
-$ npm install
+$ npm install .
 ```
 
 Then use the provided build scripts to compile your CoffeeScript files:
@@ -83,7 +87,7 @@ $ cake watch
 $ vim src/spine.coffee
 or
 $ vim src/[otherSpineComponent].coffee
-  # (...add support...)
+  # (...add the feature/fix...)
 $ open test/index.html
   # (...make sure tests run for each component that was changed...)
   # (...test in other browsers with various jquery versions if you feel like there is risk... )
