@@ -16,7 +16,7 @@ Documentation is often incomplete or just lies waiting to happen. Approachable s
 
 For documentation, usage, and examples, see: [spinejs.com](http://spinejs.com)
 
-The test suite also occasionsly can serve as useful examples.
+The test suite can also occasionsly provide useful examples.
 
 # Contributing
 
