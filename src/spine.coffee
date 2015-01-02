@@ -500,8 +500,7 @@ class Controller extends Module
       @[key] = value
 
     @el  = document.createElement(@tag) unless @el
-    @el  = $(@el)
-    @$el = @el
+    @$el = @el = $(@el)
 
     @el.addClass(@className) if @className
     @el.attr(@attributes) if @attributes

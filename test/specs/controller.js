@@ -22,13 +22,16 @@ describe("Controller", function(){
   });
 
   it("can replace generated element", function(){
-    element = '<div class="new" />'
-    var users = new Users();
-    users.replace(element);
-    expect(users.el.hasClass("new")).toBeTruthy();
-    element = $('<div class="newer" />');
-    users.replace(element);
-    expect(users.el.hasClass("newer")).toBeTruthy();
+    element.addClass('new').html('before');
+    var users = new Users({el: element});
+    expect(users.el.hasClass('new')).toBeTruthy();
+    expect(users.el.html()).toBe('before');
+    //expect(users.$el.html()).toBe('before');
+    var newElement = $('<div class="newer">replaced</div>');
+    users.replace(newElement);
+    expect(users.el.hasClass('newer')).toBeTruthy();
+    expect(users.el.html()).toBe('replaced');
+    //expect(users.$el.html()).toBe('replaced');
   });
 
   it("should populate elements", function(){
