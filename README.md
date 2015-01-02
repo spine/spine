@@ -10,13 +10,13 @@ Spine is opinionated in its approach to web application architecture and design.
 
 The library is written in [CoffeeScript](http://jashkenas.github.com/coffee-script), and though it doesn't necessarily require CoffeeScript to develop applications - you can use whichever language you're most familiar with or prefer - the documentation and some associated tools like [Hem](https://github.com/spine/hem) and [spine.app](https://github.com/spine/spine.app) cater to those who prefer CoffeeScript's syntax.
 
-# Documentation
+## Learn it
 
 Documentation is often incomplete or just lies waiting to happen. Approachable source code reduces knowledge dependencies. This is an area where Spine really excells compared to other MVC frameworks. Spine is tiny; The core library comes in at less than 700 lines of CoffeeScript code. It is written in such a way as prefer readability over terseness or clever tricks, and it is small enough that within a rather small timeframe you can understand how all the pieces work together. Expertise is acheivable within days or weeks rather than months or years. For these reasones remaining lightweight and simple is fundamental to Spine.
 
 For documentation, usage, and examples, see: [spinejs.com](http://spinejs.com)
 
-The test suite can also occasionsly provide useful examples.
+The test suite can also occasionsly provide additional useful examples, especially if you are looking for non-coffeescript examples.
 
 # Contributing
 

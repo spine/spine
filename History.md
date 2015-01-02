@@ -1,6 +1,8 @@
-## 1.3.3
+## 1.4.0
 * CoffeeScript 1.8.0
+* Refactored model event dispatching #558
 * exists() replaced with find() in relation module
+* Fixed Route unbind #551
 
 ## 1.3.2
 * Fixes and minor improvements to route and relations modules #535, #551, #533
