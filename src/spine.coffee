@@ -249,10 +249,13 @@ class Model extends Module
   @toJSON: ->
     @records
 
+  @beforeFromJSON: (objects) -> objects
+
   @fromJSON: (objects) ->
     return unless objects
     if typeof objects is 'string'
       objects = JSON.parse(objects)
+    objects = @beforeFromJSON(objects)
     if isArray(objects)
       for value in objects
         if value instanceof this
