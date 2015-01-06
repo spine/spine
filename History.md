@@ -3,6 +3,7 @@
 * Refactored model event dispatching #558
 * exists() replaced with find() in relation module
 * Fixed Route unbind #551
+* Remove controllers @$el as broken alias for @el #552
 
 ## 1.3.2
 * Fixes and minor improvements to route and relations modules #535, #551, #533
