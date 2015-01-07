@@ -152,9 +152,9 @@ page.open(system.args[1], function (status) {
 
             function printSuites(root, level) {
                 level || (level = 0);
-                $(root).find('div.suite').each(function (i, el) {
+                $(root).find('ul.suite').each(function (i, el) {
                     var output = "\n" + format(el, level, true)
-                    if (output && $(el).parents('div.suite').length == level) {
+                    if (output && $(el).parents('ul.suite').length == level) {
                       window.callPhantom(output);
                       printSpecs(el, level + 1);
                     }
@@ -164,7 +164,7 @@ page.open(system.args[1], function (status) {
 
             function printSpecs(root, level) {
                 level || (level = 0);
-                $(root).find('> .spec').each(function (i, el) {
+                $(root).find('> .specs').each(function (i, el) {
                     var output = format(el, level);
                     if (output) {
                       window.callPhantom(output);
@@ -172,11 +172,11 @@ page.open(system.args[1], function (status) {
                 });
             }
 
-            printSuites($('div.html_reporter'));
+            printSuites(document.body.querySelector('div.jasmine_html-reporter'));
 
             // handle fails
-            var fails  = document.body.querySelectorAll('div.results div.failed');
-            var passed = document.body.querySelectorAll('li.passed');
+            var fails  = document.body.querySelectorAll('ul.symbol-summary li.failed');
+            var passed = document.body.querySelectorAll('ul.symbol-summary li.passed');
             window.callPhantom(format(passed.length, fails.length));
             return fails.length === 0;
         }, system.args.length === 3 ? system.args[2] : undefined);
