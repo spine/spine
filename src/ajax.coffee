@@ -213,13 +213,10 @@ class Singleton extends Base
 
       Ajax.disable =>
         unless Spine.isBlank(data) or @record.destroyed
-          # ID change, need to do some shifting
-          if data.id and @record.id isnt data.id
-            @record.changeID(data.id)
           # Update with latest data
           @record.refresh(data)
 
-      @record.trigger('ajaxSuccess', data, status, xhr)
+      @record.trigger('ajaxSuccess', @model.fromJson(data), status, xhr)
       options.done?.apply(@record)
 
   failResponse: (options = {}) =>
