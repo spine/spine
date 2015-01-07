@@ -90,7 +90,7 @@ page.open(system.args[1], function (status) {
                     strong || (strong = false);
 
                     var ret;
-                    ret = $(el).find('> .description').text();
+                    ret = $(el).find('a').text();
                     if (strong) {
                         ret = '\033[1m' + ret;
                     }
@@ -122,7 +122,7 @@ page.open(system.args[1], function (status) {
                 }
 
                 function desc(el) {
-                    return $(el).find('> .description').text();
+                    return $(el).find('> a').text();
                 }
 
                 function tick(el) {
@@ -164,7 +164,7 @@ page.open(system.args[1], function (status) {
 
             function printSpecs(root, level) {
                 level || (level = 0);
-                $(root).find('> .specSummary').each(function (i, el) {
+                $(root).find('> .spec').each(function (i, el) {
                     var output = format(el, level);
                     if (output) {
                       window.callPhantom(output);
@@ -172,11 +172,11 @@ page.open(system.args[1], function (status) {
                 });
             }
 
-            printSuites($('div.jasmine_reporter'));
+            printSuites($('div.html_reporter'));
 
             // handle fails
-            var fails  = document.body.querySelectorAll('div.jasmine_reporter div.specSummary.failed');
-            var passed = document.body.querySelectorAll('div.jasmine_reporter div.specSummary.passed');
+            var fails  = document.body.querySelectorAll('div.results div.failed');
+            var passed = document.body.querySelectorAll('li.passed');
             window.callPhantom(format(passed.length, fails.length));
             return fails.length === 0;
         }, system.args.length === 3 ? system.args[2] : undefined);

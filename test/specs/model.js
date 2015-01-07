@@ -637,6 +637,23 @@ describe("Model", function(){
       expect(spy).toHaveBeenCalledWith(asset, {});
     });
 
+    it("can fire destroy events", function(){
+      Asset.bind("destroy", spy);
+      var asset = Asset.create({name: "cartoon world.png"});
+      expect(spy).not.toHaveBeenCalled();
+      asset.destroy();
+      expect(spy).toHaveBeenCalledWith(asset, {clear: true});
+    });
+
+    it("can fire destroy events when destroyAll is called with options", function(){
+      Asset.bind("destroy", spy);
+      var asset = Asset.create({name: "screaming goats.png"});
+      expect(spy).not.toHaveBeenCalled();
+      Asset.destroyAll({ajax: false});
+      expect(spy).toHaveBeenCalled();
+      expect(spy).toHaveBeenCalledWith(jasmine.objectContaining(asset.attributes()), {ajax: false, clear: true});
+    });
+
     it("can fire refresh events", function(){
       var asset = Asset.create({name: "cartoon world.png"});
       asset.on("refresh", spy);
@@ -723,8 +740,8 @@ describe("Model", function(){
       asset.trigger("customEvent");
       expect(spy).toHaveBeenCalled();
       expect(spy2).toHaveBeenCalled();
-      spy.reset();
-      spy2.reset();
+      spy.calls.reset();
+      spy2.calls.reset();
       asset.unbind("customEvent", spy2);
       asset.trigger('customEvent');
       expect(spy).toHaveBeenCalled();
@@ -736,12 +753,12 @@ describe("Model", function(){
       asset.on("customEvent1 customEvent2", spy);
       asset.trigger("customEvent1");
       asset.trigger("customEvent2");
-      expect(spy.calls.length).toEqual(2);
-      spy.reset();
+      expect(spy.calls.count()).toEqual(2);
+      spy.calls.reset();
       asset.unbind("customEvent1");
       asset.trigger("customEvent1");
       asset.trigger("customEvent2");
-      expect(spy.calls.length).toEqual(1);
+      expect(spy.calls.count()).toEqual(1);
     });
 
     it("can bind and unbind multiple events with a single call", function(){
@@ -749,12 +766,12 @@ describe("Model", function(){
       asset.on("customEvent1 customEvent2", spy)
       asset.trigger("customEvent1");
       asset.trigger("customEvent2");
-      expect(spy.calls.length).toEqual(2);
-      spy.reset();
+      expect(spy.calls.count()).toEqual(2);
+      spy.calls.reset();
       asset.unbind("customEvent1 customEvent2")
       asset.trigger("customEvent1");
       asset.trigger("customEvent2");
-      expect(spy.calls.length).toEqual(0);
+      expect(spy.calls.count()).toEqual(0);
     });
 
     it("can unbind all events if no arguments are passed", function(){
@@ -762,12 +779,12 @@ describe("Model", function(){
       asset.on("customEvent1 customEvent2", spy)
       asset.trigger("customEvent1");
       asset.trigger("customEvent2");
-      expect(spy.calls.length).toEqual(2);
-      spy.reset();
+      expect(spy.calls.count()).toEqual(2);
+      spy.calls.reset();
       asset.unbind();
       asset.trigger("customEvent1");
       asset.trigger("customEvent2");
-      expect(spy.calls.length).toEqual(0);
+      expect(spy.calls.count()).toEqual(0);
     });
 
     it("should not unbind all events if passed undefined", function(){
@@ -775,12 +792,12 @@ describe("Model", function(){
       asset.on("customEvent1 customEvent2", spy)
       asset.trigger("customEvent1");
       asset.trigger("customEvent2");
-      expect(spy.calls.length).toEqual(2);
-      spy.reset();
+      expect(spy.calls.count()).toEqual(2);
+      spy.calls.reset();
       asset.unbind(undefined);
       asset.trigger("customEvent1");
       asset.trigger("customEvent2");
-      expect(spy.calls.length).toEqual(2);
+      expect(spy.calls.count()).toEqual(2);
     });
 
     it("should unbind events when the instance is destroyed", function(){
@@ -993,14 +1010,14 @@ describe("Model", function(){
       asset.trigger("event2");
       asset.trigger("event3");
       expect(spy).toHaveBeenCalled();
-      expect(spy.callCount).toBe(3);
+      expect(spy.calls.count()).toBe(3);
     });
 
     it("can listen once for an event on a model instance", function(){
       asset2.listenToOnce(asset, 'event1', spy);
       asset.trigger("event1");
       expect(spy).toHaveBeenCalled();
-      spy.reset();
+      spy.calls.reset();
       asset.trigger("event1");
       expect(spy).not.toHaveBeenCalled();
     });
@@ -1009,14 +1026,14 @@ describe("Model", function(){
       asset2.listenTo(asset, 'event1 event2 event3', spy);
       asset.trigger("event1");
       expect(spy).toHaveBeenCalled();
-      spy.reset();
+      spy.calls.reset();
       asset2.stopListening(asset, 'event1');
       asset.trigger("event1");
       expect(spy).not.toHaveBeenCalled();
-      spy.reset();
+      spy.calls.reset();
       asset.trigger("event2");
       expect(spy).toHaveBeenCalled();
-      spy.reset();
+      spy.calls.reset();
       asset.trigger("event3");
       expect(spy).toHaveBeenCalled();
     });
@@ -1025,7 +1042,7 @@ describe("Model", function(){
       asset2.listenTo(asset, 'event1 event2 event3', spy);
       asset.trigger("event2");
       expect(spy).toHaveBeenCalled();
-      spy.reset();
+      spy.calls.reset();
       asset2.stopListening(asset);
       asset.trigger("event1");
       asset.trigger("event2");
@@ -1039,8 +1056,8 @@ describe("Model", function(){
       asset.trigger("event1");
       expect(spy).toHaveBeenCalled();
       expect(spy2).toHaveBeenCalled();
-      spy.reset();
-      spy2.reset();
+      spy.calls.reset();
+      spy2.calls.reset();
       asset2.stopListening(asset, 'event1');
       asset.trigger("event1");
       expect(spy).not.toHaveBeenCalled();
@@ -1054,7 +1071,7 @@ describe("Model", function(){
       asset2.stopListening(asset);
       asset.trigger("event1");
       expect(spy).not.toHaveBeenCalled();
-      spy.reset();
+      spy.calls.reset();
       asset.trigger("event2");
       expect(spy).not.toHaveBeenCalled();
     });
@@ -1065,7 +1082,7 @@ describe("Model", function(){
       asset2.stopListening();
       asset.trigger("event1");
       expect(spy).not.toHaveBeenCalled();
-      spy.reset();
+      spy.calls.reset();
       asset.trigger("event2");
       expect(spy).not.toHaveBeenCalled();
     });
@@ -1076,7 +1093,7 @@ describe("Model", function(){
       asset2.listenTo(asset, 'event1', spy);
       asset.trigger("event1");
       expect(spy).toHaveBeenCalled();
-      spy.reset();
+      spy.calls.reset();
       asset2.destroy();
       asset.trigger("event1");
       expect(spy).not.toHaveBeenCalled();
@@ -1088,7 +1105,7 @@ describe("Model", function(){
       asset2.stopListening(undefined);
       asset.trigger("event1");
       expect(spy).toHaveBeenCalled();
-      spy.reset();
+      spy.calls.reset();
       asset.trigger("event2");
       expect(spy).toHaveBeenCalled();
     });

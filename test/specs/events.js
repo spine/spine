@@ -61,7 +61,7 @@ describe("Events", function(){
     EventTest.unbind();
     EventTest.trigger("yoyo");
     expect(spy).not.toHaveBeenCalled();
-    spy.reset()
+    spy.calls.reset();
     EventTest.trigger("daddyo");
     expect(spy).not.toHaveBeenCalled();
   });
@@ -72,7 +72,7 @@ describe("Events", function(){
     ListenTest.listenTo(EventTest, "daddyo", spy);
     EventTest.trigger("daddyo");
     expect(spy).toHaveBeenCalled();
-    spy.reset();
+    spy.calls.reset();
     ListenTest.stopListening(EventTest, "daddyo");
     EventTest.trigger("daddyo");
     expect(spy).not.toHaveBeenCalled();
@@ -134,7 +134,7 @@ describe("Events", function(){
     EventTest.one("indahouse", spy);
     EventTest.trigger("indahouse");
     expect(spy).toHaveBeenCalled();
-    spy.reset();
+    spy.calls.reset();
     EventTest.trigger("indahouse");
     expect(spy).not.toHaveBeenCalled();
   });
@@ -145,7 +145,7 @@ describe("Events", function(){
     ListenTest.listenToOnce(EventTest, 'indahouse', spy)
     EventTest.trigger("indahouse");
     expect(spy).toHaveBeenCalled();
-    spy.reset();
+    spy.calls.reset();
     EventTest.trigger("indahouse");
     expect(spy).not.toHaveBeenCalled();
   });
@@ -167,7 +167,7 @@ describe("Events", function(){
     ListenTest.stopListening();
     EventTest.trigger("house");
     expect(spy).not.toHaveBeenCalled();
-    spy.reset();
+    spy.calls.reset();
     EventTest.trigger("indahouse");
     expect(spy).not.toHaveBeenCalled();
   });
@@ -178,7 +178,7 @@ describe("Events", function(){
     var b = jasmine.createSpy("b");
     var c = jasmine.createSpy("c");
 
-    b.andCallFake(function () {
+    b.and.callFake(function() {
       EventTest.unbind("once", b);
     });
 
@@ -193,9 +193,9 @@ describe("Events", function(){
 
     EventTest.trigger("once");
 
-    expect(a.callCount).toBe(2);
-    expect(b.callCount).toBe(1);
-    expect(c.callCount).toBe(2);
+    expect(a.calls.count()).toBe(2);
+    expect(b.calls.count()).toBe(1);
+    expect(c.calls.count()).toBe(2);
   });
 
   it("can cancel propogation", function(){
