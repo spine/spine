@@ -265,7 +265,6 @@ describe("Model", function(){
 
   it("can be serialized into JSON", function(){
     var asset = new Asset({name: "Johnson me!"});
-
     expect(JSON.stringify(asset)).toEqual('{"name":"Johnson me!"}');
   });
 
@@ -274,6 +273,19 @@ describe("Model", function(){
     expect(asset.name).toEqual("Un-Johnson me!");
 
     var assets = Asset.fromJSON('[{"name":"Un-Johnson me!"}]')
+    expect(assets[0] && assets[0].name).toEqual("Un-Johnson me!");
+  });
+
+  it("can preprocess json before it is deserialized", function(){
+    Asset.beforeFromJSON = function(objects){
+      console.log(objects.data);
+      return objects.data;
+    }
+    
+    var asset = Asset.fromJSON('{"data":{"name":"Un-Johnson me!"}}')
+    expect(asset.name).toEqual("Un-Johnson me!");
+
+    var assets = Asset.fromJSON('{"data":[{"name":"Un-Johnson me!"}]}')
     expect(assets[0] && assets[0].name).toEqual("Un-Johnson me!");
   });
 
