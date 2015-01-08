@@ -13,7 +13,7 @@ var waitFor = (function () {
     }
 
     return function (test, doIt, duration) {
-        duration || (duration = 3000);
+        duration || (duration = 6000); // because async timeouts default to 5 seconds. wait a little more than that to assume error
 
         var start = getTime(),
             finish = start + duration,
@@ -37,7 +37,7 @@ var waitFor = (function () {
             }
         }
 
-        int = setInterval(looop, 1000 / 60);
+        int = setInterval(looop, 1000 / 30);
     };
 }());
 
@@ -67,6 +67,7 @@ page.open(system.args[1], function (status) {
 
     waitFor(function () {
         return page.evaluate(function () {
+            // looks for the 'finished in X.XXXs' on the jasmine report page 
             return document.body.querySelector(".duration");
         });
     }, function (t) {
