@@ -83,16 +83,21 @@ page.open(system.args[1], function (status) {
                 }
 
                 function tick(el) {
-                    return $(el).is('.passed') ? '\033[32m✓\033[0m' : '\033[31m✖';
+                    var spec = $(el).children('li.passed:first, li.failed:first')
+                    if (spec.length != 0) {
+                        return spec.is('.passed') ? '\033[32m✓\033[0m' : '\033[31m✖';
+                    } else {
+                        return '\033[34m'
+                    }
                 }
 
                 function desc(el, strong) {
                     strong || (strong = false);
 
                     var ret;
-                    ret = $(el).find('a').text();
+                    ret = $(el).find('a:first').text();
                     if (strong) {
-                        ret = '\033[1m' + ret;
+                        ret = '\033[1m' + ret + ' --->';
                     }
 
                     return ret;
@@ -101,44 +106,13 @@ page.open(system.args[1], function (status) {
                 return function (el, level, strong) {
                     if (typeof el == 'number') {
                         var results= "-------------------------------------\n";
-                        results += "\033[32m✓\033[0m\033[1m Passed: \033[0m" + el;
+                        results += "\033[1m\033[32m✓ Passed: \033[0m" + el;
                         if (level > 0) {
                           results += "\n\033[31m✖ \033[0m\033[1mFailed: \033[0m" + level;
                         }
                         return results
                     } else {
-                      return '\033[1m' + indent(level) + tick(el) + ' ' + desc(el, strong);
-                    }
-                };
-            }());
-
-            var errorsOnly = (function () {
-                function indent(level) {
-                    var ret = '';
-                    for (var i = 0; i < level; i += 1) {
-                        ret = ret + '  ';
-                    }
-                    return ret;
-                }
-
-                function desc(el) {
-                    return $(el).find('> a').text();
-                }
-
-                function tick(el) {
-                    return $(el).is('.passed') ? '✓ ' : '✖ ';
-                }
-
-
-                return function (el, level, strong) {
-                    if (typeof el == 'number') {
-                      return "Passed: " + el + ", Failed: " + level;
-                    } else {
-                      if (!$(el).is(".passed")) {
-                        return indent(level) + tick(el) + desc(el);
-                      } else {
-                        return ""
-                      }
+                      return '\033[1m' + indent(level) + tick(el) + ' ' + desc(el, strong)+ '\033[0m';
                     }
                 };
             }());
