@@ -2,22 +2,7 @@ describe("Routing", function(){
   var Route = Spine.Route,
       RouteOptions = Route.options,
       spy;
-
-  // http://coffeescript.org/#try:navigate%20%3D%20(args...)%20-%3E%0A%20%20newPath%20%3D%20undefined%0A%20%20%24.Deferred((dfd)%20-%3E%0A%20%20%20%20Route.one%20'change'%2C%20(route%2C%20path)%20-%3E%20newPath%20%3D%20path%0A%0A%20%20%20%20Route.navigate%20args...%0A%0A%20%20%20%20waitsFor(-%3E%20newPath%3F)%0A%20%20%20%20runs(-%3E%20dfd.resolveWith(null%2C%20newPath))%0A%20%20).promise()
-  function navigate(){
-    var args = 1 <= arguments.length ? [].slice.call(arguments, 0) : [],
-        changed = false;
-
-    return $.Deferred(function(dfd){
-      Route.one('change', function(){changed = true;});
-
-      Route.navigate.apply(Route, args);
-      //done();
-      expect(changed).toBe(true);
-      dfd.resolve();
-    }).promise();
-  }
-
+      
   // Set (default Reset) document's URL
   var setUrl = (function(){
     var originalTitle,
@@ -30,13 +15,13 @@ describe("Routing", function(){
 
   beforeEach(function(){
     Route.options = RouteOptions; // Reset default Route options
-  });
-
-  afterEach(function(){
     Route.unbind();
     Route.routers = [];
     Route.router = new Route();
     delete Route.path;
+  });
+
+  afterEach(function(){
   });
 
   it("should have default options", function(){
@@ -57,27 +42,36 @@ describe("Routing", function(){
 
 
   describe("With trigger disabled", function(){
+     var routeSpy;
 
     beforeEach(function(){
       Route.setup({trigger: false});
+      routeSpy = {
+        go: function(done){
+          done();
+        }
+      }
+      spyOn(routeSpy, 'go').and.callThrough();
     });
+    
+    //afterEach(function(){
+    //  setUrl();
+    //});
 
     it("should not trigger before, navigate, or change", function(done){
-      Route.add('/foobe', function(){});
-      expect(Route.router.routes.length).toBe(1);
-      var triggerspy = jasmine.createSpy();
+      var triggerspy = jasmine.createSpy('triggerspy');
+      Route.add('/foobe', routeSpy.go(done));
 
       Route.one('before', triggerspy);
       Route.one('navigate', triggerspy);
       Route.one('change', triggerspy);
       Route.path = '/';
+      Route.navigate('/foobe');
+
+      expect(Route.router.routes.length).toBe(1);
+
       expect(triggerspy).not.toHaveBeenCalled();
       expect(Route.path).toBe('/');
-
-      //navigate('/foobe').done(function(){
-      //});
-      Route.navigate('/foobe');
-      done();
 
       expect(triggerspy).not.toHaveBeenCalled();
       expect(Route.path).toBe('/foobe');
@@ -127,17 +121,20 @@ describe("Routing", function(){
       expect(Route.router.routes.length).toBe(3);
     });
 
-    it("should trigger 'change' with matching routes", function(done){
+    it("should trigger 'change' with matching routes", function(){
       var changed = 0;
-      Route.one('change', function(){changed += 1;});
+      Route.one('change', function(){
+          changed += 1;
+          //done();
+        }
+      );
       Route.navigate('/foo');
-      done();
 
       expect(changed).toBeGreaterThan(0);
       expect(changed).toBe(1);
     });
 
-    it("should trigger 'before' when a route matches", function (done) {
+    it("should trigger 'before' when a route matches", function () {
       var triggerBefore = false;
       var routePath     = '';
       Route.one('before', function (route) {
@@ -146,25 +143,22 @@ describe("Routing", function(){
       });
 
       Route.navigate('/foo');
-      done();
       expect(triggerBefore).toBe(true);
       expect(routePath).toBe('/foo');
     });
 
     it("can navigate to path", function(){
-      Route.add('/users', function(){});
+      Route.add('/users');
+      Route.navigate('/users');
 
-      navigate('/users').done(function(){
-        expect(Route.path).toBe('/users');
-      });
+      expect(Route.path).toBe('/users');
     });
 
     it("can navigate to a path split into several arguments", function(){
       Route.add('/users/1/2', function(){});
-
-      navigate('/users', 1, 2).done(function(){
-        expect(Route.path).toBe('/users/1/2');
-      });
+      Route.navigate('/users', 1, 2);
+      //done();
+      expect(Route.path).toBe('/users/1/2');
     });
 
 
@@ -172,40 +166,43 @@ describe("Routing", function(){
       var routeSpy;
 
       beforeEach(function(){
-        routeSpy = jasmine.createSpy();
+        routeSpy = {
+          go: function(done){
+            done();
+          }
+        }
+        spyOn(routeSpy, 'go').and.callThrough();
       })
 
-      it("should trigger 'navigate' when navigating", function(){
-        Route.one('navigate', routeSpy);
+      it("should trigger 'navigate' when navigating", function(done){
+        Route.one('navigate', routeSpy.go(done));
         Route.navigate('/foo');
-        expect(routeSpy).toHaveBeenCalled();
+        expect(routeSpy.go).toHaveBeenCalled();
       });
 
-      it("should not navigate to the same path as the current", function(){
-        Route.one('navigate', routeSpy);
+      it("should not navigate to the same path as the current", function(done){
+        Route.one('navigate', routeSpy.go(done));
         Route.path = '/foo';
 
         Route.navigate('/foo');
 
-        expect(routeSpy).not.toHaveBeenCalled();
+        expect(routeSpy.go).not.toHaveBeenCalled();
         expect(Route.path).toBe('/foo');
       });
 
-      it("should call routes when navigating", function(){
-        Route.add('/foo', routeSpy);
-
-        navigate('/foo').done(function(){
-          expect(routeSpy).toHaveBeenCalled();
-        });
+      it("should call routes when navigating", function(done){
+        Route.add('/foo', routeSpy.go(done));
+        Route.navigate('/foo');
+        done();
+        expect(routeSpy.go).toHaveBeenCalled();
       });
 
 
       it("can call routes with params", function(done){
-        Route.add({'/users/:id/:id2': routeSpy});
+        Route.add({'/users/:id/:id2': routeSpy.go(done)});
         Route.navigate('/users/1/2');
-        done();
 
-        expect(routeSpy.calls.mostRecent().args).toEqual(jasmine.objectContaining([{
+        expect(routeSpy.go.calls.mostRecent().args).toEqual(jasmine.objectContaining([{
           trigger: true,
           history: false,
           shim: true,
@@ -216,10 +213,9 @@ describe("Routing", function(){
       });
 
       it("can call routes with glob", function(done){
-        Route.add({'/page/*stuff': routeSpy});
+        Route.add({'/page/*stuff': routeSpy.go(done)});
         Route.navigate('/page/gah');
-        done();
-        expect(routeSpy.calls.mostRecent().args).toEqual(jasmine.objectContaining([{
+        expect(routeSpy.go.calls.mostRecent().args).toEqual(jasmine.objectContaining([{
           trigger: true,
           history: false,
           shim: true,
@@ -231,12 +227,11 @@ describe("Routing", function(){
 
       it("can override trigger behavior when navigating", function(done){
         expect(Route.options.trigger).toBe(true);
-        Route.one('change', routeSpy);
+        Route.one('change', routeSpy.go(done));
 
         Route.navigate('/users', false);
-        done();
         expect(Route.options.trigger).toBe(true);
-        expect(routeSpy).not.toHaveBeenCalled();
+        expect(routeSpy.go).not.toHaveBeenCalled();
       });
 
     });
@@ -257,7 +252,8 @@ describe("Routing", function(){
     it("should have bound 'hashchange' event to window", function(){
       // $(window).data('events') was the way to get events before jquery 1.8
       var events = $(window).data('events') || $._data(window, 'events');
-
+      console.log(events)
+      expect(events).toBeDefined();
       expect('hashchange' in events).toBe(true);
     });
 
@@ -265,6 +261,7 @@ describe("Routing", function(){
       Route.unbind();
       var events = $(window).data('events') || {};
 
+      expect(events).toBeDefined();
       expect('hashchange' in events).toBe(false);
     });
 
@@ -284,10 +281,10 @@ describe("Routing", function(){
 
     it("can navigate", function(){
       Route.add('/users/1', function(){});
-
-      navigate('/users', 1).done(function(){
-        expect(window.location.hash).toBe('#/users/1');
-      });
+      Route.navigate('/users/1');
+      
+      console.log(Route.path);
+      expect(window.location.hash).toBe('#/users/1');
     });
 
   });
@@ -297,7 +294,7 @@ describe("Routing", function(){
 
     beforeEach(function(){
       Route.setup({history: true});
-      spy = jasmine.createSpy();
+      spy = jasmine.createSpy('historyRouteSpy');
     });
 
     afterEach(function(){
@@ -308,13 +305,15 @@ describe("Routing", function(){
       // $(window).data('events') was the way to get events before jquery 1.8
       var events = $(window).data('events') || $._data(window, 'events');
 
+      expect(events).toBeDefined();
       expect('popstate' in events).toBe(true);
     });
 
     it("should unbind", function(){
       Route.unbind();
-      var events = $(window).data('events') || {};
+      var events = $(window).data('events') || $._data(window, 'events');
 
+      expect(events).toBeDefined();
       expect('popstate' in events).toBe(false);
     });
 
@@ -328,6 +327,7 @@ describe("Routing", function(){
 
       // make sure popstate didn't get unbound
       var events = $(window).data('events') || $._data(window, 'events');
+      expect(events).toBeDefined();
       expect('popstate' in events).toBe(true);
     });
 
@@ -346,9 +346,9 @@ describe("Routing", function(){
 
     it("can navigate", function(){
       Route.add('/users/1', function(){});
-      navigate('/users/1').done(function(){
-        expect(window.location.pathname).toBe('/users/1');
-      });
+      Route.navigate('/users/1');
+      
+      expect(window.location.pathname).toBe('/users/1');
     });
 
   });
@@ -388,8 +388,8 @@ describe("Routing", function(){
   describe("With multiple Routes", function(){
 
     beforeEach(function(){
-      spy1 = jasmine.createSpy();
-      spy2 = jasmine.createSpy();
+      spy1 = jasmine.createSpy('spy1');
+      spy2 = jasmine.createSpy('spy2');
       Route.setup();
       otherRoute = Route.create();
     });
@@ -398,41 +398,47 @@ describe("Routing", function(){
      setUrl();
     });
 
-    it("should match 1 route per router", function(){
+    it("should match 1 route per router", function(done){
       Route.add('/foo/bar', spy1);
       Route.add('/foo/baz', spy1);
       otherRoute.add('/foo/*glob', spy2);
       otherRoute.add('/foo/baz', spy2);
-      navigate('/foo/bar').done(function(){
-        expect(spy1).toHaveBeenCalled();
-        expect(spy1.calls.count()).toEqual(1);
-        expect(spy2).toHaveBeenCalled();
-        expect(spy2.calls.count()).toEqual(1);
-      });
+      Route.navigate('/foo/bar');
+      done();
+
+      expect(spy1).toHaveBeenCalled();
+      expect(spy1.calls.count()).toEqual(1);
+      expect(spy2).toHaveBeenCalled();
+      expect(spy2.calls.count()).toEqual(1);
     });
 
-    it("should trigger 'change' with matching routes", function(){
+    it("should trigger 'change' with matching routes", function(done){
       spy = jasmine.createSpy();
       Route.one('change', spy);
       Route.add('/foo/bar', spy1);
       otherRoute.add('/foo/*glob', spy2);
-      navigate('/foo/bar').done(function(){
-        expect(spy).toHaveBeenCalled();
-        expect(spy).toHaveBeenCalledWith([
+      Route.navigate('/foo/bar');
+      done();
+      
+      expect(spy).toHaveBeenCalled();
+      expect(spy).toHaveBeenCalledWith(
+        [
           otherRoute.routes[0],
           Route.router.routes[0]
-        ], '/foo/bar');
-      });
+        ],
+        '/foo/bar'
+      );
     });
 
-    it("can destroy routers without affecting other routers", function(){
+    it("can destroy routers without affecting other routers", function(done){
       Route.add('/foo/bar', spy1);
       otherRoute.add('/foo/bar', spy2);
       otherRoute.destroy();
-      navigate('/foo/bar').done(function(){
-        expect(spy1).toHaveBeenCalled();
-        expect(spy2).not.toHaveBeenCalled();
-      });
+      Route.navigate('/foo/bar');
+      done();
+      
+      expect(spy1).toHaveBeenCalled();
+      expect(spy2).not.toHaveBeenCalled();
     });
 
   });
