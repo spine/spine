@@ -76,7 +76,7 @@ A bug-fix release.
 A bug-fix release.
 
 * Fix named globs in routes
-* deprecate Model.prototype.init()
+* Deprecate Model.prototype.init()
 * Make cids simplier
 * Controller event callbacks always return true, so you don't accidentally cancel the event
 * `release` is now just a method you can override, not an event
