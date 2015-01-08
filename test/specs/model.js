@@ -620,7 +620,7 @@ describe("Model", function(){
       var asset = new Asset({name: "cartoon world.png"});
       asset.on("create", spy);
       asset.save();
-      expect(spy).toHaveBeenCalledWith(asset, {});
+      expect(spy).toHaveBeenCalledWith(jasmine.objectContaining(asset.attributes()), {});
     });
 
     it("can fire save events", function(){
@@ -641,7 +641,7 @@ describe("Model", function(){
       var asset = Asset.create({name: "cartoon world.png"});
       asset.on("refresh", spy);
       Asset.refresh(asset.attributes());
-      expect(spy).toHaveBeenCalledWith(asset);
+      expect(spy).toHaveBeenCalledWith(jasmine.objectContaining(asset.attributes()));
     });
 
     it("can fire destroy events", function(){
@@ -675,7 +675,7 @@ describe("Model", function(){
     it("should invoke callbacks in the context of the record", function(){
       var asset = new Asset({name: "cartoon world.png"});
       asset.on("create update destroy change save error custom", function(){
-        expect(this).toEqual(asset);
+        expect(this).toEqual(jasmine.objectContaining(asset));
       });
       asset.save();
       asset.updateAttribute("name", "nice meme.png");
