@@ -637,23 +637,6 @@ describe("Model", function(){
       expect(spy).toHaveBeenCalledWith(asset, {});
     });
 
-    it("can fire destroy events", function(){
-      Asset.bind("destroy", spy);
-      var asset = Asset.create({name: "cartoon world.png"});
-      expect(spy).not.toHaveBeenCalled();
-      asset.destroy();
-      expect(spy).toHaveBeenCalledWith(asset, {clear: true});
-    });
-
-    it("can fire destroy events when destroyAll is called with options", function(){
-      Asset.bind("destroy", spy);
-      var asset = Asset.create({name: "screaming goats.png"});
-      expect(spy).not.toHaveBeenCalled();
-      Asset.destroyAll({ajax: false});
-      expect(spy).toHaveBeenCalled();
-      expect(spy).toHaveBeenCalledWith(jasmine.objectContaining(asset.attributes()), {ajax: false, clear: true});
-    });
-
     it("can fire refresh events", function(){
       var asset = Asset.create({name: "cartoon world.png"});
       asset.on("refresh", spy);
@@ -706,7 +689,7 @@ describe("Model", function(){
       asset.one("save", spy);
       asset.save();
       expect(spy).toHaveBeenCalledWith(asset, {});
-      spy.reset();
+      spy.calls.reset();
       asset.save();
       expect(spy).not.toHaveBeenCalled();
     });
@@ -823,7 +806,7 @@ describe("Model", function(){
       asset.on("customEvent2", function() {});
       asset.trigger("unbind");
       Asset.trigger("customEvent1");
-      expect(spy.calls.length).toEqual(1);
+      expect(spy.calls.count()).toEqual(1);
     });
 
     it("should not copy callbacks for new duplicated records", function(){
@@ -888,7 +871,7 @@ describe("Model", function(){
       var asset2 = Asset.create({id: 2, name: "wem.pdf"});
       var values = JSON.stringify([asset1, asset2]);
       Asset.refresh(values, {clear: true});
-      expect(spy.calls.length).toEqual(1);
+      expect(spy.calls.count()).toEqual(1);
     });
 
     it("can fire destroy events", function(){
@@ -902,7 +885,7 @@ describe("Model", function(){
       Asset.on("destroy", spy);
       var asset = Asset.create({name: "screaming goats.png"});
       Asset.destroyAll({ajax: false});
-      expect(spy).toHaveBeenCalledWith(asset, {ajax: false, clear: true});
+      expect(spy).toHaveBeenCalledWith(jasmine.objectContaining(asset.attributes()), {ajax: false, clear: true});
     });
 
     it("can fire change events", function(){
@@ -952,7 +935,7 @@ describe("Model", function(){
       asset.save();
 
       expect(spy).toHaveBeenCalledWith(asset.clone(), {});
-      spy.reset();
+      spy.calls.reset();
 
       asset.save();
       expect(spy).not.toHaveBeenCalled();

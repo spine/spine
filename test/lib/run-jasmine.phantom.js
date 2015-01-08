@@ -106,7 +106,7 @@ page.open(system.args[1], function (status) {
                 return function (el, level, strong) {
                     if (typeof el == 'number') {
                         var results= "-------------------------------------\n";
-                        results += "\033[1m\033[32m✓ Passed: \033[0m" + el;
+                        results += "\033[1m\033[32m✓ \033[0m\033[1mPassed: \033[0m" + el;
                         if (level > 0) {
                           results += "\n\033[31m✖ \033[0m\033[1mFailed: \033[0m" + level;
                         }
