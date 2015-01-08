@@ -1,4 +1,19 @@
-## 1.3.1 (pending)
+## 1.4.0
+* CoffeeScript 1.8.0
+* Refactored model event dispatching #558
+* exists() replaced with find() in relation module
+* Fixed Route unbind #551
+* Remove controllers @$el as broken alias for @el #552
+* Migrate to jasmine 2.1.3 for tests
+
+## 1.3.2
+* Fixes and minor improvements to route and relations modules #535, #551, #533
+* Add Model.findAll() #538
+* code cleanup #537, #536
+* jasmine test pass in IE9 #549
+* CoffeeScript 1.7.1
+
+## 1.3.1
 * Fixes and improvements to route and manager modules #513
 * Ajax methods configuable #523
 * Fix for orphaned model instances #527
@@ -62,7 +77,7 @@ A bug-fix release.
 A bug-fix release.
 
 * Fix named globs in routes
-* deprecate Model.prototype.init()
+* Deprecate Model.prototype.init()
 * Make cids simplier
 * Controller event callbacks always return true, so you don't accidentally cancel the event
 * `release` is now just a method you can override, not an event

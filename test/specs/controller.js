@@ -22,13 +22,16 @@ describe("Controller", function(){
   });
 
   it("can replace generated element", function(){
-    element = '<div class="new" />'
-    var users = new Users();
-    users.replace(element);
-    expect(users.el.hasClass("new")).toBeTruthy();
-    element = $('<div class="newer" />');
-    users.replace(element);
-    expect(users.el.hasClass("newer")).toBeTruthy();
+    element.addClass('new').html('before');
+    var users = new Users({el: element});
+    expect(users.el.hasClass('new')).toBeTruthy();
+    expect(users.el.html()).toBe('before');
+    //expect(users.$el.html()).toBe('before');
+    var newElement = $('<div class="newer">replaced</div>');
+    users.replace(newElement);
+    expect(users.el.hasClass('newer')).toBeTruthy();
+    expect(users.el.html()).toBe('replaced');
+    //expect(users.$el.html()).toBe('replaced');
   });
 
   it("should populate elements", function(){
@@ -130,14 +133,14 @@ describe("Controller", function(){
       asset.trigger("event2");
       asset.trigger("event3");
       expect(spy).toHaveBeenCalled();
-      expect(spy.callCount).toBe(3);
+      expect(spy.calls.count()).toBe(3);
     });
 
     it("can listen once for an event on a model instance", function(){
       users.listenToOnce(asset, 'event1', spy);
       asset.trigger("event1");
       expect(spy).toHaveBeenCalled();
-      spy.reset();
+      spy.calls.reset();
       asset.trigger("event1");
       expect(spy).not.toHaveBeenCalled();
     });
@@ -146,14 +149,14 @@ describe("Controller", function(){
       users.listenTo(asset, 'event1 event2 event3', spy);
       asset.trigger("event1");
       expect(spy).toHaveBeenCalled();
-      spy.reset();
+      spy.calls.reset();
       users.stopListening(asset, 'event1');
       asset.trigger("event1");
       expect(spy).not.toHaveBeenCalled();
-      spy.reset();
+      spy.calls.reset();
       asset.trigger("event2");
       expect(spy).toHaveBeenCalled();
-      spy.reset();
+      spy.calls.reset();
       asset.trigger("event3");
       expect(spy).toHaveBeenCalled();
     });
@@ -162,7 +165,7 @@ describe("Controller", function(){
       users.listenTo(asset, 'event1 event2 event3', spy);
       asset.trigger("event2");
       expect(spy).toHaveBeenCalled();
-      spy.reset();
+      spy.calls.reset();
       users.stopListening(asset);
       asset.trigger("event1");
       asset.trigger("event2");
@@ -176,8 +179,8 @@ describe("Controller", function(){
       asset.trigger("event1");
       expect(spy).toHaveBeenCalled();
       expect(spy2).toHaveBeenCalled();
-      spy.reset();
-      spy2.reset();
+      spy.calls.reset();
+      spy2.calls.reset();
       users.stopListening(asset, 'event1');
       asset.trigger("event1");
       expect(spy).not.toHaveBeenCalled();
@@ -190,7 +193,7 @@ describe("Controller", function(){
       users.listenTo(asset, 'event1', spy);
       asset.trigger("event1");
       expect(spy).toHaveBeenCalled();
-      spy.reset();
+      spy.calls.reset();
       users.release();
       asset.trigger("event1");
       expect(spy).not.toHaveBeenCalled();
@@ -202,8 +205,8 @@ describe("Controller", function(){
       asset.trigger("event1");
       expect(spy).toHaveBeenCalled();
       expect(spy2).toHaveBeenCalled();
-      spy.reset();
-      spy2.reset();
+      spy.calls.reset();
+      spy2.calls.reset();
       users.release();
       asset.trigger("event1");
       expect(spy).not.toHaveBeenCalled();

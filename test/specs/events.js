@@ -14,7 +14,7 @@ describe("Events", function(){
     EventTest.trigger("daddyo");
     expect(spy).toHaveBeenCalled();
   });
-  
+
   it("can listen for events on other objects", function(){
     ListenTest = Spine.Class.create();
     ListenTest.extend(Spine.Events);
@@ -34,7 +34,7 @@ describe("Events", function(){
     EventTest.trigger("car");
     expect(spy).toHaveBeenCalled();
   });
-  
+
   it("can listen for multiple events on other objects", function(){
     ListenTest = Spine.Class.create();
     ListenTest.extend(Spine.Events);
@@ -61,18 +61,18 @@ describe("Events", function(){
     EventTest.unbind();
     EventTest.trigger("yoyo");
     expect(spy).not.toHaveBeenCalled();
-    spy.reset()
+    spy.calls.reset();
     EventTest.trigger("daddyo");
     expect(spy).not.toHaveBeenCalled();
   });
-  
+
   it("can stop listening to events", function(){
     ListenTest = Spine.Class.create();
     ListenTest.extend(Spine.Events);
     ListenTest.listenTo(EventTest, "daddyo", spy);
     EventTest.trigger("daddyo");
     expect(spy).toHaveBeenCalled();
-    spy.reset();
+    spy.calls.reset();
     ListenTest.stopListening(EventTest, "daddyo");
     EventTest.trigger("daddyo");
     expect(spy).not.toHaveBeenCalled();
@@ -87,7 +87,7 @@ describe("Events", function(){
     EventTest.trigger("house");
     expect(spy).toHaveBeenCalled();
   });
-  
+
   it("can stopListening to one event", function(){
     ListenTest = Spine.Class.create();
     ListenTest.extend(Spine.Events);
@@ -99,11 +99,9 @@ describe("Events", function(){
     EventTest.trigger("house");
     expect(spy).toHaveBeenCalled();
   });
-  
-  it("can stop listening to a specific callback", function(){
-    var noop2 = {spy2: function(){}};
-    spyOn(noop2, "spy2");
-    var spy2 = noop2.spy2;
+
+  it("can stopListening to a specific callback", function(){
+    var spy2 = jasmine.createSpy();
     ListenTest = Spine.Class.create();
     ListenTest.extend(Spine.Events);
     ListenTest.listenTo(EventTest, "keep", spy);
@@ -117,22 +115,37 @@ describe("Events", function(){
     expect(spy2).not.toHaveBeenCalled();
   });
 
+  it("can stopListening to a specific object", function(){
+    ListenTest = Spine.Class.create();
+    var EventTest2 = Spine.Class.create();
+    var spy2 = jasmine.createSpy();
+    ListenTest.extend(Spine.Events);
+    EventTest2.extend(Spine.Events);
+    ListenTest.listenTo(EventTest, "keep", spy);
+    ListenTest.listenTo(EventTest2, "keep", spy2);
+    ListenTest.stopListening(EventTest);
+    EventTest.trigger("keep");
+    EventTest2.trigger("keep");
+    expect(spy).not.toHaveBeenCalled();
+    expect(spy2).toHaveBeenCalled();
+  });
+
   it("can bind to an event only once", function(){
     EventTest.one("indahouse", spy);
     EventTest.trigger("indahouse");
     expect(spy).toHaveBeenCalled();
-    spy.reset();
+    spy.calls.reset();
     EventTest.trigger("indahouse");
     expect(spy).not.toHaveBeenCalled();
   });
-  
+
   it("can listen to to a event only once", function(){
     ListenTest = Spine.Class.create();
     ListenTest.extend(Spine.Events);
     ListenTest.listenToOnce(EventTest, 'indahouse', spy)
     EventTest.trigger("indahouse");
     expect(spy).toHaveBeenCalled();
-    spy.reset();
+    spy.calls.reset();
     EventTest.trigger("indahouse");
     expect(spy).not.toHaveBeenCalled();
   });
@@ -154,7 +167,7 @@ describe("Events", function(){
     ListenTest.stopListening();
     EventTest.trigger("house");
     expect(spy).not.toHaveBeenCalled();
-    spy.reset();
+    spy.calls.reset();
     EventTest.trigger("indahouse");
     expect(spy).not.toHaveBeenCalled();
   });
@@ -165,7 +178,7 @@ describe("Events", function(){
     var b = jasmine.createSpy("b");
     var c = jasmine.createSpy("c");
 
-    b.andCallFake(function () {
+    b.and.callFake(function() {
       EventTest.unbind("once", b);
     });
 
@@ -180,9 +193,9 @@ describe("Events", function(){
 
     EventTest.trigger("once");
 
-    expect(a.callCount).toBe(2);
-    expect(b.callCount).toBe(1);
-    expect(c.callCount).toBe(2);
+    expect(a.calls.count()).toBe(2);
+    expect(b.calls.count()).toBe(1);
+    expect(c.calls.count()).toBe(2);
   });
 
   it("can cancel propogation", function(){
