@@ -343,8 +343,7 @@ describe("Ajax", function(){
   });
 
   describe("the request queue that runs asyncronosly", function() {
-    var counter = 0;
-    var promiseTimingTest = [{},{}];
+    var user1, user2;
     
     beforeEach(function(done){
       spyOn(jQuery, "ajax").and.returnValue(jqXHR);
@@ -352,10 +351,15 @@ describe("Ajax", function(){
       user2 = User.create({first: "Second"}, {parallel:true});
       expect(jQuery.ajax.calls.count()).toEqual(2);
       jqXHR.resolve();
-      
+      done();
+    });
+    
+    it("should still respect promises if requests done in parallel", function(done) {
+      var counter = 0, counter2 = 0;
+      var promiseTimingTest = [{},{}];
       user1.first = 'firstUpdated';
       user2.first = 'secondUpdated';
-    
+      
       user1.bind('ajaxSuccess', function(){
         counter++;
         promiseTimingTest[0].first = this.first;
@@ -363,20 +367,33 @@ describe("Ajax", function(){
       user2.bind('ajaxSuccess', function(){
         counter++;
         promiseTimingTest[1].first = this.first;
+        console.log(promiseTimingTest)
+        if (counter == 2) {
+          expect(counter).toBe(2);
+          expect(promiseTimingTest[0].first).toEqual('firstUpdated');
+          expect(promiseTimingTest[1].first).toEqual('secondUpdated');
+          done();
+        };
       });
-      //user1.save();
-      //user2.save();
+      //User.bind('ajaxSuccess', function(item, data, status, xhr){
+      //  console.log('user?',item);
+      //  counter2++;
+      //  switch (counter2) {
+      //    case 1:
+      //      expect(item.first).toBe('firstUpdated');
+      //      expect(item).toBe(user1);
+      //    case 2:
+      //      expect(item.first).toBe('secondUpdated');
+      //      expect(item).toBe(user2);
+      //      done();
+      //  }
+      //});
+      
       user1.save({parallel:true});
       user2.save({parallel:true});
+      //user1.save();
+      //user2.save();
       jqXHR.resolve();
-      done();
-    });
-    
-    it("should still respect promises if requests done in parallel", function(done) {
-      expect(counter).toBe(2);
-      expect(promiseTimingTest[0].first).toEqual('firstUpdated');
-      expect(promiseTimingTest[1].first).toEqual('secondUpdated');
-      done();
     });
     
     afterEach(function(){

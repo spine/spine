@@ -841,7 +841,8 @@ describe("Model", function(){
     it("can fire update events", function(){
       Asset.on("update", spy);
       var asset = Asset.create({name: "cartoon world.png"});
-      expect(spy).not.toHaveBeenCalledWith(asset);
+      expect(spy).not.toHaveBeenCalled()
+      //expect(spy).not.toHaveBeenCalledWith(asset);
       asset.save();
       expect(spy).toHaveBeenCalledWith(asset, {});
     });
