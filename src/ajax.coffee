@@ -216,12 +216,12 @@ class Singleton extends Base
           # Update with latest data
           @record.refresh(data)
 
-      @record.trigger('ajaxSuccess', @model.fromJSON(data), status, xhr)
+      @record.trigger('ajaxSuccess', @record, @model.fromJSON(data), status, xhr)
       options.done?.apply(@record)
 
   failResponse: (options = {}) =>
     (xhr, statusText, error) =>
-      @record.trigger('ajaxError', xhr, statusText, error)
+      @record.trigger('ajaxError', @record, xhr, statusText, error)
       options.fail?.apply(@record)
 
 # Ajax endpoint

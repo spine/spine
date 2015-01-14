@@ -372,22 +372,22 @@ describe("Ajax", function(){
           expect(counter).toBe(2);
           expect(promiseTimingTest[0].first).toEqual('firstUpdated');
           expect(promiseTimingTest[1].first).toEqual('secondUpdated');
-          done();
+          //done();
         };
       });
-      //User.bind('ajaxSuccess', function(item, data, status, xhr){
-      //  console.log('user?',item);
-      //  counter2++;
-      //  switch (counter2) {
-      //    case 1:
-      //      expect(item.first).toBe('firstUpdated');
-      //      expect(item).toBe(user1);
-      //    case 2:
-      //      expect(item.first).toBe('secondUpdated');
-      //      expect(item).toBe(user2);
-      //      done();
-      //  }
-      //});
+      User.bind('ajaxSuccess', function(item, data, status, xhr){
+        console.log('user?',item);
+        counter2++;
+        switch (counter2) {
+          case 1:
+            //expect(item.first).toBe('firstUpdated');
+            //expect(item).toBe(user1);
+          case 2:
+            //expect(item.first).toBe('secondUpdated');
+            //expect(item).toBe(user2);
+            done();
+        }
+      });
       
       user1.save({parallel:true});
       user2.save({parallel:true});
