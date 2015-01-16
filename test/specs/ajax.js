@@ -297,7 +297,7 @@ describe("Ajax", function(){
   });
   
   it("should send GET requests in parallel by default", function() {
-    console.log('GET - parallel');
+    //console.log('GET - parallel');
     spyOn(jQuery, "ajax").and.returnValue(jqXHR);
     User.fetch(1);
     expect(jQuery.ajax).toHaveBeenCalled();
@@ -310,7 +310,7 @@ describe("Ajax", function(){
   });
   
   it("should be able to send GET requests serially", function() {
-    console.log('GET - serially');
+    //console.log('GET - serially');
     spyOn(jQuery, "ajax").and.returnValue(jqXHR);
     User.fetch(1, {parallel:false});
     User.fetch(2, {parallel:false});
@@ -322,7 +322,7 @@ describe("Ajax", function(){
   });
   
   it("should be able to send non GET requests in parallel", function() {
-    console.log('POST - parallel ');
+    //console.log('POST - parallel ');
     spyOn(jQuery, "ajax").and.returnValue(jqXHR);
     User.create({first: "First"}, {parallel:true});
     User.create({first: "Second"}, {parallel:true});
@@ -346,12 +346,22 @@ describe("Ajax", function(){
     var user1, user2;
     
     beforeEach(function(done){
+      var counter = 0
       spyOn(jQuery, "ajax").and.returnValue(jqXHR);
       user1 = User.create({first: "First"}, {parallel:true});
       user2 = User.create({first: "Second"}, {parallel:true});
+      User.bind('ajaxSuccess', function(item, data, status, xhr){
+        counter++;
+        //console.log('User first save?', counter, item);
+        if (counter == 2) {
+            setTimeout(function() {
+              User.unbind('ajaxSuccess')
+              done();
+            }, 40);
+        }
+      });
       expect(jQuery.ajax.calls.count()).toEqual(2);
       jqXHR.resolve();
-      done();
     });
     
     it("should still respect promises if requests done in parallel", function(done) {
@@ -367,32 +377,36 @@ describe("Ajax", function(){
       user2.bind('ajaxSuccess', function(){
         counter++;
         promiseTimingTest[1].first = this.first;
-        console.log(promiseTimingTest)
+        //console.log('promiseTimingTest', promiseTimingTest)
         if (counter == 2) {
-          expect(counter).toBe(2);
           expect(promiseTimingTest[0].first).toEqual('firstUpdated');
           expect(promiseTimingTest[1].first).toEqual('secondUpdated');
-          done();
         };
       });
-      //User.bind('ajaxSuccess', function(item, data, status, xhr){
-      //  console.log('user?',item);
-      //  counter2++;
-      //  switch (counter2) {
-      //    case 1:
-      //      expect(item.first).toBe('firstUpdated');
-      //      expect(item).toBe(user1);
-      //    case 2:
-      //      expect(item.first).toBe('secondUpdated');
-      //      expect(item).toBe(user2);
-      //      done();
-      //  }
-      //});
+      User.bind('ajaxSuccess', function(item, data, status, xhr){
+        //console.log('user?',item);
+        //console.log('callback this', this)
+        //console.log(jQuery.ajax.calls);
+        counter2++;
+        switch (counter2) {
+          case 1:
+            expect(item.first).toBeDefined();
+          case 2:
+            expect(item.first).toBeDefined();
+            setTimeout(function() {
+              done();
+            }, 40);
+          //default:
+          //  console.log(counter2);
+          
+        }
+      });
       
       user1.save({parallel:true});
       user2.save({parallel:true});
       //user1.save();
       //user2.save();
+      expect(jQuery.ajax.calls.count()).toEqual(4);
       jqXHR.resolve();
     });
     
