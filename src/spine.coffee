@@ -409,6 +409,10 @@ class Model extends Module
     original
 
   refresh: (atts) ->
+    atts = @constructor.fromJSON(atts)
+    # ID change, need to do some shifting
+    if atts.id and @id isnt atts.id
+      @changeID(atts.id)
     # go to the source and load attributes
     @constructor.irecords[@id].load(atts)
     @trigger('refresh', this)
@@ -481,9 +485,9 @@ class Model extends Module
     Events.unbind.apply record, arguments
 
   trigger: ->
-    Events.trigger.apply this, arguments
-    return true if arguments[0] is 'refresh' # Don't trigger refresh events
-    @constructor.trigger arguments...
+    Events.trigger.apply this, arguments # fire off the instance event
+    return true if arguments[0] is 'refresh' # Don't trigger refresh events, because ... ?
+    @constructor.trigger arguments... # fire off the class event
 
 Model::on  = Model::bind
 Model::off = Model::unbind
@@ -622,7 +626,7 @@ makeArray = (args) ->
 Spine = @Spine   = {}
 module?.exports  = Spine
 
-Spine.version    = '1.4.0'
+Spine.version    = '1.4.1'
 Spine.isArray    = isArray
 Spine.isBlank    = isBlank
 Spine.$          = $

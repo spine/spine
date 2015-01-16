@@ -1,18 +1,37 @@
 describe("Events", function(){
-  var EventTest;
-  var ListenTest;
+  var EventTest, ListenTest;
   var spy;
 
   beforeEach(function(){
+    spy = jasmine.createSpy();
     EventTest = Spine.Class.create();
     EventTest.extend(Spine.Events);
-    spy = jasmine.createSpy();
   });
 
   it("can bind/trigger events", function(){
+    var spy2 = jasmine.createSpy('globalSpy');
+    Spine.bind('notify', spy2);
     EventTest.bind("daddyo", spy);
+    
+    EventTest.trigger("somethingElse");
+    expect(spy).not.toHaveBeenCalled();
+    
     EventTest.trigger("daddyo");
     expect(spy).toHaveBeenCalled();
+    expect(spy2).not.toHaveBeenCalled();
+  });
+  
+  it("can bind/trigger global events", function(){
+    var spy2 = jasmine.createSpy('globalSpy');
+    Spine.bind('notify', spy2);
+    EventTest.bind("daddyo", spy);
+    
+    Spine.trigger('somethingElse')
+    expect(spy2).not.toHaveBeenCalled();
+    
+    Spine.trigger("notify");
+    expect(spy2).toHaveBeenCalled();
+    expect(spy).not.toHaveBeenCalled();
   });
 
   it("can listen for events on other objects", function(){
@@ -33,6 +52,9 @@ describe("Events", function(){
     EventTest.bind("house car windows", spy);
     EventTest.trigger("car");
     expect(spy).toHaveBeenCalled();
+    EventTest.trigger("house");
+    EventTest.trigger("windows");
+    expect(spy.calls.count()).toBe(3);
   });
 
   it("can listen for multiple events on other objects", function(){
@@ -41,19 +63,34 @@ describe("Events", function(){
     ListenTest.listenTo(EventTest, "house car windows", spy);
     EventTest.trigger("car");
     expect(spy).toHaveBeenCalled();
+    EventTest.trigger("house");
+    EventTest.trigger("windows");
+    expect(spy.calls.count()).toBe(3);
   });
 
   it("can pass data to triggered events", function(){
+    var spy2 = jasmine.createSpy('globalSpy');
+    Spine.bind('notify', spy2);
     EventTest.bind("yoyo", spy);
+    
     EventTest.trigger("yoyo", 5, 10);
     expect(spy).toHaveBeenCalledWith(5, 10);
+    
+    Spine.trigger("notify", 'a message');
+    expect(spy2).toHaveBeenCalledWith('a message');
   });
 
   it("can unbind events", function(){
     EventTest.bind("daddyo", spy);
+    var spy2 = jasmine.createSpy('globalSpy');
+    Spine.bind('notify', spy2);
+        
     EventTest.unbind("daddyo");
+    Spine.unbind('notify');
     EventTest.trigger("daddyo");
+    Spine.trigger("notify");
     expect(spy).not.toHaveBeenCalled();
+    expect(spy2).not.toHaveBeenCalled();
   });
 
   it("can unbind all events if no arguments given", function() {
@@ -137,6 +174,16 @@ describe("Events", function(){
     spy.calls.reset();
     EventTest.trigger("indahouse");
     expect(spy).not.toHaveBeenCalled();
+  });
+  
+  it("can bind to a global event only once", function(){
+    var spy2 = jasmine.createSpy('globalSpy');
+    Spine.one('notify', spy2);
+    Spine.trigger("notify");
+    expect(spy2).toHaveBeenCalled();
+    spy2.calls.reset();
+    Spine.trigger("notify");
+    expect(spy2).not.toHaveBeenCalled();
   });
 
   it("can listen to to a event only once", function(){

@@ -841,7 +841,8 @@ describe("Model", function(){
     it("can fire update events", function(){
       Asset.on("update", spy);
       var asset = Asset.create({name: "cartoon world.png"});
-      expect(spy).not.toHaveBeenCalledWith(asset);
+      expect(spy).not.toHaveBeenCalled()
+      //expect(spy).not.toHaveBeenCalledWith(asset);
       asset.save();
       expect(spy).toHaveBeenCalledWith(asset, {});
     });
@@ -917,8 +918,9 @@ describe("Model", function(){
     });
 
     it("should invoke callbacks in the context of the class", function(){
-      Asset.on("create update destroy change save error custom", function(){
+      Asset.on("create update destroy change save error custom", function(item){
         expect(this).toEqual(Asset);
+        //console.log('item', item);
       });
       var asset = Asset.create({name: "screaming goats.png"});
       asset.updateAttribute("name", "more screaming goats.png");
