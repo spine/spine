@@ -1,3 +1,7 @@
+## 1.4.1
+* use beforeFromJSON before passing json to ajaxSuccess
+* ajaxSuccess event again passes item as first arg
+
 ## 1.4.0
 * CoffeeScript 1.8.0
 * Refactored model event dispatching #558
