@@ -626,7 +626,7 @@ makeArray = (args) ->
 Spine = @Spine   = {}
 module?.exports  = Spine
 
-Spine.version    = '1.4.1'
+Spine.version    = '1.4.2'
 Spine.isArray    = isArray
 Spine.isBlank    = isBlank
 Spine.$          = $

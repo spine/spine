@@ -1,3 +1,8 @@
+## 1.4.2 (pending)
+* CoffeeScript 1.9.1
+* Fixes for coffeescript change #578
+* LocalStorage module checks for functioning localStorage #584
+
 ## 1.4.1
 * use beforeFromJSON before passing json to ajaxSuccess
 * ajaxSuccess event again passes item as first arg
