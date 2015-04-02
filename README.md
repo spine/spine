@@ -37,7 +37,7 @@ $ git clone git://github.com/spine/spine.git
 $ cd spine
 ```
 
-Next, open `test/index.html` to run the [Jasmine](http://pivotal.github.com/jasmine/) test suite for spine core.  If you see all the tests passing, you're ready to contribute!
+Next, open `test/index.html` to run the [Jasmine](http://jasmine.github.io/) test suite for spine core.  If you see all the tests passing, you're ready to contribute!
 
 ## Contributing to the Spine documentation
 
