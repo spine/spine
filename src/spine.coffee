@@ -514,6 +514,7 @@ class Controller extends Module
 
     @events = @constructor.events unless @events
     @elements = @constructor.elements unless @elements
+    @activated = @constructor.activated unless @activated
 
     context = @
     while parent_prototype = context.constructor.__super__

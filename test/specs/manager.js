@@ -39,6 +39,25 @@ describe("Manager", function(){
     expect(manager.controllers).toEqual([groups]);
   });
 
+
+  describe("When set activated", function(){
+    var spy;
+
+    it("should call the function specified for activated on activate", function() {
+      spy = jasmine.createSpy();
+
+      Users.include({
+        activated: function() {}
+      });
+
+      users = new Users();
+
+      spyOn(users, 'activated');
+      users.activate();
+      expect(users.activated).toHaveBeenCalled();
+    });
+  })
+
   describe("When moving through the stack", function(){
     var spy;
 

@@ -34,6 +34,16 @@ describe("Controller", function(){
     //expect(users.$el.html()).toBe('replaced');
   });
 
+  it("should set activated when a function is passed", function() {
+    Users.include({
+      activated: function() {}
+    })
+
+    var users = new Users({ el: element });
+
+    expect(users.activated).toBeTruthy();
+  });
+
   it("should populate elements", function(){
     Users.include({
       elements: {".foo": "foo"}

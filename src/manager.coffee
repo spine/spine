@@ -47,6 +47,7 @@ Spine.Controller.include
 
   activate: ->
     @el.addClass('active')
+    @activated() if @activated? && $.isFunction(@activated)
     this
 
   deactivate: ->
