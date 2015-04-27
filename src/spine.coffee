@@ -160,13 +160,16 @@ class Model extends Module
 
   @exists: (id) -> Boolean @irecords[id]
 
-  @addRecord: (record) ->
+  @addRecord: (record,idx) ->
     if root = @irecords[record.id or record.cid]
       root.refresh(record)
     else
       record.id or= record.cid
       @irecords[record.id] = @irecords[record.cid] = record
-      @records.push(record)
+      if idx isnt undefined
+        @records.splice(idx,0,record)
+      else
+        @records.push(record)
     record
 
   @refresh: (values, options = {}) ->
@@ -464,7 +467,7 @@ class Model extends Module
     @id or= @cid
 
     record = @dup(false)
-    @constructor.addRecord(record)
+    @constructor.addRecord(record,options.idx)
     @constructor.sort()
 
     clone = record.clone()
