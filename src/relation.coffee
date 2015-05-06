@@ -1,5 +1,4 @@
 Spine   = @Spine or require('spine')
-isArray = Spine.isArray
 
 class Collection extends Spine.Module
   constructor: (options = {}) ->
@@ -42,7 +41,7 @@ class Collection extends Spine.Module
       for match, i in @model.records when match.id is record.id
         @model.records.splice(i, 1)
         break
-    values = [values] unless isArray(values)
+    values = [values] unless Array.isArray(values)
     for record in values
       record.newRecord = false
       record[@fkey] = @record.id
