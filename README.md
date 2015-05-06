@@ -16,7 +16,7 @@ Documentation is often incomplete or just lies waiting to happen. Approachable s
 
 For documentation, usage, and examples, see: [spinejs.com](http://spinejs.com)
 
-The test suite can also occasionsly provide additional useful examples, especially if you are looking for non-coffeescript examples.
+The test suite can also occasionally provide additional useful examples, especially if you are looking for non-coffeescript examples.
 
 # Contributing
 
