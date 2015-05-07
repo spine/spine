@@ -37,7 +37,13 @@ $ git clone git://github.com/spine/spine.git
 $ cd spine
 ```
 
-Next, open `test/index.html` to run the [Jasmine](http://jasmine.github.io/) test suite for spine core.  If you see all the tests passing, you're ready to contribute!
+Next, open `test/index.html` to run the [Jasmine](http://jasmine.github.io/) test suite for spine core.  If you see all the tests passing, you're ready to contribute! (A known issue is that some of the routing tests will fail if you are simply using a `file://` protocol in the browser. This has to do with browser security. if you use a server like Apache or Nginx to server the test files to the browser you won't ecounter this.)
+
+Alternatively if you have node, npm, and [phantom.js](http://phantomjs.org/) then a script is included to make running tests even slicker! 
+
+```
+npm test
+```
 
 ## Contributing to the Spine documentation
 
@@ -51,7 +57,7 @@ This recommended contribution process is based on the [Ruby on Rails contributio
 
 When submitting a pull request for code, please submit in CoffeeScript. Building the effected js files is required for testing sake, but submitting those js files is optional.
 
-Start by installing local dev dependencies:
+Assuming you have Node.js and npm already installed then proceed by installing local dev dependencies:
 
 ```
 $ npm install .
