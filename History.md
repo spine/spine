@@ -1,16 +1,23 @@
-## 1.4.2 (pending)
+## 1.5.0
+* CoffeeScript 1.9.2
+* Add ability to insert record at index #586
+* Remove Spine.isArray polyfill #589
+* Remove Spine.isBlank util #589
+* The relation module utilizes underscore instead of dot #446
+
+## 1.4.2
 * CoffeeScript 1.9.1
 * Fixes for coffeescript change #578
 * LocalStorage module checks for functioning localStorage #584
 
 ## 1.4.1
-* use beforeFromJSON before passing json to ajaxSuccess
-* ajaxSuccess event again passes item as first arg
+* Use beforeFromJSON before passing json to ajaxSuccess
+* The ajaxSuccess event again passes item as first arg
 
 ## 1.4.0
 * CoffeeScript 1.8.0
 * Refactored model event dispatching #558
-* exists() replaced with find() in relation module
+* Replaced exists() with find() in relation module
 * Fixed Route unbind #551
 * Remove controllers @$el as broken alias for @el #552
 * Migrate to jasmine 2.1.3 for tests
