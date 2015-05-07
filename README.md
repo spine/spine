@@ -8,7 +8,7 @@ Spine is a lightweight MVC library for building JavaScript web applications. Spi
 
 Spine is opinionated in its approach to web application architecture and design. Spine's architecture complements patterns such as de-coupled components and CommonJS modules, markedly helping with code quality and maintainability.
 
-The library is written in [CoffeeScript](http://jashkenas.github.com/coffee-script), and though it doesn't necessarily require CoffeeScript to develop applications - you can use whichever language you're most familiar with or prefer - the documentation and some associated tools like [Hem](https://github.com/spine/hem) and [spine.app](https://github.com/spine/spine.app) cater to those who prefer CoffeeScript's syntax.
+The library is written in [CoffeeScript](http://coffeescript.org), and though it doesn't necessarily require CoffeeScript to develop applications - you can use whichever language you're most familiar with or prefer - the documentation and some associated tools like [Hem](https://github.com/spine/hem) and [spine.app](https://github.com/spine/spine.app) cater to those who prefer CoffeeScript's syntax.
 
 ## Learn it
 
@@ -16,7 +16,7 @@ Documentation is often incomplete or just lies waiting to happen. Approachable s
 
 For documentation, usage, and examples, see: [spinejs.com](http://spinejs.com)
 
-The test suite can also occasionsly provide additional useful examples, especially if you are looking for non-coffeescript examples.
+The test suite can also occasionally provide additional useful examples, especially if you are looking for non-coffeescript examples.
 
 # Contributing
 
@@ -37,7 +37,7 @@ $ git clone git://github.com/spine/spine.git
 $ cd spine
 ```
 
-Next, open `test/index.html` to run the [Jasmine](http://pivotal.github.com/jasmine/) test suite for spine core.  If you see all the tests passing, you're ready to contribute!
+Next, open `test/index.html` to run the [Jasmine](http://jasmine.github.io/) test suite for spine core.  If you see all the tests passing, you're ready to contribute!
 
 ## Contributing to the Spine documentation
 

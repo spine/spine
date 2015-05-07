@@ -1,12 +1,12 @@
 {
   "name": "spine",
   "description": "MVC Library.",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "author": "maccman",
   "keywords": ["spine", "coffeescript", "MVC"],
   "contributors": ["maccman", "aeischeid", "cengebretson", "adambiggs"],
   "devDependencies": {
-    "coffee-script": ">=1.8.0"
+    "coffee-script": ">=1.9.1"
   },
   "licenses":
     [{

@@ -11,6 +11,14 @@ describe("Model", function(){
     expect(Asset.first()).toEqual(asset);
   });
 
+  it("can insert records at index",function(){
+    Asset.create({name: "test_first.pdf"});
+    expect(Asset.count()).toEqual(1);
+    var asset = Asset.create({name: "test.pdf"},{idx: 0});
+    expect(Asset.count()).toEqual(2);
+    expect(Asset.first().id).toEqual(asset.id);
+  });
+
   it("can update records", function(){
     var asset = Asset.create({name: "test.pdf"});
 
@@ -281,7 +289,7 @@ describe("Model", function(){
       console.log(objects.data);
       return objects.data;
     }
-    
+
     var asset = Asset.fromJSON('{"data":{"name":"Un-Johnson me!"}}')
     expect(asset.name).toEqual("Un-Johnson me!");
 
