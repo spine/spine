@@ -2,7 +2,7 @@ describe("Routing", function(){
   var Route = Spine.Route,
       RouteOptions = Route.options,
       spy;
-      
+
   // Set (default Reset) document's URL
   var setUrl = (function(){
     var originalTitle,
@@ -16,7 +16,7 @@ describe("Routing", function(){
   beforeEach(function(){
     Route.options = RouteOptions; // Reset default Route options
   });
-  
+
   afterEach(function(){
     Route.unbind();
     Route.routers = [];
@@ -42,7 +42,7 @@ describe("Routing", function(){
 
 
   describe("With trigger disabled", function(){
-  
+
     beforeEach(function(){
       Route.setup({trigger: false});
     });
@@ -51,17 +51,17 @@ describe("Routing", function(){
       var triggerspy = jasmine.createSpy('triggerspy');
       Route.add('/foobe');
       expect(Route.router.routes.length).toBe(1);
-      
+
       Route.one('before', triggerspy);
       Route.one('navigate', triggerspy);
       Route.one('change', triggerspy);
       Route.path = '/';
-      
+
       expect(Route.path).toBe('/');
       expect(triggerspy).not.toHaveBeenCalled();
 
       Route.navigate('/foobe'); // since trigger isn't used nothing async should be happening
-      
+
       expect(triggerspy).not.toHaveBeenCalled();
       expect(Route.path).toBe('/foobe');
     });
@@ -168,13 +168,13 @@ describe("Routing", function(){
         Route.path = '/foo';
 
         Route.navigate('/foo');
-        
+
         expect(routeSpy).not.toHaveBeenCalled();
         expect(Route.path).toBe('/foo');
       });
 
       it("should call routes when navigating", function(done){
-        
+
         Route.add('/fool', function(){
           expect(Route.path).toBe('/fool');
           done();
@@ -183,37 +183,37 @@ describe("Routing", function(){
       });
 
 
-      it("can call routes with params", function(done){ 
-        Route.add({'/users/:id/:id2': function(){
-          expect(arguments).toEqual(jasmine.objectContaining([{
-              trigger: true,
-              history: false,
-              shim: true,
-              replace: false,
-              redirect: false,
-              match: ['/users/1/2', '1', '2'], id: '1', id2: '2'
-            }])
-          )
-          done();
-        }});
+      it("can call routes with params", function(){
+        var spy = jasmine.createSpy();
+        Route.add({'/users/:id/:id2': spy});
         Route.navigate('/users/1/2');
 
+        expect(spy).toHaveBeenCalledWith(jasmine.objectContaining({
+          trigger: true,
+          history: false,
+          shim: true,
+          replace: false,
+          redirect: false,
+          match: jasmine.arrayContaining(['/users/1/2', '1', '2']),
+          id: '1',
+          id2: '2'
+        }));
       });
 
-      it("can call routes with glob", function(done){
-        Route.add({'/page/*stuff': function(){
-          expect(arguments).toEqual(jasmine.objectContaining([{
-              trigger: true,
-              history: false,
-              shim: true,
-              replace: false,
-              redirect: false,
-              match: ['/page/gah', 'gah'], stuff: 'gah'
-            }])
-          );
-          done();
-        }});
+      it("can call routes with glob", function(){
+        var spy = jasmine.createSpy();
+        Route.add({'/page/*stuff': spy});
         Route.navigate('/page/gah');
+
+        expect(spy).toHaveBeenCalledWith(jasmine.objectContaining({
+          trigger: true,
+          history: false,
+          shim: true,
+          replace: false,
+          redirect: false,
+          match: jasmine.arrayContaining(['/page/gah', 'gah']),
+          stuff: 'gah'
+        }));
       });
 
       it("can override trigger behavior when navigating", function(){
@@ -345,7 +345,7 @@ describe("Routing", function(){
     it("can navigate", function(){
       Route.add('/users/1', function(){});
       Route.navigate('/users/1');
-      
+
       expect(window.location.pathname).toBe('/users/1');
     });
 
@@ -403,7 +403,7 @@ describe("Routing", function(){
       otherRoute.add('/foo/*glob', spy2);
       otherRoute.add('/foo/baz', spy2);
       Route.navigate('/foo/bar');
-      
+
       setTimeout(function() {
         expect(spy1).toHaveBeenCalled();
         expect(spy1.calls.count()).toEqual(1);
@@ -420,7 +420,7 @@ describe("Routing", function(){
       Route.add('/foo/bar', spy1);
       otherRoute.add('/foo/*glob', spy2);
       Route.navigate('/foo/bar');
-      
+
       setTimeout(function() {
         expect(spy).toHaveBeenCalled();
         expect(spy).toHaveBeenCalledWith(
@@ -439,7 +439,7 @@ describe("Routing", function(){
       otherRoute.add('/foo/bar', spy2);
       otherRoute.destroy();
       Route.navigate('/foo/bar');
-      
+
       setTimeout(function() {
         expect(spy1).toHaveBeenCalled();
         expect(spy2).not.toHaveBeenCalled();

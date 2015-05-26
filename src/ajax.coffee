@@ -95,9 +95,9 @@ class Base
       if typeof settings.data isnt 'string' and settings.processData isnt true
         settings.data = JSON.stringify(settings.data)
       jqXHR = $.ajax(settings)
-                .done(deferred.resolve)
-                .fail(deferred.reject)
-                .then(next, next)
+      jqXHR.done(deferred.resolve)
+      jqXHR.fail(deferred.reject)
+      jqXHR.then(next, next)
       if parallel
         Queue.dequeue()
 
