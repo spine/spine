@@ -129,7 +129,7 @@ class Collection extends Base
         parallel: options.parallel
       }
     ).done(@recordsResponse)
-     .fail(@failResponse)
+      .fail(@failResponse)
 
   all: (params, options = {}) ->
     @ajaxQueue(
@@ -139,7 +139,7 @@ class Collection extends Base
         parallel: options.parallel
       }
     ).done(@recordsResponse)
-     .fail(@failResponse)
+      .fail(@failResponse)
 
   fetch: (params = {}, options = {}) ->
     if id = params.id
@@ -170,7 +170,7 @@ class Singleton extends Base
         parallel: options.parallel
       }, @record
     ).done(@recordResponse(options))
-     .fail(@failResponse(options))
+      .fail(@failResponse(options))
 
   create: (params, options = {}) ->
     @ajaxQueue(
@@ -182,7 +182,7 @@ class Singleton extends Base
         parallel: options.parallel
       }
     ).done(@recordResponse(options))
-     .fail(@failResponse(options))
+      .fail(@failResponse(options))
 
   update: (params, options = {}) ->
     @ajaxQueue(
@@ -194,7 +194,7 @@ class Singleton extends Base
         parallel: options.parallel
       }, @record
     ).done(@recordResponse(options))
-     .fail(@failResponse(options))
+      .fail(@failResponse(options))
 
   destroy: (params, options = {}) ->
     @ajaxQueue(
@@ -204,7 +204,7 @@ class Singleton extends Base
         parallel: options.parallel
       }, @record
     ).done(@recordResponse(options))
-     .fail(@failResponse(options))
+      .fail(@failResponse(options))
 
   # Private
 
