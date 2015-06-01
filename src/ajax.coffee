@@ -133,8 +133,8 @@ class Collection extends Base
         url: options.url or Ajax.getURL(record)
         parallel: options.parallel
       }
-    ).done(@recordsResponse)
-      .fail(@failResponse)
+    ).done(@recordsResponse(options))
+      .fail(@failResponse(options))
 
   all: (params, options = {}) ->
     @ajaxQueue(
@@ -143,8 +143,8 @@ class Collection extends Base
         url: options.url or Ajax.getURL(@model)
         parallel: options.parallel
       }
-    ).done(@recordsResponse)
-      .fail(@failResponse)
+    ).done(@recordsResponse(options))
+      .fail(@failResponse(options))
 
   fetch: (params = {}, options = {}) ->
     if id = params.id
@@ -157,11 +157,15 @@ class Collection extends Base
 
   # Private
 
-  recordsResponse: (data, status, xhr, settings) =>
-    @model.trigger('ajaxSuccess', null, status, xhr, settings)
+  recordsResponse: (options) =>
+    (data, status, xhr, settings) =>
+      @model.trigger('ajaxSuccess', null, status, xhr, settings)
+      options.done?.call(@model, settings)
 
-  failResponse: (xhr, statusText, error, settings) =>
-    @model.trigger('ajaxError', null, xhr, statusText, error, settings)
+  failResponse: (options) =>
+    (xhr, statusText, error, settings) =>
+      @model.trigger('ajaxError', null, xhr, statusText, error, settings)
+      options.fail?.call(@model, settings)
 
 class Singleton extends Base
   constructor: (@record) ->
@@ -213,14 +217,14 @@ class Singleton extends Base
 
   # Private
 
-  recordResponse: (options = {}) =>
+  recordResponse: (options) =>
     (data, status, xhr, settings) =>
       if data? and Object.getOwnPropertyNames(data).length and not @record.destroyed
         @record.refresh(data, ajax: false)
       @record.trigger('ajaxSuccess', @record, @model.fromJSON(data), status, xhr, settings)
       options.done?.call(@record, settings)
 
-  failResponse: (options = {}) =>
+  failResponse: (options) =>
     (xhr, statusText, error, settings) =>
       switch settings.type
         when 'POST' then @createFailed()

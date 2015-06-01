@@ -345,7 +345,7 @@ describe("Ajax", function(){
     expect(User.exists("IDD")).toBeTruthy();
   });
 
-  it("should have done callbacks", function(){
+  it("should have done callbacks for singleton requests", function(){
     var spy = jasmine.createSpy();
     User.create({first: "Second"}, {done: spy});
 
@@ -356,11 +356,15 @@ describe("Ajax", function(){
     });
 
     expect(spy).toHaveBeenCalled();
+    var settings = spy.calls.mostRecent().args[0]
+    expect(settings).toBeDefined();
+    expect(settings.type).toEqual("POST");
+    expect(settings.data).toEqual(JSON.stringify(User.first()));
   });
 
-  it("should pass request settings into done callbacks", function(){
+  it("should have done callbacks for collection requests", function(){
     var spy = jasmine.createSpy();
-    User.create({first: "Second"}, {done: spy});
+    User.fetch(null, {done: spy});
 
     var serverAttrs = {first: "Second"};
     jasmine.Ajax.requests.mostRecent().respondWith({
@@ -368,8 +372,9 @@ describe("Ajax", function(){
       responseText: JSON.stringify(serverAttrs)
     });
 
-    var args = spy.calls.mostRecent().args
-    expect(args[0]).toBeDefined();
+    expect(spy).toHaveBeenCalled();
+    var settings = spy.calls.mostRecent().args[0]
+    expect(settings.type).toEqual("GET");
   });
 
   it("should trigger an 'ajaxSuccess' event", function(){
@@ -387,23 +392,28 @@ describe("Ajax", function(){
     });
 
     expect(spy).toHaveBeenCalled();
+    var settings = spy.calls.mostRecent().args[4]
+    expect(settings.type).toEqual("POST");
+    expect(settings.data).toEqual(JSON.stringify(user));
   });
 
-  it("should have fail callbacks", function(){
+  it("should have fail callbacks for singleton requests", function(){
     var spy = jasmine.createSpy();
-    User.create({first: "Second"}, {fail: spy});
-
+    var user = User.create({first: "Second"}, {fail: spy});
     jasmine.Ajax.requests.mostRecent().respondWith({ status: 400 });
-
     expect(spy).toHaveBeenCalled();
+    var settings = spy.calls.mostRecent().args[0]
+    expect(settings.type).toEqual("POST");
+    expect(settings.data).toEqual(JSON.stringify(user));
   });
 
-  it("should pass request settings into fail callbacks", function(){
+  it("should have fail callbacks for collection requests", function(){
     var spy = jasmine.createSpy();
-    User.create({first: "Second"}, {fail: spy});
-    jasmine.Ajax.requests.mostRecent().respondWith({status: 501});
-    var args = spy.calls.mostRecent().args
-    expect(args[0]).toBeDefined();
+    User.fetch(null, {fail: spy});
+    jasmine.Ajax.requests.mostRecent().respondWith({ status: 400 });
+    expect(spy).toHaveBeenCalled();
+    var settings = spy.calls.mostRecent().args[0]
+    expect(settings.type).toEqual("GET");
   });
 
   it("should trigger an 'ajaxError' event", function(){
@@ -414,6 +424,9 @@ describe("Ajax", function(){
     expect(spy).not.toHaveBeenCalled();
     jasmine.Ajax.requests.mostRecent().respondWith({status: 501});
     expect(spy).toHaveBeenCalled();
+    var settings = spy.calls.mostRecent().args[4]
+    expect(settings.type).toEqual("POST");
+    expect(settings.data).toEqual(JSON.stringify(user));
   });
 
   it("removes new records from model storage if creation fails on the server", function(){
