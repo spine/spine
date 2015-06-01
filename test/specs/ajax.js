@@ -358,12 +358,61 @@ describe("Ajax", function(){
     expect(spy).toHaveBeenCalled();
   });
 
+  it("should pass request settings into done callbacks", function(){
+    var spy = jasmine.createSpy();
+    User.create({first: "Second"}, {done: spy});
+
+    var serverAttrs = {first: "Second"};
+    jasmine.Ajax.requests.mostRecent().respondWith({
+      status: 200,
+      responseText: JSON.stringify(serverAttrs)
+    });
+
+    var args = spy.calls.mostRecent().args
+    expect(args[0]).toBeDefined();
+  });
+
+  it("should trigger an 'ajaxSuccess' event", function(){
+    var spy = jasmine.createSpy();
+    var user = new User({first: "Adam"});
+    user.on('ajaxSuccess', spy);
+    user.save();
+
+    expect(spy).not.toHaveBeenCalled();
+
+    var serverAttrs = {first: "Adam"};
+    jasmine.Ajax.requests.mostRecent().respondWith({
+      status: 200,
+      responseText: JSON.stringify(serverAttrs)
+    });
+
+    expect(spy).toHaveBeenCalled();
+  });
+
   it("should have fail callbacks", function(){
     var spy = jasmine.createSpy();
     User.create({first: "Second"}, {fail: spy});
 
     jasmine.Ajax.requests.mostRecent().respondWith({ status: 400 });
 
+    expect(spy).toHaveBeenCalled();
+  });
+
+  it("should pass request settings into fail callbacks", function(){
+    var spy = jasmine.createSpy();
+    User.create({first: "Second"}, {fail: spy});
+    jasmine.Ajax.requests.mostRecent().respondWith({status: 501});
+    var args = spy.calls.mostRecent().args
+    expect(args[0]).toBeDefined();
+  });
+
+  it("should trigger an 'ajaxError' event", function(){
+    var spy = jasmine.createSpy();
+    var user = new User({first: "Adam"});
+    user.on('ajaxError', spy);
+    user.save();
+    expect(spy).not.toHaveBeenCalled();
+    jasmine.Ajax.requests.mostRecent().respondWith({status: 501});
     expect(spy).toHaveBeenCalled();
   });
 
