@@ -222,8 +222,18 @@ class Singleton extends Base
 
   failResponse: (options = {}) =>
     (xhr, statusText, error, settings) =>
+      switch settings.type
+        when 'POST' then @createFailed()
+        when 'DELETE' then @destroyFailed()
       @record.trigger('ajaxError', @record, xhr, statusText, error, settings)
       options.fail?.call(@record, settings)
+
+  createFailed: ->
+    @record.remove(clear: true)
+
+  destroyFailed: ->
+    @record.destroyed = false
+    @record.constructor.refresh(@record)
 
 # Ajax endpoint
 Model.host = ''

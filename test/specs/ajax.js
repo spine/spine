@@ -416,6 +416,22 @@ describe("Ajax", function(){
     expect(spy).toHaveBeenCalled();
   });
 
+  it("removes new records from model storage if creation fails on the server", function(){
+    var user = User.create({first: "Adam"});
+    expect(User.count()).toEqual(1);
+    jasmine.Ajax.requests.mostRecent().respondWith({status: 501});
+    expect(User.count()).toEqual(0);
+    expect(user.destroyed).toBeFalsy();
+  });
+
+  it("restores destroyed records in model storage if deletion fails on the server", function(){
+    var user = User.create({first: "Adam"}, {ajax: false});
+    user.destroy();
+    expect(User.count()).toEqual(0);
+    jasmine.Ajax.requests.mostRecent().respondWith({status: 501});
+    expect(User.count()).toEqual(1);
+    expect(user.destroyed).toBeFalsy();
+  });
 
   it("can be disabled in method options", function() {
     User.create({first: "Second"}, {ajax: false});
