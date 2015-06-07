@@ -12,7 +12,7 @@ The library is written in [CoffeeScript](http://coffeescript.org), and though it
 
 ## Learn it
 
-Documentation is often incomplete or just lies waiting to happen. Approachable source code reduces knowledge dependencies. This is an area where Spine really excells compared to other MVC frameworks. Spine is tiny; The core library comes in at less than 700 lines of CoffeeScript code. It is written in such a way as prefer readability over terseness or clever tricks, and it is small enough that within a rather small timeframe you can understand how all the pieces work together. Expertise is acheivable within days or weeks rather than months or years. For these reasons remaining lightweight and simple is fundamental to Spine.
+Documentation is often incomplete or just lies waiting to happen. Approachable source code reduces knowledge dependencies. This is an area where Spine really excells compared to other MVC frameworks. Spine is tiny; the core library comes in at less than 700 lines of CoffeeScript code. It is written in such a way to prefer readability over terseness or clever tricks, and it is small enough that within a rather small timeframe you can understand how all the pieces work together. Expertise is achievable within days or weeks rather than months or years. For these reasons, remaining lightweight and simple is fundamental to Spine.
 
 For documentation, usage, and examples, see: [spinejs.com](http://spinejs.com)
 
