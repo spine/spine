@@ -1,3 +1,10 @@
+## 1.6.0
+* CoffeeScript 1.9.3
+* Collection ajax calls can now accept done or fail callbacks #591
+* Unsuccessful ajax POST calls automatically delete the local model #591
+* Unsuccessful ajax DELETE calls automatically restore the local model #591
+* Fix a bug with stopListening #596
+
 ## 1.5.0
 * CoffeeScript 1.9.2
 * Add ability to insert record at index #586

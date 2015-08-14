@@ -1,12 +1,12 @@
 {
   "name": "spine",
   "description": "MVC Library.",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "author": "maccman",
   "keywords": ["spine", "coffeescript", "MVC"],
   "contributors": ["maccman", "aeischeid", "cengebretson", "adambiggs"],
   "devDependencies": {
-    "coffee-script": "^1.9.2",
+    "coffee-script": "^1.9.3",
     "jasmine-core": "^2.3.0",
     "jasmine-ajax": "^3.1.1",
     "local-web-server": "^0.5.19"

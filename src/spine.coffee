@@ -621,7 +621,7 @@ makeArray = (args) ->
 Spine = @Spine   = {}
 module?.exports  = Spine
 
-Spine.version    = '1.5.0'
+Spine.version    = '1.6.0'
 Spine.$          = $
 Spine.Events     = Events
 Spine.Log        = Log
