@@ -40,15 +40,15 @@ $ cd spine
 Next, You will need node and npm to pull in the testing libraries. Once you're all set with those then from within the Spine repo directory run 
 
 ```
-npm install .
+$ npm install .
 ```
 
-This should bring in [Jasmine](http://jasmine.github.io/), Coffeescript, and a minimalist local server for running the tests a browser. You can also simply open `test/index.html` in a browser to run the [Jasmine](http://jasmine.github.io/) test suite for spine core.  If you see all the tests passing, you're ready to contribute! A known issue is that some of the routing tests will fail if you are simply using a `file://` protocol in the browser. This has to do with browser security. You can avoid this by running the local server, `npm start`. Alternatively you can use a server like Apache or Nginx to serve the test files to the browser. 
+This should bring in [Jasmine](http://jasmine.github.io/), Coffeescript, and a minimalist local server for running the tests a browser. You can also simply open `test/index.html` in a browser to run the [Jasmine](http://jasmine.github.io/) test suite for spine core.  If you see all the tests passing, you're ready to contribute! A known issue is that some of the routing tests will fail if you are simply using a `file://` protocol in the browser. This has to do with browser security. You can avoid this by running the local server, `$ npm start`. Alternatively you can use a server like Apache or Nginx to serve the test files to the browser. 
 
 If you have [phantom.js](http://phantomjs.org/) available then a script is included to make running tests even slicker!
 
 ```
-npm test
+$ npm test
 ```
 
 ## Contributing to the Spine documentation
