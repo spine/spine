@@ -12,23 +12,23 @@ describe("Events", function(){
     var spy2 = jasmine.createSpy('globalSpy');
     Spine.bind('notify', spy2);
     EventTest.bind("daddyo", spy);
-    
+
     EventTest.trigger("somethingElse");
     expect(spy).not.toHaveBeenCalled();
-    
+
     EventTest.trigger("daddyo");
     expect(spy).toHaveBeenCalled();
     expect(spy2).not.toHaveBeenCalled();
   });
-  
+
   it("can bind/trigger global events", function(){
     var spy2 = jasmine.createSpy('globalSpy');
     Spine.bind('notify', spy2);
     EventTest.bind("daddyo", spy);
-    
+
     Spine.trigger('somethingElse')
     expect(spy2).not.toHaveBeenCalled();
-    
+
     Spine.trigger("notify");
     expect(spy2).toHaveBeenCalled();
     expect(spy).not.toHaveBeenCalled();
@@ -72,10 +72,10 @@ describe("Events", function(){
     var spy2 = jasmine.createSpy('globalSpy');
     Spine.bind('notify', spy2);
     EventTest.bind("yoyo", spy);
-    
+
     EventTest.trigger("yoyo", 5, 10);
     expect(spy).toHaveBeenCalledWith(5, 10);
-    
+
     Spine.trigger("notify", 'a message');
     expect(spy2).toHaveBeenCalledWith('a message');
   });
@@ -84,7 +84,7 @@ describe("Events", function(){
     EventTest.bind("daddyo", spy);
     var spy2 = jasmine.createSpy('globalSpy');
     Spine.bind('notify', spy2);
-        
+
     EventTest.unbind("daddyo");
     Spine.unbind('notify');
     EventTest.trigger("daddyo");
@@ -175,7 +175,7 @@ describe("Events", function(){
     EventTest.trigger("indahouse");
     expect(spy).not.toHaveBeenCalled();
   });
-  
+
   it("can bind to a global event only once", function(){
     var spy2 = jasmine.createSpy('globalSpy');
     Spine.one('notify', spy2);
@@ -275,5 +275,17 @@ describe("Events", function(){
     EventTest.trigger("house");
     expect(spy).toHaveBeenCalled();
   });
-});
 
+  it("should stop listening only on the specified events", function() {
+    var spy2 = jasmine.createSpy();
+    ListenTest = Spine.Class.create();
+    ListenTest.extend(Spine.Events);
+    ListenTest.listenToOnce(EventTest, "dastardly1", spy);
+    ListenTest.listenTo(EventTest, "dastardly2", spy2);
+    EventTest.trigger("dastardly2");
+    ListenTest.stopListening(EventTest, "dastardly2");
+    EventTest.trigger("dastardly1");
+    expect(spy).toHaveBeenCalled();
+    expect(spy2).toHaveBeenCalled();
+  });
+});

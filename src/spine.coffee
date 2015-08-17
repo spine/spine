@@ -46,16 +46,16 @@ Events =
   stopListening: (obj, events, callback) ->
     if arguments.length is 0
       for listeningTo in [@listeningTo, @listeningToOnce]
-        continue unless listeningTo
+        continue unless listeningTo?.length
         for lt in listeningTo
           lt.obj.unbind(lt.ev, lt.callback)
       @listeningTo = undefined
       @listeningToOnce = undefined
 
     else if obj
+      events = if events then events.split(' ') else [undefined]
       for listeningTo in [@listeningTo, @listeningToOnce]
         continue unless listeningTo
-        events = if events then events.split(' ') else [undefined]
         for ev in events
           for idx in [listeningTo.length-1..0]
             lt = listeningTo[idx]
@@ -621,7 +621,7 @@ makeArray = (args) ->
 Spine = @Spine   = {}
 module?.exports  = Spine
 
-Spine.version    = '1.5.0'
+Spine.version    = '1.6.0'
 Spine.$          = $
 Spine.Events     = Events
 Spine.Log        = Log

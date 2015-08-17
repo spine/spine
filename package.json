@@ -1,12 +1,15 @@
 {
   "name": "spine",
   "description": "MVC Library.",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "author": "maccman",
   "keywords": ["spine", "coffeescript", "MVC"],
   "contributors": ["maccman", "aeischeid", "cengebretson", "adambiggs"],
   "devDependencies": {
-    "coffee-script": ">=1.9.1"
+    "coffee-script": "^1.9.3",
+    "jasmine-core": "^2.3.0",
+    "jasmine-ajax": "^3.1.1",
+    "local-web-server": "^0.5.19"
   },
   "licenses":
     [{
@@ -19,6 +22,7 @@
   },
   "main" : "./index.js",
   "scripts": {
-    "test": "set -e; for i in test/*.html; do phantomjs test/lib/run-jasmine.phantom.js file://`pwd`/$i; done"
+    "test": "set -e; for i in test/*.html; do phantomjs test/lib/run-jasmine.phantom.js file://`pwd`/$i; done",
+    "start": "./node_modules/.bin/ws --log-format none"
   }
 }

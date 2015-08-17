@@ -12,7 +12,7 @@ The library is written in [CoffeeScript](http://coffeescript.org), and though it
 
 ## Learn it
 
-Documentation is often incomplete or just lies waiting to happen. Approachable source code reduces knowledge dependencies. This is an area where Spine really excells compared to other MVC frameworks. Spine is tiny; The core library comes in at less than 700 lines of CoffeeScript code. It is written in such a way as prefer readability over terseness or clever tricks, and it is small enough that within a rather small timeframe you can understand how all the pieces work together. Expertise is acheivable within days or weeks rather than months or years. For these reasons remaining lightweight and simple is fundamental to Spine.
+Documentation is often incomplete or just lies waiting to happen. Approachable source code reduces knowledge dependencies. This is an area where Spine really excells compared to other MVC frameworks. Spine is tiny; the core library comes in at less than 700 lines of CoffeeScript code. It is written in such a way to prefer readability over terseness or clever tricks, and it is small enough that within a rather small timeframe you can understand how all the pieces work together. Expertise is achievable within days or weeks rather than months or years. For these reasons, remaining lightweight and simple is fundamental to Spine.
 
 For documentation, usage, and examples, see: [spinejs.com](http://spinejs.com)
 
@@ -37,7 +37,19 @@ $ git clone git://github.com/spine/spine.git
 $ cd spine
 ```
 
-Next, open `test/index.html` to run the [Jasmine](http://jasmine.github.io/) test suite for spine core.  If you see all the tests passing, you're ready to contribute!
+Next, You will need node and npm to pull in the testing libraries. Once you're all set with those then from within the Spine repo directory run 
+
+```
+$ npm install .
+```
+
+This should bring in [Jasmine](http://jasmine.github.io/), Coffeescript, and a minimalist local server for running the tests a browser. You can also simply open `test/index.html` in a browser to run the [Jasmine](http://jasmine.github.io/) test suite for spine core.  If you see all the tests passing, you're ready to contribute! A known issue is that some of the routing tests will fail if you are simply using a `file://` protocol in the browser. This has to do with browser security. You can avoid this by running the local server, `$ npm start`. Alternatively you can use a server like Apache or Nginx to serve the test files to the browser. 
+
+If you have [phantom.js](http://phantomjs.org/) available then a script is included to make running tests even slicker!
+
+```
+$ npm test
+```
 
 ## Contributing to the Spine documentation
 
@@ -51,7 +63,7 @@ This recommended contribution process is based on the [Ruby on Rails contributio
 
 When submitting a pull request for code, please submit in CoffeeScript. Building the effected js files is required for testing sake, but submitting those js files is optional.
 
-Start by installing local dev dependencies:
+Assuming you have Node.js and npm already installed then proceed by installing local dev dependencies:
 
 ```
 $ npm install .
