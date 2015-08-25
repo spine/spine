@@ -9,7 +9,7 @@
     "coffee-script": "^1.9.3",
     "jasmine-core": "^2.3.0",
     "jasmine-ajax": "^3.1.1",
-    "local-web-server": "^0.5.19"
+    "local-web-server": "0.5.20"
   },
   "licenses":
     [{
@@ -23,6 +23,6 @@
   "main" : "./index.js",
   "scripts": {
     "test": "set -e; for i in test/*.html; do phantomjs test/lib/run-jasmine.phantom.js file://`pwd`/$i; done",
-    "start": "./node_modules/.bin/ws --log-format none"
+    "start": "ws --log-format none"
   }
 }
