@@ -235,7 +235,7 @@ class Model extends Module
     record.save(options)
 
   @destroy: (id, options) ->
-    @find(id).destroy(options)
+    @find(id)?.destroy(options)
 
   @change: (callbackOrParams) ->
     if typeof callbackOrParams is 'function'
