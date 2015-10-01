@@ -101,6 +101,17 @@ describe("Ajax", function(){
     });
   });
 
+  it("shouldn't send extra PUT requests on create", function(){
+    User.create({fist: "Hans", last: "Zimmer"});
+    var serverAttrs = {fist: "Hans", last: "Zimmer", id: "server-uuid"};
+    expect(jQuery.ajax.calls.count()).toEqual(1);
+    jasmine.Ajax.requests.mostRecent().respondWith({
+      status: 200,
+      responseText: JSON.stringify(serverAttrs)
+    });
+    expect(jQuery.ajax.calls.count()).toEqual(1);
+  });
+
   it("can use custom HTTP method to create a record", function(){
     Spine.Ajax.config.createMethod = 'PUT'
     User.create({first: "Hans", last: "Zimmer", id: "IDD"});

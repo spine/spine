@@ -235,7 +235,7 @@ class Model extends Module
     record.save(options)
 
   @destroy: (id, options) ->
-    @find(id).destroy(options)
+    @find(id)?.destroy(options)
 
   @change: (callbackOrParams) ->
     if typeof callbackOrParams is 'function'
@@ -366,7 +366,7 @@ class Model extends Module
     records[id] = records[@id]
     delete records[@id] unless @cid is @id
     @id = id
-    @save()
+    #@save()
 
   remove: (options = {}) ->
     # Remove record from model
@@ -621,7 +621,7 @@ makeArray = (args) ->
 Spine = @Spine   = {}
 module?.exports  = Spine
 
-Spine.version    = '1.6.0'
+Spine.version    = '1.6.1'
 Spine.$          = $
 Spine.Events     = Events
 Spine.Log        = Log
