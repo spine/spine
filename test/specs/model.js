@@ -765,6 +765,15 @@ describe("Model", function(){
       expect(spy.calls.count()).toEqual(0);
     });
 
+    it("dispatches events to all record clones", function(){
+      var asset = Asset.create({name: 'cartoon world.png'});
+      clone1 = asset.clone();
+      clone2 = asset.clone();
+      clone1.on("customEvent", spy);
+      clone2.trigger("customEvent");
+      expect(spy).toHaveBeenCalled();
+    });
+
     it("can unbind all events if no arguments are passed", function(){
       var asset = Asset.create({name: "cartoon world.png"});
       asset.on("customEvent1 customEvent2", spy)
