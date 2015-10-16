@@ -73,9 +73,7 @@ class Instance extends Spine.Module
 
   update: (value) ->
     return this unless value?
-    unless value instanceof @model
-      value = new @model(value)
-    value.save() if value.isNew()
+    value = @model.refresh(value)[0]
     @record[@fkey] = value and value.id
     this
 
@@ -89,11 +87,8 @@ class Singleton extends Spine.Module
 
   update: (value) ->
     return this unless value?
-    unless value instanceof @model
-      value = @model.fromJSON(value)
-
     value[@fkey] = @record.id
-    value.save()
+    @model.refresh(value)
     this
 
 singularize = (str) ->
@@ -101,10 +96,10 @@ singularize = (str) ->
 
 underscore = (str) ->
   str.replace(/::/g, '/')
-     .replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
-     .replace(/([a-z\d])([A-Z])/g, '$1_$2')
-     .replace(/(-|\.)/g, '_')
-     .toLowerCase()
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
+    .replace(/([a-z\d])([A-Z])/g, '$1_$2')
+    .replace(/(-|\.)/g, '_')
+    .toLowerCase()
 
 requireModel = (model) ->
   if typeof model is 'string'

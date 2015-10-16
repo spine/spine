@@ -141,7 +141,7 @@ describe("Model.Relation", function(){
     expect(spy).not.toHaveBeenCalled();
   });
 
-  it("can create new parent and related Singleton record at once if UUIDs are enabled", function(){
+  it("can create nested belongsTo record if UUIDs are enabled", function(){
     Album.uuid = function(){ return 'fc0942b0-956f-11e2-9c95-9b0af2c6635d' };
     Photo.uuid = function(){ return '2d08ad90-9572-11e2-9c95-9b0af2c6635d' };
 
@@ -160,6 +160,29 @@ describe("Model.Relation", function(){
     expect( album.photo() ).toBeTruthy();
     expect( album.photo().album_id ).toEqual(Album.uuid());
     expect( album.photo().name ).toBe("Beautiful photo");
+
+    delete Album.uuid
+    delete Photo.uuid
+  });
+
+  it("can create nested hasOne record if UUIDs are enabled", function(){
+    Album.uuid = function(){ return 'fc0942b0-956f-11e2-9c95-9b0af2c6635d' };
+    Photo.uuid = function(){ return '2d08ad90-9572-11e2-9c95-9b0af2c6635d' };
+
+    Album.hasOne("photo", Photo);
+    Photo.belongsTo("album", Album);
+
+    var photo = new Photo({
+      name: "Beautiful photo",
+      album: {
+        name: "Beautiful album"
+      }
+    });
+
+    expect( photo ).toBeTruthy();
+    expect( photo.id ).toEqual(Photo.uuid());
+    expect( photo.album() ).toBeTruthy();
+    expect( photo.album().name ).toBe("Beautiful album");
 
     delete Album.uuid
     delete Photo.uuid
