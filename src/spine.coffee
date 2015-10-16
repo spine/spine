@@ -488,9 +488,11 @@ class Model extends Module
     Events.unbind.apply record, arguments
 
   trigger: ->
-    Events.trigger.apply this, arguments # fire off the instance event
-    return true if arguments[0] is 'refresh' # Don't trigger refresh events, because ... ?
-    @constructor.trigger arguments... # fire off the class event
+    Events.trigger.apply this, arguments # Trigger the instance event.
+    # Don't trigger 'refresh' multiple times on the class - the class method
+    # will trigger it once for the whole refresh operation.
+    return true if arguments[0] is 'refresh'
+    @constructor.trigger arguments... # Trigger the class event.
 
 Model::on  = Model::bind
 Model::off = Model::unbind
