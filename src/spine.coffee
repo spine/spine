@@ -311,6 +311,7 @@ class Model extends Module
   load: (atts) ->
     if atts.id then @id = atts.id
     for key, value of atts
+      continue if key is '_callbacks'
       if typeof @[key] is 'function'
         continue if typeof value is 'function'
         @[key](value)

@@ -432,6 +432,20 @@ describe("Model", function(){
     expect(spy).toHaveBeenCalledWith("setter value");
   });
 
+  it("respects existing event listeners when loading attributes from a model instance", function(){
+    spy = jasmine.createSpy();
+    var asset = new Asset({name: "test.pdf"});
+    var assetDupe = new Asset(asset.attributes());
+    asset.on('custom-event', spy);
+    assetDupe.on('some-other-event', spy);
+    asset.load(assetDupe);
+
+    asset.trigger('some-other-event');
+    expect(spy).not.toHaveBeenCalled();
+    asset.trigger('custom-event');
+    expect(spy).toHaveBeenCalled();
+  });
+
   it("attributes() respects getters/setters", function(){
     Asset.include({
       name: function(){
