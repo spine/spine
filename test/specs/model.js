@@ -391,6 +391,39 @@ describe("Model", function(){
     var asset = new Asset();
     expect(asset.attributes()).toEqual({});
   });
+  
+  it("should have an isDirty() method", function(){
+    var asset = new Asset({name: "wazzzup!"});
+    expect(asset.attributes()).toEqual({name: "wazzzup!"});
+    expect(asset.isDirty()).toBe(undefined);
+    asset.save();
+    expect(asset.isDirty()).toBe(false);
+    asset.name = "changed name";
+    expect(asset.isDirty()).toBe(true);
+  });
+
+  it("dirtyAttributes() should return atts that have been changed from the persisted version", function(){
+    var asset = new Asset();
+    expect(asset.attributes()).toEqual({});
+    expect(asset.isNew()).toBe(true);
+    expect(asset.dirtyAttributes()).toEqual(undefined);
+    
+    asset.name = "original name";
+    expect(asset.attributes()).toBe({name: "original name"});
+    expect(asset.dirtyAttributes()).toEqual(undefined);
+    asset.save();
+    expect(asset.dirtyAttributes()).toEqual({});
+    
+    asset.name = "changed NAME";
+    expect(asset.dirtyAttributes()).toEqual({name:"changed NAME"});
+    asset.save();
+    expect(asset.dirtyAttributes()).toEqual({});
+    
+    asset.contact_methods = "faxMachines!";
+    expect(asset.dirtyAttributes()).toEqual({contact_methods:"faxMachines!"});
+    asset.save();
+    expect(asset.dirtyAttributes()).toEqual({});
+  });
 
   it("can load() attributes", function(){
     var asset = new Asset();
@@ -419,6 +452,7 @@ describe("Model", function(){
     Asset.include({spy: spy});
     var asset     = Asset.create({name: "test.pdf"});
     var assetDupe = new Asset(asset.attributes());
+    expect(assetDupe.name).toEqual("test.pdf");
 
     assetDupe.spy  = spy; // Simulate instance method using CoffeeScript fat-arrow
     assetDupe.name = "wem.pdf";
