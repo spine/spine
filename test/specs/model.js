@@ -432,6 +432,20 @@ describe("Model", function(){
     expect(spy).toHaveBeenCalledWith("setter value");
   });
 
+  it("respects existing event listeners when loading attributes from a model instance", function(){
+    spy = jasmine.createSpy();
+    var asset = new Asset({name: "test.pdf"});
+    var assetDupe = new Asset(asset.attributes());
+    asset.on('custom-event', spy);
+    assetDupe.on('some-other-event', spy);
+    asset.load(assetDupe);
+
+    asset.trigger('some-other-event');
+    expect(spy).not.toHaveBeenCalled();
+    asset.trigger('custom-event');
+    expect(spy).toHaveBeenCalled();
+  });
+
   it("attributes() respects getters/setters", function(){
     Asset.include({
       name: function(){
@@ -763,6 +777,15 @@ describe("Model", function(){
       asset.trigger("customEvent1");
       asset.trigger("customEvent2");
       expect(spy.calls.count()).toEqual(0);
+    });
+
+    it("dispatches events to all record clones", function(){
+      var asset = Asset.create({name: 'cartoon world.png'});
+      clone1 = asset.clone();
+      clone2 = asset.clone();
+      clone1.on("customEvent", spy);
+      clone2.trigger("customEvent");
+      expect(spy).toHaveBeenCalled();
     });
 
     it("can unbind all events if no arguments are passed", function(){

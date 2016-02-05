@@ -311,6 +311,7 @@ class Model extends Module
   load: (atts) ->
     if atts.id then @id = atts.id
     for key, value of atts
+      continue if key is '_callbacks'
       if typeof @[key] is 'function'
         continue if typeof value is 'function'
         @[key](value)
@@ -488,9 +489,11 @@ class Model extends Module
     Events.unbind.apply record, arguments
 
   trigger: ->
-    Events.trigger.apply this, arguments # fire off the instance event
-    return true if arguments[0] is 'refresh' # Don't trigger refresh events, because ... ?
-    @constructor.trigger arguments... # fire off the class event
+    Events.trigger.apply this, arguments # Trigger the instance event.
+    # Don't trigger 'refresh' multiple times on the class - the class method
+    # will trigger it once for the whole refresh operation.
+    return true if arguments[0] is 'refresh'
+    @constructor.trigger arguments... # Trigger the class event.
 
 Model::on  = Model::bind
 Model::off = Model::unbind
@@ -621,7 +624,7 @@ makeArray = (args) ->
 Spine = @Spine   = {}
 module?.exports  = Spine
 
-Spine.version    = '1.6.1'
+Spine.version    = '1.6.2'
 Spine.$          = $
 Spine.Events     = Events
 Spine.Log        = Log
