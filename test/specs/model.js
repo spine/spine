@@ -86,6 +86,7 @@ describe("Model", function(){
     var customfallback = function(id){
       sessionStorage.fallbackRan = true
       sessionStorage.fallbackReceivedId = id
+      expect(this).toEqual(Asset);
       return Asset.create({name: 'test2.pdf', id:id})
     };
     var foundAsset = Asset.find(asset.id, customfallback);
@@ -99,6 +100,7 @@ describe("Model", function(){
     Asset.notFound = function(id){
       sessionStorage.fallback2Ran = true
       sessionStorage.fallback2ReceivedId = id
+      expect(this).toEqual(Asset);
       return Asset.create({name: 'test3.pdf'})
     };
     var foundAsset2 = Asset.find(asset.id);

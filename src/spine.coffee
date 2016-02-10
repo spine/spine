@@ -151,7 +151,7 @@ class Model extends Module
   @toString: -> "#{@className}(#{@attributes.join(", ")})"
 
   @find: (id, notFound = @notFound) ->
-    @irecords[id]?.clone() or notFound?(id)
+    @irecords[id]?.clone() or notFound?.call(this, id)
 
   @findAll: (ids, notFound) ->
     (@find(id) for id in ids when @find(id, notFound))
