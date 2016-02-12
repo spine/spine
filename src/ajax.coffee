@@ -106,13 +106,13 @@ class Base
       if parallel
         Queue.dequeue()
 
-    promise.abort = (statusText) ->
+    promise.abort = (statusText) =>
       return jqXHR.abort(statusText) if jqXHR
       index = $.inArray(request, @queue())
       @queue().splice(index, 1) if index > -1
       deferred.rejectWith(
         settings.context or settings,
-        [promise, statusText, '']
+        [promise, statusText, '', settings]
       )
       promise
 

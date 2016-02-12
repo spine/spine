@@ -343,6 +343,21 @@ describe("Ajax", function(){
     expect(spy).toHaveBeenCalled();
   });
 
+  it("should allow promise objects to abort requests still waiting in the queue", function(){
+    User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
+    var user = User.find("IDD");
+    var spy = jasmine.createSpy();
+    var promise1 = user.ajax().update();
+    var promise2 = user.ajax().update();
+
+    expect(Spine.Ajax.queue().length).toEqual(2);
+    promise2.fail(spy);
+    promise2.abort();
+
+    expect(Spine.Ajax.queue().length).toEqual(1);
+    expect(spy).toHaveBeenCalled();
+  });
+
   it("should not replace AJAX results when dequeued", function() {
     User.refresh([], {clear: true});
     User.fetch();
