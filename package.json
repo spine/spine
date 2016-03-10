@@ -26,6 +26,7 @@
     "karma-firefox-launcher": "^0.1.7",
     "karma-jasmine": "^0.3.7",
     "karma-jasmine-ajax": "^0.1.13",
+    "karma-junit-reporter": "0.3.3",
     "karma-phantomjs-launcher": "^1.0.0"
   },
   "main": "index.js",

@@ -2,6 +2,7 @@
 # Generated on Wed Mar 09 2016 17:12:47 GMT-0800 (PST)
 DEFAULT_JQUERY_VERSION = '2.2.1'
 JQUERY_VERSION = process.env.JQUERY_VERSION or DEFAULT_JQUERY_VERSION
+JUNIT_DIR = process.env.CIRCLE_TEST_REPORTS or '.junit'
 
 module.exports = (config) ->
   console.log ""
@@ -56,7 +57,10 @@ module.exports = (config) ->
     # test results reporter to use
     # possible values: 'dots', 'progress'
     # available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['dots']
+    reporters: ['dots', 'junit']
+
+    junitReporter:
+      outputDir: "#{ JUNIT_DIR }/jquery-v#{ JQUERY_VERSION }"
 
 
     # web server port
