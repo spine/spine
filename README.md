@@ -35,19 +35,32 @@ $ git clone git://github.com/spine/spine.git
 $ cd spine
 ```
 
-Next, You will need node and npm to pull in the testing libraries. Once you're all set with those then from within the Spine repo directory run 
+Next, You will need node and npm to pull in the testing libraries. Once you're all set with those then from within the Spine repo directory run
 
 ```
-$ npm install .
+$ npm install
 ```
 
-This should bring in [Jasmine](http://jasmine.github.io/), Coffeescript, and a minimalist local server for running the tests a browser. You can also simply open `test/index.html` in a browser to run the [Jasmine](http://jasmine.github.io/) test suite for spine core.  If you see all the tests passing, you're ready to contribute! A known issue is that some of the routing tests will fail if you are simply using a `file://` protocol in the browser. This has to do with browser security. You can avoid this by running the local server, `$ npm start`. Alternatively you can use a server like Apache or Nginx to serve the test files to the browser. 
+This will install CoffeeScript and the [Karma test runner](http://karma-runner.github.io).
 
-If you have [phantom.js](http://phantomjs.org/) available then a script is included to make running tests even slicker!
+At this point you can easily run the complete test suite using
 
 ```
 $ npm test
 ```
+
+But this isn't very practical for development, since it runs the test suite multiple times agains different versions of jQuery.
+
+A better approach is to install the Karma CLI
+
+```
+$ npm install -g karma-cli
+```
+
+Then you can use `$ karma start` to run the tests using the latest stable version of jQuery. Karma will keep running in the background and re-run tests whenever you change any files.
+When the Karma server is running, you can debug tests in your browser by visiting `http://localhost:9876/debug.html`.
+
+It's also possible to test agains a specific version of jQuery if needed: `$ JQUERY_VERSION=1.9.1 karma start`.
 
 ## Contributing to the Spine documentation
 
@@ -64,7 +77,7 @@ When submitting a pull request for code, please submit in CoffeeScript. Building
 Assuming you have Node.js and npm already installed then proceed by installing local dev dependencies:
 
 ```
-$ npm install .
+$ npm install
 ```
 
 Then use the provided build scripts to compile your CoffeeScript files:
