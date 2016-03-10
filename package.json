@@ -20,15 +20,11 @@
   ],
   "devDependencies": {
     "coffee-script": "^1.10.0",
-    "jasmine-ajax": "^3.2.0",
-    "jasmine-core": "^2.3.0",
     "karma": "^0.13.22",
     "karma-coffee-preprocessor": "^0.3.0",
     "karma-jasmine": "^0.3.7",
     "karma-jasmine-ajax": "^0.1.13",
-    "karma-phantomjs-launcher": "^1.0.0",
-    "local-web-server": "^0.5.23",
-    "phantomjs": "^1.9.18"
+    "karma-phantomjs-launcher": "^1.0.0"
   },
   "main": "index.js",
   "scripts": {

@@ -33,7 +33,7 @@ module.exports = (config) ->
       'src/list.coffee'
       'src/bindings.coffee'
       'src/ajax.coffee'
-      'test/specs/*.js'
+      'test/*.js'
     ]
 
 
