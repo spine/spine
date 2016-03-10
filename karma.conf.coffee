@@ -1,7 +1,13 @@
 # Karma configuration
 # Generated on Wed Mar 09 2016 17:12:47 GMT-0800 (PST)
+DEFAULT_JQUERY_VERSION = '2.2.1'
+JQUERY_VERSION = process.env.JQUERY_VERSION or DEFAULT_JQUERY_VERSION
 
 module.exports = (config) ->
+  console.log ""
+  console.log "Running Spine.js unit tests against jQuery v#{ JQUERY_VERSION }..."
+  console.log ""
+
   config.set
 
     # base path that will be used to resolve all patterns (eg. files, exclude)
@@ -18,7 +24,7 @@ module.exports = (config) ->
 
     # list of files / patterns to load in the browser
     files: [
-      'test/lib/jquery.js'
+      "http://code.jquery.com/jquery-#{ JQUERY_VERSION }.min.js"
       'src/spine.coffee'
       'src/route.coffee'
       'src/relation.coffee'
