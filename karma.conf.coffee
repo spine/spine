@@ -44,16 +44,13 @@ module.exports = (config) ->
 
     # preprocess matching files before serving them to the browser
     # available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-    preprocessors: {
+    preprocessors:
       '**/*.coffee': ['coffee']
-    }
 
-    coffeePreprocessor: {
-      options: {
+    coffeePreprocessor:
+      options:
         bare: false
         sourceMap: false
-      }
-    }
 
 
     # test results reporter to use
@@ -86,7 +83,11 @@ module.exports = (config) ->
 
     # start these browsers
     # available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['PhantomJS']
+    browsers: [
+      'PhantomJS'
+      'Chrome'
+      'Firefox'
+    ]
 
 
     # Continuous Integration mode
