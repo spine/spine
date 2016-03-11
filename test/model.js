@@ -288,7 +288,6 @@ describe("Model", function(){
 
   it("can preprocess json before it is deserialized", function(){
     Asset.beforeFromJSON = function(objects){
-      console.log(objects.data);
       return objects.data;
     }
 
@@ -953,7 +952,6 @@ describe("Model", function(){
     it("should invoke callbacks in the context of the class", function(){
       Asset.on("create update destroy change save error custom", function(item){
         expect(this).toEqual(Asset);
-        //console.log('item', item);
       });
       var asset = Asset.create({name: "screaming goats.png"});
       asset.updateAttribute("name", "more screaming goats.png");

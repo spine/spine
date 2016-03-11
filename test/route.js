@@ -37,7 +37,6 @@ describe("Routing", function(){
   it("can get the host", function(){
     host = Route.getHost();
     expect(host).not.toBeNull();
-    //console.log('result of getHost()', host)
   });
 
 
@@ -224,7 +223,6 @@ describe("Routing", function(){
         //  expect(arguments[0].trigger).toBe(true);
         //  expect(Route.options.trigger).toBe(true);
         //  expect(routeSpy).not.toHaveBeenCalled();
-        //  console.log(arguments, 'done');
         //  done();
         //}});
         Route.navigate('/losers', false);
@@ -250,7 +248,6 @@ describe("Routing", function(){
     it("should have bound 'hashchange' event to window", function(){
       // $(window).data('events') was the way to get events before jquery 1.8
       var events = $(window).data('events') || $._data(window, 'events');
-      console.log(events)
       expect(events).toBeDefined();
       expect('hashchange' in events).toBe(true);
     });
