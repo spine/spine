@@ -232,7 +232,7 @@ describe("Ajax", function(){
     expect(User.irecords["IDD2"].id).toEqual(first.id);
   });
 
-  it("can update record IDs for already queued requests", function(){
+  it("can update record IDs for already queued requests", function(done){
     u = User.create();
     u.first = "Todd";
     u.last = "Shaw";
@@ -244,8 +244,12 @@ describe("Ajax", function(){
       responseText: JSON.stringify(serverAttrs)
     });
 
-    updateAjaxRequest = jQuery.ajax.calls.mostRecent().args[0]
-    expect(updateAjaxRequest.url).toBe("/users/IDD")
+    // jQuery v3.* executes ajax callbacks asynchronously
+    setTimeout(function(){
+      updateAjaxRequest = jQuery.ajax.calls.mostRecent().args[0];
+      expect(updateAjaxRequest.url).toBe("/users/IDD");
+      done();
+    });
   });
 
   it("should not recreate records after DELETE", function() {
@@ -262,7 +266,7 @@ describe("Ajax", function(){
     expect(User.count()).toEqual(0);
   });
 
-  it("should send requests serially", function(){
+  it("should send requests serially", function(done){
     User.create({first: "First"});
     expect(jQuery.ajax).toHaveBeenCalled();
 
@@ -276,7 +280,11 @@ describe("Ajax", function(){
       responseText: JSON.stringify(serverAttrs)
     });
 
-    expect(jQuery.ajax).toHaveBeenCalled();
+    // jQuery v3.* executes ajax callbacks asynchronously
+    setTimeout(function(){
+      expect(jQuery.ajax).toHaveBeenCalled();
+      done();
+    });
   });
 
   it("should send GET requests in parallel by default", function() {
@@ -329,7 +337,7 @@ describe("Ajax", function(){
     expect(jQuery.ajax.calls.count()).toEqual(2);
   });
 
-  it("should allow promise objects to abort the request and dequeue", function(){
+  it("should allow promise objects to abort the request and dequeue", function(done){
     User.refresh([{first: "John", last: "Williams", id: "IDD"}]);
     var user = User.find("IDD");
     var spy = jasmine.createSpy();
@@ -339,8 +347,12 @@ describe("Ajax", function(){
     promise.fail(spy);
     promise.abort();
 
-    expect(Spine.Ajax.queue().length).toEqual(0);
-    expect(spy).toHaveBeenCalled();
+    // jQuery v3.* executes ajax callbacks asynchronously
+    setTimeout(function(){
+      expect(Spine.Ajax.queue().length).toEqual(0);
+      expect(spy).toHaveBeenCalled();
+      done();
+    });
   });
 
   it("should allow promise objects to abort requests still waiting in the queue", function(){
