@@ -25,7 +25,7 @@ module.exports = (config) ->
 
     # list of files / patterns to load in the browser
     files: [
-      "http://code.jquery.com/jquery-#{ JQUERY_VERSION }.min.js"
+      "http://code.jquery.com/jquery-#{ JQUERY_VERSION }.js"
       'src/spine.coffee'
       'src/route.coffee'
       'src/relation.coffee'
