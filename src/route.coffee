@@ -66,21 +66,21 @@ class Route extends Spine.Module
     return if @options.shim
 
     if @history
-      $(window).bind('popstate', @change)
+      $(window).on('popstate', @change)
     else
-      $(window).bind('hashchange', @change)
+      $(window).on('hashchange', @change)
     @change()
 
-  @unbind: ->
-    unbindResult = Spine.Events.unbind.apply this, arguments
+  @off: ->
+    unbindResult = Spine.Events.off.apply this, arguments
     return unbindResult if arguments.length > 0
 
     return if @options.shim
 
     if @history
-      $(window).unbind('popstate', @change)
+      $(window).off('popstate', @change)
     else
-      $(window).unbind('hashchange', @change)
+      $(window).off('hashchange', @change)
 
   @navigate: (args...) ->
     options = {}
@@ -176,6 +176,9 @@ class Route extends Spine.Module
     @constructor.trigger(args...)
 
 Route.router = new Route
+
+# Deprecated.
+Route::unbind = Route::off
 
 
 Spine.Controller.include

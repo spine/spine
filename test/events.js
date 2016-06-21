@@ -10,8 +10,8 @@ describe("Events", function(){
 
   it("can bind/trigger events", function(){
     var spy2 = jasmine.createSpy('globalSpy');
-    Spine.bind('notify', spy2);
-    EventTest.bind("daddyo", spy);
+    Spine.on('notify', spy2);
+    EventTest.on("daddyo", spy);
 
     EventTest.trigger("somethingElse");
     expect(spy).not.toHaveBeenCalled();
@@ -23,8 +23,8 @@ describe("Events", function(){
 
   it("can bind/trigger global events", function(){
     var spy2 = jasmine.createSpy('globalSpy');
-    Spine.bind('notify', spy2);
-    EventTest.bind("daddyo", spy);
+    Spine.on('notify', spy2);
+    EventTest.on("daddyo", spy);
 
     Spine.trigger('somethingElse')
     expect(spy2).not.toHaveBeenCalled();
@@ -43,13 +43,13 @@ describe("Events", function(){
   });
 
   it("should trigger correct events", function(){
-    EventTest.bind("daddyo", spy);
+    EventTest.on("daddyo", spy);
     EventTest.trigger("motherio");
     expect(spy).not.toHaveBeenCalled();
   });
 
   it("can bind/trigger multiple events", function(){
-    EventTest.bind("house car windows", spy);
+    EventTest.on("house car windows", spy);
     EventTest.trigger("car");
     expect(spy).toHaveBeenCalled();
     EventTest.trigger("house");
@@ -70,8 +70,8 @@ describe("Events", function(){
 
   it("can pass data to triggered events", function(){
     var spy2 = jasmine.createSpy('globalSpy');
-    Spine.bind('notify', spy2);
-    EventTest.bind("yoyo", spy);
+    Spine.on('notify', spy2);
+    EventTest.on("yoyo", spy);
 
     EventTest.trigger("yoyo", 5, 10);
     expect(spy).toHaveBeenCalledWith(5, 10);
@@ -81,12 +81,12 @@ describe("Events", function(){
   });
 
   it("can unbind events", function(){
-    EventTest.bind("daddyo", spy);
+    EventTest.on("daddyo", spy);
     var spy2 = jasmine.createSpy('globalSpy');
-    Spine.bind('notify', spy2);
+    Spine.on('notify', spy2);
 
-    EventTest.unbind("daddyo");
-    Spine.unbind('notify');
+    EventTest.off("daddyo");
+    Spine.off('notify');
     EventTest.trigger("daddyo");
     Spine.trigger("notify");
     expect(spy).not.toHaveBeenCalled();
@@ -94,8 +94,8 @@ describe("Events", function(){
   });
 
   it("can unbind all events if no arguments given", function() {
-    EventTest.bind("yoyo daddyo", spy);
-    EventTest.unbind();
+    EventTest.on("yoyo daddyo", spy);
+    EventTest.off();
     EventTest.trigger("yoyo");
     expect(spy).not.toHaveBeenCalled();
     spy.calls.reset();
@@ -116,8 +116,8 @@ describe("Events", function(){
   });
 
   it("can unbind one event", function(){
-    EventTest.bind("house car windows", spy);
-    EventTest.unbind("car windows");
+    EventTest.on("house car windows", spy);
+    EventTest.off("car windows");
     EventTest.trigger("car");
     EventTest.trigger("windows");
     expect(spy).not.toHaveBeenCalled();
@@ -226,12 +226,12 @@ describe("Events", function(){
     var c = jasmine.createSpy("c");
 
     b.and.callFake(function() {
-      EventTest.unbind("once", b);
+      EventTest.off("once", b);
     });
 
-    EventTest.bind("once", a);
-    EventTest.bind("once", b);
-    EventTest.bind("once", c);
+    EventTest.on("once", a);
+    EventTest.on("once", b);
+    EventTest.on("once", c);
     EventTest.trigger("once");
 
     expect(a).toHaveBeenCalled();
@@ -246,14 +246,14 @@ describe("Events", function(){
   });
 
   it("can cancel propogation", function(){
-    EventTest.bind("motherio", function(){ return false; });
-    EventTest.bind("motherio", spy);
+    EventTest.on("motherio", function(){ return false; });
+    EventTest.on("motherio", spy);
     EventTest.trigger("motherio");
     expect(spy).not.toHaveBeenCalled();
   });
 
   it("should clear events on inherited objects", function(){
-    EventTest.bind("yoyo", spy);
+    EventTest.on("yoyo", spy);
     var Sub = EventTest.sub();
     Sub.trigger("yoyo");
     expect(spy).not.toHaveBeenCalled();
@@ -261,8 +261,8 @@ describe("Events", function(){
 
 
   it("should not unbind all events if given and undefined object", function() {
-    EventTest.bind("daddyo", spy);
-    EventTest.unbind(undefined);
+    EventTest.on("daddyo", spy);
+    EventTest.off(undefined);
     EventTest.trigger("daddyo");
     expect(spy).toHaveBeenCalled();
   });

@@ -9,7 +9,7 @@ class Spine.List extends Spine.Controller
 
   constructor: ->
     super
-    @bind 'change', @change
+    @on 'change', @change
 
   template: ->
     throw Error 'Override template'

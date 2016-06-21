@@ -7,16 +7,16 @@ class Spine.Manager extends Spine.Module
 
   constructor: ->
     @controllers = []
-    @bind 'change', @change
+    @on 'change', @change
     @add(arguments...)
 
   add: (controllers...) ->
     @addOne(cont) for cont in controllers
 
   addOne: (controller) ->
-    controller.bind 'active', (args...) =>
+    controller.on 'active', (args...) =>
       @trigger('change', controller, args...)
-    controller.bind 'release', =>
+    controller.on 'release', =>
       @controllers = (c for c in @controllers when c isnt controller)
 
     @controllers.push(controller)
@@ -36,7 +36,7 @@ class Spine.Manager extends Spine.Module
 Spine.Controller.include
   active: (args...) ->
     if typeof args[0] is 'function'
-      @bind('active', args[0])
+      @on('active', args[0])
     else
       args.unshift('active')
       @trigger(args...)

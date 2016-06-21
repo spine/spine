@@ -71,7 +71,7 @@ BindingsInstance =
       @valueSetter.setValue @$(selector), model[@_getField(field)], field.setter
 
   changeBindingSource: (model) ->
-    @getModel().unbind 'change'
+    @getModel().off 'change'
     @walkBindings (selector) =>
       selector = false if selector is 'self'
       @el.off 'change', selector
@@ -86,7 +86,7 @@ BindingsInstance =
       model[self._getField(field)] = self.valueSetter.getValue $(this), field.getter
 
   _bindElToModel: (model, field, selector) ->
-    model.bind 'change', =>
+    model.on 'change', =>
       @valueSetter.setValue @$(selector), model[@_getField(field)], field.setter
 
 Spine.Bindings =
