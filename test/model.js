@@ -458,6 +458,35 @@ describe("Model", function(){
     expect(asset.attributes()).toEqual({name: "Bob"});
   });
 
+  it("can get a hash of a clone's changed attributes", function(){
+    var asset = Asset.create({name: "original name"});
+    asset.name = "new name";
+    expect(asset.changes()).toEqual({name: "new name"});
+    asset.name = "original name";
+    asset.not_a_model_attribute = 'blah';
+    expect(asset.changes()).toEqual({});
+    asset.visible = true;
+    expect(asset.changes()).toEqual({visible: true});
+    asset.save();
+    expect(asset.changes()).toEqual({});
+
+    // test with array values
+    asset.name = ['first', 'last'];
+    asset.save();
+    asset.name = ['first', 'last'];
+    expect(asset.changes()).toEqual({});
+    asset.name = ['first', 'changed last'];
+    expect(asset.changes()).toEqual({name: ['first', 'changed last']});
+
+    // test with object values
+    asset.name = {first: 'Dm', last: 'Bggs'};
+    asset.save();
+    asset.name = {first: 'Dm', last: 'Bggs'};
+    expect(asset.changes()).toEqual({});
+    asset.name = {first: 'Dm', last: 'Changed'};
+    expect(asset.changes()).toEqual({name: {first: 'Dm', last: 'Changed'}});
+  });
+
   it("can generate ID", function(){
     var asset = Asset.create({name: "who's in the house?"});
     expect(asset.id).toBeTruthy();
@@ -674,13 +703,38 @@ describe("Model", function(){
       expect(spy).toHaveBeenCalledWith(asset, {clear: true});
     });
 
-    it("can fire change events", function(){
-      var asset = Asset.create({name: "cartoon world.png"});
+    it("fires change events when record attributes have changed", function(){
+      var asset = new Asset({name: "cartoon world.png"});
       asset.on("change", spy);
+
+      // test create changes
+      asset = asset.save();
+      expect(spy).toHaveBeenCalledWith(asset, "create", {});
+      spy.calls.reset();
+
+      // test update changes
       asset.save();
-      expect(spy).toHaveBeenCalledWith(asset, "update", {});
+      expect(spy).not.toHaveBeenCalled();
+      asset.name = "changed name";
+      asset.save();
+      expect(spy).toHaveBeenCalledWith(asset, "update", {changes: {name: "changed name"}});
+      spy.calls.reset();
+
+      // test instance refresh changes
       asset.refresh({});
-      expect(spy).toHaveBeenCalledWith(asset, "refresh");
+      expect(spy).not.toHaveBeenCalled();
+      asset.refresh({name: "another change"});
+      expect(spy).toHaveBeenCalledWith(asset, "refresh", {changes: {name: "another change"}});
+      spy.calls.reset();
+
+      // test class refresh changes
+      Asset.refresh({id: asset.id});
+      expect(spy).not.toHaveBeenCalled();
+      Asset.refresh({id: asset.id, name: "yet another change"});
+      expect(spy).toHaveBeenCalledWith(jasmine.objectContaining(Asset.find(asset.id)), "refresh", {changes: {name: "yet another change"}});
+      spy.calls.reset();
+
+      // test destroy changes
       asset.destroy();
       expect(spy).toHaveBeenCalledWith(asset, "destroy", {clear: true});
     });
@@ -926,9 +980,14 @@ describe("Model", function(){
 
       var asset = Asset.create({name: "cartoon world.png"});
       expect(spy).toHaveBeenCalledWith(asset, "create", {});
+      spy.calls.reset();
 
       asset.save();
-      expect(spy).toHaveBeenCalledWith(asset, "update", {});
+      expect(spy).not.toHaveBeenCalled();
+      asset.name = "changed name";
+      asset.save();
+      expect(spy).toHaveBeenCalledWith(asset, "update", {changes: {name: "changed name"}});
+      spy.calls.reset();
 
       asset.destroy();
       expect(spy).toHaveBeenCalledWith(asset, "destroy", {clear: true});
