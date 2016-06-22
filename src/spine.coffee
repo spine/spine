@@ -330,6 +330,15 @@ class Model extends Module
     result.id = @id if @id
     result
 
+  changes: ->
+    result = {}
+    root = @root() or {}
+    for key in Object.keys(this) when key in @constructor.attributes
+      continue if typeof @[key] is 'function'
+      continue if root[key]? and JSON.stringify(root[key]) is JSON.stringify(@[key])
+      result[key] = @[key]
+    result
+
   eql: (rec) ->
     rec and rec.constructor is @constructor and
       ((rec.cid is @cid) or (rec.id and rec.id is @id))
