@@ -331,14 +331,21 @@ class Model extends Module
     result
 
   changes: ->
-    result = {}
-    return result if this is @root()
+    changed = false
+    changes =
+      before: {}
+      after: {}
+    return changes if this is @root()
     for key in @constructor.attributes
       continue unless @hasOwnProperty(key)
       continue if typeof @[key] is 'function'
-      continue if @root()[key]? and JSON.stringify(@root()[key]) is JSON.stringify(@[key])
-      result[key] = @[key]
-    result
+      continue if @root()[key]? and
+        JSON.stringify(@root()[key]) is JSON.stringify(@[key])
+      changed = true
+      changes.before[key] = @root()[key]
+      changes.after[key] = @[key]
+    return unless changed
+    changes
 
   eql: (rec) ->
     rec and rec.constructor is @constructor and
@@ -432,11 +439,10 @@ class Model extends Module
     clone = if this is @root() then @clone() else this
     clone.load(atts)
     changes = clone.changes()
-    # load changes into root record
+    # load new attributes into root record
     @root().load(atts)
     @trigger('refresh', this)
-    if Object.keys(changes).length
-      @trigger('change', this, 'refresh', {changes})
+    @trigger('change', this, 'refresh', {changes}) if changes
     this
 
   toJSON: ->
@@ -472,12 +478,13 @@ class Model extends Module
   update: (options = {}) ->
     @trigger('beforeUpdate', this, options)
 
-    @root().load changes = @changes()
+    changes = @changes()
+    @root().load(@attributes())
     @constructor.sort()
 
     clone = @root().clone()
     clone.trigger('update', clone, options)
-    if Object.keys(changes).length
+    if changes
       options.changes = changes
       clone.trigger('change', clone, 'update', options)
     clone
