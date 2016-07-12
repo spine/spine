@@ -1002,13 +1002,16 @@ describe("Model", function(){
       expect(spy).toHaveBeenCalledWith(jasmine.objectContaining(asset.attributes()), {ajax: false, clear: true});
     });
 
-    it("can fire change events", function(){
+    it("fires change events when record attributes have changed", function(){
       Asset.on("change", spy);
 
+      // test create events
       var asset = Asset.create({name: "cartoon world.png"});
       expect(spy).toHaveBeenCalledWith(asset, "create", {});
       spy.calls.reset();
 
+      // test update events
+      asset.name = "cartoon world.png" // no change
       asset.save();
       expect(spy).not.toHaveBeenCalled();
       asset.name = "changed name";
@@ -1021,6 +1024,21 @@ describe("Model", function(){
       });
       spy.calls.reset();
 
+      // test refresh events
+      refreshed = asset.attributes();
+      Asset.refresh(refreshed);
+      expect(spy).not.toHaveBeenCalled();
+      refreshed.name = "another change"
+      Asset.refresh(refreshed);
+      expect(spy).toHaveBeenCalledWith(jasmine.objectContaining(asset.attributes()), "refresh", {
+        changes: {
+          before: {name: "changed name"},
+          after: {name: "another change"}
+        }
+      });
+      spy.calls.reset();
+
+      // test destroy events
       asset.destroy();
       expect(spy).toHaveBeenCalledWith(asset, "destroy", {clear: true});
     });
