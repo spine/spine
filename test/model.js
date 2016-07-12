@@ -497,6 +497,11 @@ describe("Model", function(){
       before: {name: {first: 'Dm', last: 'Bggs'}},
       after: {name: {first: 'Dm', last: 'Changed'}}
     });
+
+    // root record shouldn't return any changes
+    root = asset.root();
+    root.name = "another change";
+    expect(root.changes()).toEqual();
   });
 
   it("can generate ID", function(){

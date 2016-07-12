@@ -335,7 +335,7 @@ class Model extends Module
     changes =
       before: {}
       after: {}
-    return changes if this is @root()
+    return if this is @root()
     for key in @constructor.attributes
       continue unless @hasOwnProperty(key)
       continue if typeof @[key] is 'function'
