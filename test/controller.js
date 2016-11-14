@@ -174,7 +174,7 @@ describe("Controller", function(){
     });
 
     it("should stop listening to events on a model instance, without canceling out other binders on that model instance", function(){
-      Asset.bind('event1', spy2)
+      Asset.on('event1', spy2)
       users.listenTo(asset, 'event1', spy);
       asset.trigger("event1");
       expect(spy).toHaveBeenCalled();
@@ -200,7 +200,7 @@ describe("Controller", function(){
     });
 
     it("should stop listening to events on a model instance if the controller is released, without canceling out other binders on that model instance", function(){
-      asset.bind('event1', spy2)
+      asset.on('event1', spy2)
       users.listenTo(asset, 'event1', spy);
       asset.trigger("event1");
       expect(spy).toHaveBeenCalled();

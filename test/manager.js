@@ -54,7 +54,7 @@ describe("Manager", function(){
 
     it("should fire 'change' event on manager", function(){
       var manager = new Spine.Manager(users, groups);
-      manager.bind('change', spy);
+      manager.on('change', spy);
 
       users.active();
       expect(spy).toHaveBeenCalledWith(users);

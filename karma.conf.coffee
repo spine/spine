@@ -1,6 +1,6 @@
 # Karma configuration
 # Generated on Wed Mar 09 2016 17:12:47 GMT-0800 (PST)
-DEFAULT_JQUERY_VERSION = '2.2.3'
+DEFAULT_JQUERY_VERSION = '3.0.0'
 JQUERY_VERSION = process.env.JQUERY_VERSION or DEFAULT_JQUERY_VERSION
 JUNIT_DIR = process.env.CIRCLE_TEST_REPORTS or '.junit'
 
@@ -25,7 +25,7 @@ module.exports = (config) ->
 
     # list of files / patterns to load in the browser
     files: [
-      "http://code.jquery.com/jquery-#{ JQUERY_VERSION }.min.js"
+      "http://code.jquery.com/jquery-#{ JQUERY_VERSION }.js"
       'src/spine.coffee'
       'src/route.coffee'
       'src/relation.coffee'

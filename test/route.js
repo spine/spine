@@ -18,7 +18,7 @@ describe("Routing", function(){
   });
 
   afterEach(function(){
-    Route.unbind();
+    Route.off();
     Route.routers = [];
     Route.router = new Route();
     delete Route.path;
@@ -253,7 +253,7 @@ describe("Routing", function(){
     });
 
     it("should unbind", function(){
-      Route.unbind();
+      Route.off();
       //var events = $(window).data('events') || $._data(window, 'events');
       var events = $(window).data('events') || {};
 
@@ -304,7 +304,7 @@ describe("Routing", function(){
     });
 
     it("should unbind", function(){
-      Route.unbind();
+      Route.off();
       //var events = $(window).data('events') || $._data(window, 'events');
       var events = $(window).data('events') || {};
 
@@ -313,8 +313,8 @@ describe("Routing", function(){
     });
 
     it("should unbind single listeners", function(){
-      Route.bind('navigate', spy);
-      Route.unbind('navigate', spy);
+      Route.on('navigate', spy);
+      Route.off('navigate', spy);
 
       // make sure our listener got unbound
       Route.trigger('navigate');

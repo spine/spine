@@ -4,7 +4,7 @@ Released under the MIT License
 ###
 
 Events =
-  bind: (ev, callback) ->
+  on: (ev, callback) ->
     evs   = ev.split(' ')
     @_callbacks or= {} unless @hasOwnProperty('_callbacks')
     for name in evs
@@ -13,8 +13,8 @@ Events =
     this
 
   one: (ev, callback) ->
-    @bind ev, handler = ->
-      @unbind(ev, handler)
+    @on ev, handler = ->
+      @off(ev, handler)
       callback.apply(this, arguments)
 
   trigger: (args...) ->
@@ -26,18 +26,18 @@ Events =
     true
 
   listenTo: (obj, ev, callback) ->
-    obj.bind(ev, callback)
+    obj.on(ev, callback)
     @listeningTo or= []
     @listeningTo.push {obj, ev, callback}
     this
 
   listenToOnce: (obj, ev, callback) ->
     listeningToOnce = @listeningToOnce or= []
-    obj.bind ev, handler = ->
+    obj.on ev, handler = ->
       idx = -1
       for lt, i in listeningToOnce when lt.obj is obj
         idx = i if lt.ev is ev and lt.callback is handler
-      obj.unbind(ev, handler)
+      obj.off(ev, handler)
       listeningToOnce.splice(idx, 1) unless idx is -1
       callback.apply(this, arguments)
     listeningToOnce.push {obj, ev, callback: handler}
@@ -48,7 +48,7 @@ Events =
       for listeningTo in [@listeningTo, @listeningToOnce]
         continue unless listeningTo?.length
         for lt in listeningTo
-          lt.obj.unbind(lt.ev, lt.callback)
+          lt.obj.off(lt.ev, lt.callback)
       @listeningTo = undefined
       @listeningToOnce = undefined
 
@@ -62,17 +62,17 @@ Events =
             continue unless lt.obj is obj
             continue if callback and lt.callback isnt callback
             if (not ev) or (ev is lt.ev)
-              lt.obj.unbind(lt.ev, lt.callback)
+              lt.obj.off(lt.ev, lt.callback)
               listeningTo.splice(idx, 1) unless idx is -1
             else if ev
               evts = lt.ev.split(' ')
               if ev in evts
                 evts = (e for e in evts when e isnt ev)
                 lt.ev = $.trim(evts.join(' '))
-                lt.obj.unbind(ev, lt.callback)
+                lt.obj.off(ev, lt.callback)
     this
 
-  unbind: (ev, callback) ->
+  off: (ev, callback) ->
     if arguments.length is 0
       @_callbacks = {}
       return this
@@ -91,8 +91,9 @@ Events =
         break
     this
 
-Events.on  = Events.bind
-Events.off = Events.unbind
+# Deprecated.
+Events.bind   = Events.on
+Events.unbind = Events.off
 
 Log =
   trace: true
@@ -145,7 +146,7 @@ class Model extends Module
     @attributes = attributes if attributes.length
     @attributes and= makeArray(@attributes)
     @attributes or=  []
-    @unbind()
+    @off()
     this
 
   @toString: -> "#{@className}(#{@attributes.join(", ")})"
@@ -239,13 +240,13 @@ class Model extends Module
 
   @change: (callbackOrParams) ->
     if typeof callbackOrParams is 'function'
-      @bind('change', callbackOrParams)
+      @on('change', callbackOrParams)
     else
       @trigger('change', arguments...)
 
   @fetch: (callbackOrParams) ->
     if typeof callbackOrParams is 'function'
-      @bind('fetch', callbackOrParams)
+      @on('fetch', callbackOrParams)
     else
       @trigger('fetch', arguments...)
 
@@ -390,7 +391,7 @@ class Model extends Module
     @trigger('destroy', this, options)
     @trigger('change', this, 'destroy', options)
     @stopListening() if @listeningTo
-    @unbind()
+    @off()
     this
 
   dup: (newRecord = true) ->
@@ -476,17 +477,17 @@ class Model extends Module
     clone.trigger('change', clone, 'create', options)
     clone
 
-  bind: ->
+  on: ->
     record = @constructor.irecords[@id] or this
-    Events.bind.apply record, arguments
+    Events.on.apply record, arguments
 
   one: ->
     record = @constructor.irecords[@id] or this
     Events.one.apply record, arguments
 
-  unbind: ->
+  off: ->
     record = @constructor.irecords[@id] or this
-    Events.unbind.apply record, arguments
+    Events.off.apply record, arguments
 
   trigger: ->
     Events.trigger.apply this, arguments # Trigger the instance event.
@@ -495,8 +496,9 @@ class Model extends Module
     return true if arguments[0] is 'refresh'
     @constructor.trigger arguments... # Trigger the class event.
 
-Model::on  = Model::bind
-Model::off = Model::unbind
+# Deprecated.
+Model::bind   = Model::on
+Model::unbind = Model::off
 
 
 class Controller extends Module
@@ -533,7 +535,7 @@ class Controller extends Module
     @trigger 'release', this
     # no need to unDelegateEvents since remove will end up handling that
     @el.remove()
-    @unbind()
+    @off()
     @stopListening()
 
   $: (selector) -> @el.find(selector)
@@ -559,7 +561,7 @@ class Controller extends Module
       selector   = match[2]
 
       if selector is ''
-        @el.bind(eventName, method)
+        @el.on(eventName, method)
       else
         @el.on(eventName, selector, method)
 
@@ -641,7 +643,7 @@ Module.create = Module.sub =
       class Result extends this
       Result.include(instances) if instances
       Result.extend(statics) if statics
-      Result.unbind?()
+      Result.off?()
       Result
 
 Model.setup = (name, attributes = []) ->
