@@ -1,10 +1,10 @@
 describe("Model.Relation", function(){
-  var Album;
-  var Photo;
+  var Album, Photo, spy;
 
   beforeEach(function(){
     Album = Spine.Model.setup("Album", ["name"]);
     Photo = Spine.Model.setup("Photo", ["name"]);
+    spy = jasmine.createSpy();
   });
 
   it("should honour hasMany associations", function(){
@@ -109,7 +109,39 @@ describe("Model.Relation", function(){
     expect( album.photo().name ).toBe("Beautiful photo");
   });
 
-  it("can create new parent and related Singleton record at once if UUIDs are enabled", function(){
+  it("doesn't trigger 'create' events when populating hasOne relationships", function(){
+    Album.hasOne("photo", Photo);
+    Photo.belongsTo("album", Album);
+    Photo.on("create", spy);
+
+    var album = Album.create({
+      name: "Beautiful album",
+      photo: {
+        name: "Beautiful photo"
+      },
+      id: "1"
+    });
+
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it("doesn't trigger 'create' events when populating belongsTo relationships", function(){
+    Album.hasOne("photo", Photo);
+    Photo.belongsTo("album", Album);
+    Album.on("create", spy);
+
+    var photo = Photo.create({
+      name: "Beautiful photo",
+      album: {
+        name: "Beautiful album"
+      },
+      id: "1"
+    });
+
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it("can create nested belongsTo record if UUIDs are enabled", function(){
     Album.uuid = function(){ return 'fc0942b0-956f-11e2-9c95-9b0af2c6635d' };
     Photo.uuid = function(){ return '2d08ad90-9572-11e2-9c95-9b0af2c6635d' };
 
@@ -128,6 +160,29 @@ describe("Model.Relation", function(){
     expect( album.photo() ).toBeTruthy();
     expect( album.photo().album_id ).toEqual(Album.uuid());
     expect( album.photo().name ).toBe("Beautiful photo");
+
+    delete Album.uuid
+    delete Photo.uuid
+  });
+
+  it("can create nested hasOne record if UUIDs are enabled", function(){
+    Album.uuid = function(){ return 'fc0942b0-956f-11e2-9c95-9b0af2c6635d' };
+    Photo.uuid = function(){ return '2d08ad90-9572-11e2-9c95-9b0af2c6635d' };
+
+    Album.hasOne("photo", Photo);
+    Photo.belongsTo("album", Album);
+
+    var photo = new Photo({
+      name: "Beautiful photo",
+      album: {
+        name: "Beautiful album"
+      }
+    });
+
+    expect( photo ).toBeTruthy();
+    expect( photo.id ).toEqual(Photo.uuid());
+    expect( photo.album() ).toBeTruthy();
+    expect( photo.album().name ).toBe("Beautiful album");
 
     delete Album.uuid
     delete Photo.uuid
@@ -175,8 +230,8 @@ describe("Model.Relation", function(){
     });
 
     Photo.create({
-	    id: "3",
-	    name: "This record should NOT be removed"
+      id: "3",
+      name: "This record should NOT be removed"
     });
 
     expect( Photo.count() ).toBe(2);
