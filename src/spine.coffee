@@ -507,10 +507,7 @@ class Controller extends Module
   tag: 'div'
 
   constructor: (options) ->
-    @options = options
-
-    for key, value of @options
-      @[key] = value
+    @[key] = value for key, value of options
 
     @el = document.createElement(@tag) unless @el
     @el = $(@el)
