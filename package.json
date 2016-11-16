@@ -33,6 +33,9 @@
   },
   "main": "index.js",
   "scripts": {
-    "test": "karma start --single-run && JQUERY_VERSION=2.2.4 karma start --single-run && JQUERY_VERSION=2.1.4 karma start --single-run && JQUERY_VERSION=2.0.3 karma start --single-run && JQUERY_VERSION=1.12.1 karma start --single-run && JQUERY_VERSION=1.11.3 karma start --single-run && JQUERY_VERSION=1.10.2 karma start --single-run && JQUERY_VERSION=1.9.1 karma start --single-run && JQUERY_VERSION=1.8.3 karma start --single-run"
+    "test": "cake build && karma start --single-run && JQUERY_VERSION=2.2.4 karma start --single-run && JQUERY_VERSION=2.1.4 karma start --single-run && JQUERY_VERSION=2.0.3 karma start --single-run && JQUERY_VERSION=1.12.1 karma start --single-run && JQUERY_VERSION=1.11.3 karma start --single-run && JQUERY_VERSION=1.10.2 karma start --single-run && JQUERY_VERSION=1.9.1 karma start --single-run && JQUERY_VERSION=1.8.3 karma start --single-run"
+  },
+  "dependencies": {
+    "cake": "^0.1.1"
   }
 }
