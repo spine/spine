@@ -273,7 +273,9 @@ Model.Ajax =
   # Private
 
   ajaxFetch: ->
-    @ajax().fetch(arguments...)
+    request = @ajax().fetch(arguments...)
+    @trigger("ajaxStart", request)
+    request
 
   ajaxChange: (record, type, options = {}) ->
     return if options.ajax is false
