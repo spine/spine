@@ -12,7 +12,7 @@ The library is written in [CoffeeScript](http://coffeescript.org), and though it
 
 Documentation is often incomplete or just lies waiting to happen. Approachable source code reduces knowledge dependencies. This is an area where Spine really excells compared to other MVC frameworks. Spine is tiny; the core library comes in at less than 700 lines of CoffeeScript code. It is written in such a way to prefer readability over terseness or clever tricks, and it is small enough that within a rather small timeframe you can understand how all the pieces work together. Expertise is achievable within days or weeks rather than months or years. For these reasons, remaining lightweight and simple is fundamental to Spine.
 
-For documentation, usage, and examples, see: [spinejs.com](http://spinejs.com)
+For documentation, usage, and examples, see: [spine.github.io](http://spine.github.io/)
 
 The test suite can also occasionally provide additional useful examples, especially if you are looking for non-coffeescript examples.
 
@@ -64,7 +64,7 @@ It's also possible to test agains a specific version of jQuery if needed: `$ JQU
 
 ## Contributing to the Spine documentation
 
-Perhaps the easiest way to get started with contributing is through the docs.  If you find typos, bugs, or omissions in the docs, please submit a pull request to fix.  The Spine website [spinejs.com](http://spinejs.com), which is the primary documentation, is a very simple rails app [spine.site](https://github.com/spine/spine.site). You don't need to know Rails or Ruby to contribute. The vast majority of it is in Markdown
+Perhaps the easiest way to get started with contributing is through the docs.  If you find typos, bugs, or omissions in the docs, please submit a pull request to fix.  [The Spine website](http://spine.github.io/), which is the primary documentation, is a very simple [Wintersmith](http://wintersmith.io/) app at [spine.github.io](https://github.com/spine/spine.github.io). Basic markdown  familiarity is probably all you need to be able to make changes.
 
 ## Contributing to the Spine code
 
