@@ -65,6 +65,13 @@ class Route extends Spine.Module
 
     return if @options.shim
 
+    if @options.singlepage
+      if not @history and not window.location.hash.length
+        window.location.hash = window.location.pathname
+      else if @history and window.location.hash.length
+        window.location.pathname = window.location.hash.slice(1)
+        window.location.hash = ''
+
     if @history
       $(window).bind('popstate', @change)
     else
