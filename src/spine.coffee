@@ -568,6 +568,10 @@ class Controller extends Module
   refreshElements: ->
     for key, value of @elements
       @[value] = @$(key)
+    if @el.attr('id')?
+      @el = $("#"+@el.attr('id'))
+    else
+      @el = $("."+@el.attr('class').split(' ').join('.')) if @el.attr('class')?
 
   delay: (func, timeout) ->
     setTimeout(@proxy(func), timeout || 0)
