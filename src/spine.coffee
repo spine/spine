@@ -601,6 +601,7 @@ class Controller extends Module
     element = $.trim(element) if typeof element is "string"
     # parseHTML is incompatible with Zepto
     [previous, @el] = [@el, $($.parseHTML(element)?[0] or element)]
+    @$el = @el
     previous.replaceWith(@el)
     @delegateEvents(@events)
     @refreshElements()
