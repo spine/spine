@@ -1016,7 +1016,7 @@ describe("Model", function(){
     it("wont listen to events of the same name on unlistened to model instances", function(){
       asset2.listenTo(asset, 'event1', spy);
       asset3.trigger("event1");
-      asset2.trigger("evemt1")
+      asset2.trigger("not_event1")
       expect(spy).not.toHaveBeenCalled();
     });
 
