@@ -38,7 +38,7 @@
 
 ## 1.3.1
 * Fixes and improvements to route and manager modules #513
-* Ajax methods configuable #523
+* Ajax methods configurable #523
 * Fix for orphaned model instances #527
 
 ## 1.3
