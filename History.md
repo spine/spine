@@ -48,7 +48,7 @@
 * Optional customizable UUID for model records #451
 * Improvements to some triggers #508
 * Improve ajax route and scope customizability #510
-* Expiremental bindings module #491
+* Experimental bindings module #491
 
 ## 1.2.2
 * Add Model.slice() and improve .last() and .first()
