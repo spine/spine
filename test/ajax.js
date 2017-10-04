@@ -653,7 +653,7 @@ describe("Ajax", function(){
     expect(user.url()).toBe('http://example.com/roots/1/users/1');
   });
 
-  it("should allow the scope for url on model to be superseeded by an instance", function(){
+  it("should allow the scope for url on model to be superseded by an instance", function(){
     Spine.Model.host = '';
     User.scope = "admin";
     expect(User.url()).toBe('/admin/users');

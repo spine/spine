@@ -245,7 +245,7 @@ describe("Events", function(){
     expect(c.calls.count()).toBe(2);
   });
 
-  it("can cancel propogation", function(){
+  it("can cancel propagation", function(){
     EventTest.on("motherio", function(){ return false; });
     EventTest.on("motherio", spy);
     EventTest.trigger("motherio");

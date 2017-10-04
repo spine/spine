@@ -79,7 +79,7 @@ describe("Model", function(){
   it("can use notFound fallback function if records are not found with find", function(){
     var asset = Asset.create({name: "test.pdf"});
     expect(Asset.find(asset.id)).toBeTruthy();
-    // defauly notFound simply returns null
+    // default notFound simply returns null
     asset.destroy();
     expect(Asset.find(asset.id)).toBeFalsy();
     // a custom notFound fallback can be added to the find
@@ -126,7 +126,7 @@ describe("Model", function(){
     var asset1 = Asset.create({name: "test1.pdf"}),
         asset2 = Asset.create({name: "test2.pdf"});
     expect(Asset.findAll([asset1.id, asset2.id]).length).toBe(2);
-    // defauly notFound simply returns null
+    // default notFound simply returns null
     asset1.destroy();
     expect(Asset.findAll([asset1.id]).length).toBe(0);
     expect(Asset.findAll([asset1.id, asset2.id]).length).toBe(1);
@@ -1016,7 +1016,7 @@ describe("Model", function(){
     it("wont listen to events of the same name on unlistened to model instances", function(){
       asset2.listenTo(asset, 'event1', spy);
       asset3.trigger("event1");
-      asset2.trigger("evemt1")
+      asset2.trigger("not_event1")
       expect(spy).not.toHaveBeenCalled();
     });
 

@@ -123,7 +123,7 @@ describe("Controller", function(){
       var asset2 = Asset.create({name: "scooby.pdf"});
       var asset3 = Asset.create({name: "shaggy.pdf"});
       asset3.trigger("event1");
-      asset2.trigger("evemt1")
+      asset2.trigger("not_event1")
       expect(spy).not.toHaveBeenCalled();
     });
 

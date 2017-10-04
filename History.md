@@ -38,7 +38,7 @@
 
 ## 1.3.1
 * Fixes and improvements to route and manager modules #513
-* Ajax methods configuable #523
+* Ajax methods configurable #523
 * Fix for orphaned model instances #527
 
 ## 1.3
@@ -48,7 +48,7 @@
 * Optional customizable UUID for model records #451
 * Improvements to some triggers #508
 * Improve ajax route and scope customizability #510
-* Expiremental bindings module #491
+* Experimental bindings module #491
 
 ## 1.2.2
 * Add Model.slice() and improve .last() and .first()
