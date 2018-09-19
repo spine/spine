@@ -10,6 +10,7 @@ escapeRegExp = /[-[\]{}()+?.,\\^$|#\s]/g
 class Path extends Spine.Module
 
   constructor: (path, callback) ->
+    super()
     @names = []
     @path = path
     @callback = callback
@@ -165,6 +166,7 @@ class Route extends Spine.Module
     window.location = path
 
   constructor: ->
+    super()
     @routes = []
 
   matchRoute: (path, options) ->

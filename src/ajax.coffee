@@ -123,7 +123,7 @@ class Base
     $.extend({}, @defaults, defaults, params)
 
 class Collection extends Base
-  constructor: (@model) ->
+  constructor: (@model) -> super()
 
   find: (id, params, options = {}) ->
     record = new @model(id: id)
@@ -169,6 +169,7 @@ class Collection extends Base
 
 class Singleton extends Base
   constructor: (@record) ->
+    super()
     @model = @record.constructor
 
   reload: (params, options = {}) ->

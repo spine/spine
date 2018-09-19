@@ -8,7 +8,7 @@ class Spine.List extends Spine.Controller
   selectFirst: false
 
   constructor: ->
-    super
+    super()
     @bind 'change', @change
 
   template: ->

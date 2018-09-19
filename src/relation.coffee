@@ -2,6 +2,7 @@ Spine   = @Spine or require('spine')
 
 class Collection extends Spine.Module
   constructor: (options = {}) ->
+    super()
     for key, value of options
       @[key] = value
 
@@ -65,6 +66,7 @@ class Collection extends Spine.Module
 
 class Instance extends Spine.Module
   constructor: (options = {}) ->
+    super()
     for key, value of options
       @[key] = value
 
@@ -81,6 +83,7 @@ class Instance extends Spine.Module
 
 class Singleton extends Spine.Module
   constructor: (options = {}) ->
+    super()
     for key, value of options
       @[key] = value
 

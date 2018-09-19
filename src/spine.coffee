@@ -292,7 +292,7 @@ class Model extends Module
   # Instance
 
   constructor: (atts) ->
-    super
+    super()
     if @constructor.uuid? and typeof @constructor.uuid is 'function'
       @cid = @constructor.uuid()
       @id  = @cid unless @id
@@ -507,6 +507,7 @@ class Controller extends Module
   tag: 'div'
 
   constructor: (options) ->
+    super()
     @options = options
 
     for key, value of @options
@@ -530,7 +531,6 @@ class Controller extends Module
     @delegateEvents(@events) if @events
     @refreshElements() if @elements
 
-    super
 
   release: =>
     @trigger 'release', this

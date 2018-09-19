@@ -6,6 +6,7 @@ class Spine.Manager extends Spine.Module
   @include Spine.Events
 
   constructor: ->
+    super()
     @controllers = []
     @bind 'change', @change
     @add(arguments...)
@@ -61,7 +62,7 @@ class Spine.Stack extends Spine.Controller
   className: 'spine stack'
 
   constructor: ->
-    super
+    super()
 
     @manager = new Spine.Manager
     @router  = Spine.Route?.create()
@@ -85,7 +86,7 @@ class Spine.Stack extends Spine.Controller
 
   release: =>
     @router?.destroy()
-    super
+    super()
 
 
 module?.exports       = Spine.Manager

@@ -19,7 +19,6 @@
     "adambiggs"
   ],
   "devDependencies": {
-    "coffee-script": "^1.10.0",
     "jasmine-ajax": "^3.2.0",
     "jasmine-core": "^2.3.0",
     "local-web-server": "^0.5.23",
@@ -29,5 +28,8 @@
   "scripts": {
     "test": "set -e; for i in test/*.html; do phantomjs test/lib/run-jasmine.phantom.js file://`pwd`/$i; done",
     "start": "ws --log-format none"
+  },
+  "dependencies": {
+    "coffeescript": "^2.3.1"
   }
 }
