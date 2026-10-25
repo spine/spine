@@ -49,7 +49,7 @@ At this point you can easily run the complete test suite using
 $ npm test
 ```
 
-But this isn't very practical for development, since it runs the test suite multiple times agains different versions of jQuery.
+But this isn't very practical for development, since it runs the test suite multiple times against different versions of jQuery.
 
 A better approach is to install the Karma CLI
 
@@ -60,7 +60,7 @@ $ npm install -g karma-cli
 Then you can use `$ karma start` to run the tests using the latest stable version of jQuery. Karma will keep running in the background and re-run tests whenever you change any files.
 When the Karma server is running, you can debug tests in your browser by visiting `http://localhost:9876/debug.html`.
 
-It's also possible to test agains a specific version of jQuery if needed: `$ JQUERY_VERSION=1.9.1 karma start`.
+It's also possible to test against a specific version of jQuery if needed: `$ JQUERY_VERSION=1.9.1 karma start`.
 
 ## Contributing to the Spine documentation
 
